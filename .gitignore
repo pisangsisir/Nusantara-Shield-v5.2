@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------------------
+# Nusantara Shield v5.1 — berkas yang TIDAK BOLEH ikut repositori / zip rilis
+# ---------------------------------------------------------------------------
+
+# Lingkungan Python lokal. Isinya khusus untuk komputer pembuatnya (path, versi Python,
+# sistem operasi), jadi pasti rusak di komputer lain. Setiap orang membuatnya sendiri:
+#   python -m venv .venv && pip install -r requirements.txt
+.venv/
+venv/
+env/
+
+# Rahasia & data yang dibuat saat aplikasi berjalan (log audit, buku bukti, akun, nomor laporan)
+.env
+data/
+
+# Cache Python & pytest
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Sampah sistem operasi
+.DS_Store
+__MACOSX/
+Thumbs.db
+
+# Hasil pengemasan (python tools/kemas_rilis.py)
+dist/
+*.zip

@@ -1,0 +1,45 @@
+flowchart TB
+    subgraph S1["① Sumber data sintetis"]
+        direction LR
+        SENSOR["📡 Sensor jaringan<br/>topologi · beban · radar"]
+        OSINT["📻 Radio CTI / OSINT<br/>berita ancaman tiap 30 dtk"]
+    end
+
+    subgraph S2["② Peladen FastAPI"]
+        KORELASI["🔎 Korelasi CTI ⇄ inventaris aset<br/>peluang serangan per aset"]
+        DAPUR["🍳 Dapur tunggal<br/>masak gambaran situasi 1×/detik"]
+        HUB["📢 Hub siaran SSE<br/>potret utuh sekali, lalu tambalan delta"]
+        GERBANG["🛂 Gerbang keamanan<br/>login · peran · batas laju · maks 16 KB"]
+        APPROVAL{"✅ Persetujuan & kunci urutan<br/>bukti → isolasi → pulihkan<br/>dilanggar = 409"}
+    end
+
+    subgraph S3["③ Browser"]
+        DASBOR["🖥️ Dasbor operator & pengamat<br/>peta · radar · Action Center"]
+        OPERATOR(["👤 Operator<br/>tahan ⚡ 0,6 dtk<br/>atau darurat 1,5 dtk + alasan"])
+    end
+
+    subgraph S4["④ Jejak HMAC berantai"]
+        BUKTI[("🔒 Buku Rantai Bukti<br/>SHA-256 barang bukti")]
+        LAPSIT["📄 LAPSIT otomatis<br/>IR-2026-001 → manajemen"]
+        AUDIT[("📒 Log audit<br/>siapa · apa · kapan")]
+    end
+
+    SENSOR --> DAPUR
+    OSINT --> KORELASI --> DAPUR
+    DAPUR --> HUB -->|"siaran langsung"| DASBOR
+    DASBOR --> OPERATOR -->|"POST /api/soar/…"| GERBANG --> APPROVAL
+    APPROVAL -->|"1 · amankan bukti"| BUKTI
+    APPROVAL -->|"2 · putus jaringan"| DAPUR
+    APPROVAL -->|"3 · semua pemutusan tuntas"| LAPSIT
+    BUKTI -.->|"dicerminkan"| AUDIT
+    LAPSIT -.->|"dicatat"| AUDIT
+    APPROVAL -.->|"setiap tindakan"| AUDIT
+
+    classDef sumber fill:#0f2a24,stroke:#3ef0a1,color:#d7e3f2
+    classDef peladen fill:#101a2d,stroke:#7aa2d6,color:#d7e3f2
+    classDef keputusan fill:#2a2208,stroke:#f2c14e,color:#f6dc9c
+    classDef jejak fill:#1a1030,stroke:#b48cff,color:#e6dcff
+    class SENSOR,OSINT sumber
+    class KORELASI,DAPUR,HUB,GERBANG,DASBOR peladen
+    class APPROVAL,OPERATOR keputusan
+    class BUKTI,LAPSIT,AUDIT jejak

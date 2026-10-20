@@ -1,0 +1,32 @@
+sequenceDiagram
+    autonumber
+    actor Op as Operator
+    participant UI as Browser
+    participant SV as Peladen
+    participant BB as Buku Rantai Bukti
+    participant LA as Log audit (HMAC)
+    participant MJ as Manajemen
+
+    Op->>UI: Tahan ⚡ EKSEKUSI ISOLASI 0,6 detik
+    UI->>SV: POST /api/soar/jalankan (isolasi)
+    SV->>BB: Salin bukti + SHA-256 + berita acara
+    BB-->>LA: Dicerminkan
+    alt Bukti berhasil diamankan
+        SV->>SV: ±1,2 detik kemudian: putus jaringan
+    else Agen forensik gagal
+        SV-->>UI: 409 · gunakan isolasi darurat
+        Op->>UI: Isi alasan + tahan ⚠ 1,5 detik
+        UI->>SV: POST /api/soar/darurat (alasan)
+        SV->>BB: Alasan dicatat permanen
+        SV->>SV: Putus jaringan seketika
+    end
+    SV->>MJ: LAPSIT otomatis (rujukan bukti / alasan darurat)
+    SV->>LA: Laporan dicatat
+    Op->>UI: PULIHKAN
+    UI->>SV: POST /api/soar/jalankan (pulihkan)
+    SV->>BB: Cocokkan ulang SHA-256 semua barang bukti
+    alt Sidik jari cocok
+        SV-->>UI: 200 · layanan dipulihkan
+    else Tidak cocok
+        SV-->>UI: 409 · pemulihan dikunci
+    end

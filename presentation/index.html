@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nusantara Shield v5.1 — Proposal dan Dokumentasi Teknis</title>
+<!--
+  Presentasi Proposal Solusi + Dokumentasi Teknis · Nusantara Shield v5.1
+  Kartika Cyber Hackathon 2026 · Kategori 02 Penangkalan
+
+  Satu berkas, 100% luring: tanpa CDN, tanpa fon luar, tanpa gambar dari internet.
+  Semua animasi memakai CSS @keyframes murni.
+
+  Kendali:
+    → / Spasi / PageDown / klik bagian kanan layar : slide berikutnya
+    ← / PageUp / klik sepertiga kiri layar          : slide sebelumnya
+    Home / End                                      : slide pertama / terakhir
+    1–6                                             : lompat ke slide
+    F                                               : layar penuh
+    N                                               : catatan pembicara (bekal tanya jawab)
+  Cetak ke PDF (Ctrl/Cmd+P) menghasilkan satu halaman per slide sebagai cadangan.
+-->
+<style>
+:root {
+  --latar: #0a1120;
+  --permukaan: #101a2d;
+  --permukaan-2: #14213a;
+  --permukaan-3: #0c1526;
+  --garis: #1f2d47;
+  --garis-lembut: #172339;
+  --teks: #d7e3f2;
+  --teks-redup: #8798b1;
+  --teks-samar: #5b6c87;
+  --neon: #3ef0a1;
+  --neon-lembut: rgba(62, 240, 161, .13);
+  --neon-garis: rgba(62, 240, 161, .35);
+  --biru: #7aa2d6;
+  --biru-terang: #5cc8ff;
+  --biru-lembut: rgba(92, 200, 255, .13);
+  --kuning: #f2c14e;
+  --kuning-lembut: rgba(242, 193, 78, .12);
+  --merah: #ff5c74;
+  --merah-lembut: rgba(255, 92, 116, .13);
+  --merah-garis: rgba(255, 92, 116, .45);
+  --huruf: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --huruf-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: #060b15; color: var(--teks); font-family: var(--huruf);
+  overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p { margin: 0; }
+b, strong { font-weight: 700; }
+
+/* ---------- Panggung 1600×900, diskalakan agar pas layar apa pun ---------- */
+#panggung {
+  position: absolute; left: 50%; top: 50%;
+  width: 1600px; height: 900px;
+  transform: translate(-50%, -50%) scale(var(--skala, 1));
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(62, 240, 161, .07), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(92, 200, 255, .06), transparent 60%),
+    var(--latar);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--garis-lembut), 0 30px 80px rgba(0, 0, 0, .5);
+}
+#panggung::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(122, 162, 214, .045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 162, 214, .045) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 85%);
+}
+
+.slide {
+  position: absolute; inset: 0;
+  padding: 56px 88px 84px;
+  display: flex; flex-direction: column;
+  opacity: 0; visibility: hidden; transform: translateX(40px);
+  transition: opacity .5s ease, transform .5s ease, visibility 0s linear .5s;
+}
+.slide.aktif { opacity: 1; visibility: visible; transform: none; transition: opacity .5s ease, transform .5s ease; }
+.slide.lalu { transform: translateX(-40px); }
+
+.kepala { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+.penanda { font-family: var(--huruf-mono); font-size: 17px; letter-spacing: .18em; color: var(--neon); text-transform: uppercase; }
+.penanda b { color: var(--teks-samar); font-weight: 400; margin-right: 14px; }
+.merek { display: flex; align-items: center; gap: 12px; font-size: 15px; letter-spacing: .2em; color: var(--teks-redup); font-weight: 600; }
+.logo { width: 34px; height: 34px; filter: drop-shadow(0 0 10px rgba(62, 240, 161, .25)); }
+.kaki {
+  position: absolute; left: 88px; right: 88px; bottom: 34px;
+  display: flex; justify-content: space-between;
+  font-family: var(--huruf-mono); font-size: 14px; color: var(--teks-samar); letter-spacing: .08em;
+}
+h2 { font-size: 48px; line-height: 1.12; font-weight: 750; letter-spacing: -.01em; }
+h2 em { font-style: normal; color: var(--neon); }
+.sub { margin-top: 12px; font-size: 22px; line-height: 1.45; color: var(--teks-redup); max-width: 1300px; }
+.mono { font-family: var(--huruf-mono); }
+.neon { color: var(--neon); }
+.kartu-dasar {
+  background: linear-gradient(180deg, var(--permukaan), var(--permukaan-3));
+  border: 1px solid var(--garis); border-radius: 16px;
+}
+.label-kecil { font-family: var(--huruf-mono); font-size: 14px; letter-spacing: .16em; text-transform: uppercase; color: var(--teks-samar); }
+
+/* =====================================================================
+   SLIDE 1 · Latar belakang & prolog (tanpa fitur teknis)
+   ===================================================================== */
+.latar { margin-top: 4px; flex: 1; display: grid; grid-template-columns: 1fr 590px; gap: 52px; align-items: start; }
+.kicker { font-family: var(--huruf-mono); font-size: 15px; letter-spacing: .2em; color: var(--merah); text-transform: uppercase; }
+.punchline { margin-top: 10px; font-size: 46px; line-height: 1.14; font-weight: 800; letter-spacing: -.012em; }
+.punchline em { font-style: normal; color: var(--merah); text-shadow: 0 0 34px rgba(255, 92, 116, .35); }
+.lini { margin-top: 24px; display: grid; gap: 12px; position: relative; padding-left: 28px; }
+.lini::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--merah-garis), rgba(255, 92, 116, .05)); }
+.peristiwa { position: relative; }
+.peristiwa::before { content: ""; position: absolute; left: -27px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--latar); border: 2px solid var(--merah); box-shadow: 0 0 12px rgba(255, 92, 116, .5); }
+.peristiwa b { font-family: var(--huruf-mono); font-size: 15px; letter-spacing: .12em; color: var(--merah); }
+.peristiwa p { margin-top: 3px; font-size: 18px; line-height: 1.45; color: var(--teks); }
+.peristiwa p span { color: var(--teks-redup); }
+.proyeksi { margin-top: 24px; padding: 18px 22px 18px; border-radius: 14px; border: 1px dashed var(--merah-garis); background: linear-gradient(135deg, rgba(255, 92, 116, .10), rgba(16, 26, 45, .55) 60%); }
+.proyeksi .label-kecil { color: var(--kuning); font-size: 13px; }
+.proyeksi .tanya-besar { margin-top: 8px; font-size: 25px; line-height: 1.35; font-weight: 700; color: #fff; }
+.dampak { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+.dampak span { font-family: var(--huruf-mono); font-size: 14px; border-radius: 8px; padding: 6px 12px; border: 1px solid var(--garis); background: rgba(10, 17, 32, .6); color: var(--teks); }
+.dampak span i { font-style: normal; color: var(--kuning); margin-right: 6px; }
+.proyeksi .nyawa { margin-top: 10px; font-size: 16.5px; line-height: 1.45; color: var(--teks-redup); }
+.proyeksi .nyawa b { color: var(--merah); }
+
+/* Kliping berita: dua bingkai miring bertumpuk */
+.kliping { position: relative; height: 640px; }
+.berita { position: absolute; margin: 0; width: 540px; border-radius: 10px; overflow: hidden; background: #0b1324;
+  border: 1px solid #2a3a58; box-shadow: 0 28px 60px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 92, 116, .08); }
+.berita.satu { top: 6px; left: 0; transform: rotate(-2.2deg); z-index: 1; }
+.berita.dua { top: 318px; left: 46px; transform: rotate(1.8deg); z-index: 2; }
+.berita svg { display: block; width: 100%; height: auto; }
+.berita figcaption { display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 14px; color: var(--teks-redup); border-top: 1px solid #22314d; background: #0e182c; }
+.berita figcaption b { font-family: var(--huruf-mono); font-size: 12px; letter-spacing: .14em; color: #fff; background: var(--merah); border-radius: 4px; padding: 2px 7px; }
+.slide.aktif .peristiwa, .slide.aktif .proyeksi { animation: muncul .6s ease both; animation-delay: calc(var(--i) * .25s + .2s); }
+.slide.aktif .berita.satu { animation: kliping-masuk .8s cubic-bezier(.2, .8, .2, 1) .3s both; }
+.slide.aktif .berita.dua { animation: kliping-masuk-2 .8s cubic-bezier(.2, .8, .2, 1) .7s both; }
+@keyframes kliping-masuk { from { opacity: 0; transform: translateY(26px) rotate(-6deg); } }
+@keyframes kliping-masuk-2 { from { opacity: 0; transform: translateY(26px) rotate(6deg); } }
+
+/* =====================================================================
+   SLIDE 2 · Ringkasan eksekutif + radar berkedip + 3 titik lemah
+   ===================================================================== */
+.ringkas { margin-top: 8px; display: grid; grid-template-columns: 1fr 360px; gap: 56px; align-items: center; }
+.ringkas .label-kecil { color: var(--neon); }
+.ringkas h1 { margin-top: 10px; font-size: 88px; line-height: 1; font-weight: 800; letter-spacing: -.025em; }
+.ringkas h1 span { color: var(--neon); text-shadow: 0 0 40px rgba(62, 240, 161, .35); }
+.slogan { margin-top: 16px; font-size: 24px; line-height: 1.42; max-width: 900px; }
+.prolog { border-left: 3px solid var(--merah); background: linear-gradient(90deg, var(--merah-lembut), transparent 85%); padding: 10px 18px; border-radius: 0 10px 10px 0; }
+.prolog p { font-size: 18px; line-height: 1.45; color: var(--teks); }
+.prolog b { color: var(--merah); }
+.prolog .tanya { margin-top: 4px; font-size: 19px; font-weight: 650; color: #fff; }
+.slide.aktif .prolog { animation: muncul .7s ease .1s both; }
+.slide.aktif .prolog .tanya { animation: muncul .7s ease .9s both; }
+.slogan b { color: var(--neon); }
+.slogan b.it { color: var(--teks); }
+.urutan { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-family: var(--huruf-mono); font-size: 15px; letter-spacing: .06em; }
+.urutan span { border: 1px solid var(--neon-garis); background: var(--neon-lembut); color: var(--neon); border-radius: 8px; padding: 7px 12px; }
+.urutan i { font-style: normal; color: var(--teks-samar); }
+.strip-angka { margin-top: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.angka { border: 1px solid var(--garis); background: rgba(16, 26, 45, .75); border-radius: 12px; padding: 12px 16px; }
+.angka b { display: block; font-family: var(--huruf-mono); font-size: 32px; color: var(--neon); letter-spacing: -.02em; }
+.angka span { display: block; font-size: 14px; line-height: 1.35; color: var(--teks-redup); margin-top: 2px; }
+
+/* Radar CSS murni */
+.radar-bingkai { display: grid; justify-items: center; gap: 12px; }
+.radar {
+  position: relative; width: 340px; height: 340px; border-radius: 50%; overflow: hidden;
+  border: 1px solid var(--neon-garis);
+  background:
+    radial-gradient(circle, transparent 0 55.5px, rgba(62, 240, 161, .28) 55.5px 57px, transparent 57px 112px, rgba(242, 193, 78, .28) 112px 113.5px, transparent 113.5px),
+    radial-gradient(circle at center, rgba(62, 240, 161, .10), rgba(10, 17, 32, .2) 70%),
+    var(--permukaan-3);
+  box-shadow: 0 0 60px rgba(62, 240, 161, .12), inset 0 0 40px rgba(0, 0, 0, .55);
+}
+.radar::before, .radar::after { content: ""; position: absolute; background: rgba(62, 240, 161, .22); }
+.radar::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+.radar::after { top: 50%; left: 0; right: 0; height: 1px; }
+.sapu {
+  position: absolute; inset: 0; border-radius: 50%; z-index: 1;
+  background: conic-gradient(transparent 0deg 290deg, rgba(62, 240, 161, .04) 290deg, rgba(62, 240, 161, .42) 360deg);
+}
+.sapu::after { content: ""; position: absolute; left: calc(50% - 1px); top: 0; width: 2px; height: 50%; background: var(--neon); box-shadow: 0 0 12px var(--neon); }
+.slide.aktif .sapu { animation: putar 4s linear infinite; }
+@keyframes putar { to { transform: rotate(360deg); } }
+.zona { position: absolute; left: 50%; transform: translateX(-50%); z-index: 2; font-family: var(--huruf-mono); font-size: 11px; letter-spacing: .14em; color: var(--teks-samar); background: rgba(12, 21, 38, .8); padding: 1px 5px; border-radius: 4px; }
+.titik {
+  position: absolute; z-index: 3; width: 12px; height: 12px; border-radius: 50%;
+  transform: translate(-50%, -50%); opacity: .35;
+}
+.titik.normal { background: var(--neon); width: 9px; height: 9px; }
+.titik.waspada { background: var(--kuning); }
+.titik.kritis { background: var(--merah); }
+.titik.blokir { background: var(--biru-terang); border-radius: 2px; }
+/* Kedip disinkronkan dengan sapuan: jeda = sudut ÷ 360 × 4 detik */
+.slide.aktif .titik { animation: kedip-titik 4s ease-out infinite; animation-delay: var(--t); }
+.slide.aktif .titik.kritis { animation-name: kedip-kritis; }
+@keyframes kedip-titik {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); box-shadow: 0 0 16px currentColor; }
+  35% { opacity: .55; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: .25; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes kedip-kritis {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1.6); box-shadow: 0 0 0 0 rgba(255, 92, 116, .7), 0 0 18px var(--merah); }
+  30% { opacity: .9; box-shadow: 0 0 0 16px rgba(255, 92, 116, 0), 0 0 10px var(--merah); transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: .45; box-shadow: 0 0 0 0 rgba(255, 92, 116, 0); transform: translate(-50%, -50%) scale(1); }
+}
+.legenda { display: flex; gap: 16px; font-family: var(--huruf-mono); font-size: 13px; color: var(--teks-redup); }
+.legenda span { display: flex; align-items: center; gap: 6px; }
+.legenda i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+.lemah { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.lemah > div { padding: 18px 22px; border-top: 3px solid var(--merah); }
+.lemah .label-kecil { color: var(--merah); font-size: 13px; }
+.lemah h3 { margin-top: 6px; font-size: 22px; }
+.lemah p { margin-top: 6px; font-size: 16px; line-height: 1.42; color: var(--teks-redup); }
+.lemah .jawab { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--garis); color: var(--neon); }
+.petunjuk { position: absolute; right: 210px; bottom: 34px; font-family: var(--huruf-mono); font-size: 13px; color: var(--teks-samar); }
+
+/* =====================================================================
+   SLIDE 2 · Doktrin OODA + alur baku F-04 + tombol tahan 0–600 ms
+   ===================================================================== */
+.doktrin { margin-top: 22px; display: grid; grid-template-columns: 400px 1fr; gap: 44px; align-items: start; }
+.ooda { width: 400px; height: 400px; display: block; }
+.ooda text { font-family: var(--huruf); }
+.ooda .busur { fill: none; stroke: var(--neon); stroke-opacity: .65; stroke-width: 2.4; stroke-dasharray: 7 6; }
+.slide.aktif .ooda .busur { animation: alir 1.2s linear infinite; }
+@keyframes alir { to { stroke-dashoffset: -13; } }
+.ooda .simpul circle { fill: var(--permukaan); stroke: var(--garis); stroke-width: 2.4; }
+.ooda .simpul .j { font-size: 15px; font-weight: 800; fill: var(--teks); letter-spacing: .05em; }
+.ooda .simpul .s { font-size: 11.5px; fill: var(--teks-redup); }
+.slide.aktif .ooda .simpul circle { animation: sorot 8s ease-in-out infinite; animation-delay: var(--t); }
+@keyframes sorot {
+  0%, 22% { stroke: var(--neon); fill: rgba(62, 240, 161, .16); filter: drop-shadow(0 0 10px rgba(62, 240, 161, .6)); }
+  27%, 100% { stroke: var(--garis); fill: var(--permukaan); filter: none; }
+}
+.ooda-keterangan { margin-top: 6px; font-size: 16px; line-height: 1.45; color: var(--teks-redup); text-align: center; }
+.ooda-keterangan b { color: var(--teks); }
+
+.langkah { display: grid; gap: 8px; }
+.baris-langkah {
+  display: grid; grid-template-columns: 54px 1fr 250px; gap: 18px; align-items: center;
+  padding: 9px 18px; border-radius: 14px;
+  background: linear-gradient(90deg, var(--permukaan), var(--permukaan-3));
+  border: 1px solid var(--garis);
+}
+.baris-langkah .no { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-family: var(--huruf-mono); font-size: 17px; font-weight: 700; border: 1px solid var(--garis); color: var(--teks-redup); }
+.baris-langkah h3 { font-size: 20px; }
+.baris-langkah p { margin-top: 3px; font-size: 15.5px; line-height: 1.4; color: var(--teks-redup); }
+.baris-langkah.bukti { border-color: rgba(92, 200, 255, .4); }
+.baris-langkah.bukti .no { color: var(--biru-terang); border-color: rgba(92, 200, 255, .45); }
+.baris-langkah.isolasi { border-color: var(--neon-garis); box-shadow: 0 0 34px rgba(62, 240, 161, .07); }
+.baris-langkah.isolasi .no { color: var(--neon); border-color: var(--neon-garis); }
+.baris-langkah.pulih { border-style: dashed; }
+.lencana { font-family: var(--huruf-mono); font-size: 16px; border-radius: 8px; padding: 8px 12px; text-align: center; }
+.lencana small { display: block; font-size: 12px; color: var(--teks-redup); margin-top: 2px; }
+.lencana.kuning { border: 1px solid rgba(242, 193, 78, .45); background: var(--kuning-lembut); color: var(--kuning); }
+.lencana.biru { border: 1px solid rgba(92, 200, 255, .45); background: var(--biru-lembut); color: var(--biru-terang); }
+.lencana.kunci { border: 1px dashed var(--garis); color: var(--teks-samar); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.lencana.kunci svg { width: 16px; height: 16px; }
+
+/* Tombol tahan isolasi: terisi 0 → 600 ms, lalu dieksekusi */
+.tahan { display: grid; gap: 5px; }
+.tombol-tahan {
+  position: relative; overflow: hidden; border: 1px solid var(--neon); border-radius: 10px;
+  padding: 10px 12px; text-align: center; font-weight: 750; font-size: 16px; letter-spacing: .04em; color: var(--neon);
+}
+.tombol-tahan .isi { position: absolute; inset: 0; width: 100%; background: rgba(62, 240, 161, .28); }
+.tombol-tahan span { position: relative; }
+.slide.aktif .tombol-tahan .isi { animation: isi-tahan 3s linear .6s infinite; }
+.slide.aktif .tombol-tahan { animation: kilat-tahan 3s linear .6s infinite; }
+/* 600 ms dari siklus 3 s = 20% */
+@keyframes isi-tahan { 0% { width: 0; } 20% { width: 100%; } 34% { width: 100%; opacity: 1; } 46%, 100% { width: 100%; opacity: 0; } }
+@keyframes kilat-tahan { 0%, 19% { box-shadow: none; } 21% { box-shadow: 0 0 26px rgba(62, 240, 161, .7); } 40%, 100% { box-shadow: none; } }
+.skala-ms { display: flex; justify-content: space-between; font-family: var(--huruf-mono); font-size: 11.5px; color: var(--teks-samar); }
+
+.darurat { margin-top: 12px; display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 12px; border: 1px solid var(--merah-garis); background: var(--merah-lembut); font-size: 16px; line-height: 1.4; }
+.darurat b { color: var(--merah); font-family: var(--huruf-mono); letter-spacing: .1em; font-size: 14px; white-space: nowrap; }
+
+/* =====================================================================
+   SLIDE 3 · Server: grafik CPU menurun (−74%) + 196 uji
+   ===================================================================== */
+.dua-kolom { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.grafik { padding: 22px 26px 18px; }
+.grafik-kepala { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.grafik-kepala h3 { font-size: 21px; font-weight: 650; }
+.grafik-kepala h3 small { display: block; font-size: 14px; font-weight: 400; color: var(--teks-samar); margin-top: 4px; font-family: var(--huruf-mono); }
+.turun { font-family: var(--huruf-mono); font-size: 52px; font-weight: 800; color: var(--neon); letter-spacing: -.03em; line-height: 1; text-shadow: 0 0 28px rgba(62, 240, 161, .45); }
+.baris { display: grid; grid-template-columns: 92px 1fr 96px; align-items: center; gap: 14px; margin-bottom: 14px; }
+.baris .lbl { font-family: var(--huruf-mono); font-size: 14px; letter-spacing: .12em; color: var(--teks-samar); text-transform: uppercase; }
+.batang { height: 38px; background: rgba(31, 45, 71, .55); border-radius: 6px; overflow: hidden; }
+.batang i { display: block; height: 100%; border-radius: 6px; }
+.batang.sebelum i { width: 100%; background-color: rgba(255, 92, 116, .55); background-image: repeating-linear-gradient(135deg, transparent 0 10px, rgba(255, 255, 255, .06) 10px 20px); }
+.batang.sesudah i { width: 25.9%; background-color: var(--neon); box-shadow: 0 0 22px rgba(62, 240, 161, .55); }
+.baris .nilai { font-family: var(--huruf-mono); font-size: 24px; font-weight: 700; text-align: right; color: var(--teks-redup); }
+.baris .nilai.sesudah { color: var(--neon); }
+/* Animasi: batang "sebelum" tumbuh, batang "sesudah" tumbuh setinggi sebelum lalu MENURUN ke 25,9% */
+.slide.aktif .batang.sebelum i { animation: tumbuh 1s cubic-bezier(.16, .84, .24, 1) .3s both; }
+.slide.aktif .batang.sesudah i { animation: turun-cpu 3s cubic-bezier(.65, 0, .25, 1) .5s both; }
+.slide.aktif .nilai.sesudah, .slide.aktif .turun { animation: muncul .6s ease 3.2s both; }
+@keyframes tumbuh { from { width: 0; } }
+@keyframes turun-cpu {
+  0% { width: 0; background-color: var(--merah); box-shadow: none; }
+  30% { width: 100%; background-color: var(--merah); box-shadow: none; }
+  50% { width: 100%; background-color: var(--merah); }
+  100% { width: 25.9%; background-color: var(--neon); box-shadow: 0 0 22px rgba(62, 240, 161, .55); }
+}
+@keyframes muncul { from { opacity: 0; transform: translateY(6px) scale(.96); } }
+.sumber { margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--teks-samar); }
+.sumber b { color: var(--teks-redup); font-weight: 500; }
+
+.mini { margin-top: 18px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.mini div { border: 1px solid var(--garis); background: rgba(16, 26, 45, .7); border-radius: 12px; padding: 12px 16px; }
+.mini b { font-family: var(--huruf-mono); font-size: 21px; }
+.mini b em { font-style: normal; color: var(--neon); }
+.mini span { display: block; font-size: 13.5px; color: var(--teks-samar); margin-top: 3px; line-height: 1.35; }
+.komponen { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+.komponen span { font-family: var(--huruf-mono); font-size: 14px; color: var(--biru-terang); border: 1px solid rgba(92, 200, 255, .35); background: var(--biru-lembut); border-radius: 999px; padding: 6px 14px; }
+.komponen-ket { margin-top: 10px; font-size: 16px; line-height: 1.45; color: var(--teks-redup); }
+
+.terminal { border-radius: 14px; overflow: hidden; border: 1px solid #1e293b; background: #0f172a; box-shadow: 0 20px 50px rgba(0, 0, 0, .45); }
+.terminal-kepala { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #111c33; border-bottom: 1px solid #1e293b; }
+.terminal-kepala i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.terminal-kepala span { margin-left: 10px; font-family: var(--huruf-mono); font-size: 13px; color: var(--teks-samar); }
+.terminal-isi { padding: 16px 20px 18px; font-family: var(--huruf-mono); font-size: 15.5px; line-height: 1.5; }
+.t-baris { display: grid; grid-template-columns: 1fr auto; gap: 14px; padding: 5px 0; border-bottom: 1px dashed rgba(31, 45, 71, .7); }
+.t-baris span { color: #cbd5e1; }
+.t-baris span small { color: var(--teks-samar); font-size: 12.5px; margin-left: 6px; }
+.t-baris em { font-style: normal; color: #4ade80; font-weight: 700; }
+.t-baris.t-ot span { color: var(--kuning); }
+.t-baris.t-ai span { color: var(--biru-terang); }
+.t-perintah { color: var(--teks-redup); margin-bottom: 6px; }
+.t-perintah b { color: var(--neon); font-weight: 400; }
+.t-akhir { margin-top: 12px; padding: 8px 12px; text-align: center; color: #4ade80; font-weight: 700; border: 1px solid rgba(74, 222, 128, .4); background: rgba(74, 222, 128, .08); border-radius: 8px; }
+.slide.aktif .t-baris, .slide.aktif .t-akhir { animation: ketik .35s ease both; animation-delay: calc(var(--i) * .32s + .5s); }
+@keyframes ketik { from { opacity: 0; transform: translateX(-8px); } }
+.terminal-ket { margin-top: 14px; font-size: 16px; line-height: 1.5; color: var(--teks-redup); }
+.terminal-ket b { color: var(--teks); }
+
+/* =====================================================================
+   SLIDE 4 · Mode Berdaulat (berjalan) vs peta jalan Hybrid n8n / AI Lokal
+   ===================================================================== */
+.berdaulat { margin-top: 24px; display: grid; grid-template-columns: 1fr 1.08fr; gap: 32px; }
+.panel { padding: 22px 26px; }
+.panel.berjalan { border-color: var(--neon-garis); box-shadow: 0 0 40px rgba(62, 240, 161, .06); }
+.panel.rancangan { border-style: dashed; border-color: rgba(242, 193, 78, .45); background: linear-gradient(180deg, rgba(20, 33, 58, .6), rgba(12, 21, 38, .6)); }
+.status { display: inline-block; font-family: var(--huruf-mono); font-size: 13px; letter-spacing: .14em; border-radius: 999px; padding: 5px 12px; }
+.status.hijau { color: var(--neon); border: 1px solid var(--neon-garis); background: var(--neon-lembut); }
+.status.kuning { color: var(--kuning); border: 1px solid rgba(242, 193, 78, .45); background: var(--kuning-lembut); }
+.panel h3 { margin-top: 12px; font-size: 25px; }
+.perimeter { margin-top: 12px; width: 100%; height: auto; display: block; }
+.perimeter text { font-family: var(--huruf-mono); }
+.slide.aktif .perimeter .lampu-on { animation: kedip 1.6s ease-in-out infinite; }
+.cek { margin-top: 10px; display: grid; gap: 9px; }
+.cek div { display: grid; grid-template-columns: 26px 1fr; font-size: 16.5px; line-height: 1.4; }
+.cek i { font-style: normal; color: var(--neon); font-family: var(--huruf-mono); }
+.cek b { color: var(--teks); }
+.cek span { color: var(--teks-redup); }
+.banding { margin-top: 14px; width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15.5px; line-height: 1.38; }
+.banding th, .banding td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--garis); }
+.banding th { font-size: 17px; }
+.banding th small { display: block; font-family: var(--huruf-mono); font-size: 12px; font-weight: 400; color: var(--teks-samar); letter-spacing: .08em; margin-top: 2px; }
+.banding th.hybrid { color: var(--biru-terang); }
+.banding th.lokal { color: var(--kuning); }
+.banding td:first-child { width: 150px; font-family: var(--huruf-mono); font-size: 13px; letter-spacing: .06em; color: var(--teks-samar); text-transform: uppercase; }
+.banding td { color: var(--teks-redup); }
+.aturan { margin-top: 16px; padding: 12px 16px; border-radius: 12px; border-left: 3px solid var(--neon); background: var(--neon-lembut); font-size: 15.5px; line-height: 1.45; }
+.aturan b { color: var(--neon); }
+
+/* =====================================================================
+   SLIDE 5 · Kesimpulan & tanya jawab
+   ===================================================================== */
+.penutup { margin-top: 32px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.besar { padding: 24px 24px 20px; }
+.besar b { display: block; font-family: var(--huruf-mono); font-size: 56px; font-weight: 800; letter-spacing: -.03em; color: var(--neon); text-shadow: 0 0 30px rgba(62, 240, 161, .35); line-height: 1.05; }
+.besar b.biru { color: var(--biru-terang); text-shadow: 0 0 30px rgba(92, 200, 255, .35); }
+.besar strong { display: block; margin-top: 10px; font-size: 20px; }
+.besar span { display: block; margin-top: 6px; font-size: 16px; color: var(--teks-redup); line-height: 1.45; }
+.slide.aktif .besar { animation: muncul .6s ease both; animation-delay: calc(var(--i) * .15s + .2s); }
+.jaminan { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
+.jaminan span { font-family: var(--huruf-mono); font-size: 15px; letter-spacing: .06em; color: var(--neon); border: 1px solid var(--neon-garis); background: var(--neon-lembut); border-radius: 999px; padding: 8px 16px; }
+.pernyataan { margin-top: 30px; font-size: 27px; line-height: 1.45; max-width: 1340px; }
+.qa { margin-top: auto; display: flex; align-items: center; gap: 22px; font-size: 44px; font-weight: 800; letter-spacing: .02em; }
+.qa::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 16px var(--neon); }
+.penempatan { margin-top: 26px; display: grid; grid-template-columns: 200px 1fr 1fr 1fr; gap: 16px; align-items: stretch; }
+.penempatan .label { font-family: var(--huruf-mono); font-size: 14px; letter-spacing: .14em; color: var(--kuning); align-self: center; line-height: 1.5; }
+.penempatan .label small { display: block; letter-spacing: .04em; color: var(--teks-samar); font-size: 13px; margin-top: 4px; }
+.penempatan .tk { position: relative; border: 1px solid rgba(122, 162, 214, .35); background: rgba(122, 162, 214, .07); border-radius: 12px; padding: 12px 18px; }
+.penempatan .tk b { display: block; font-family: var(--huruf-mono); font-size: 14px; letter-spacing: .14em; color: var(--biru); }
+.penempatan .tk strong { display: block; font-size: 20px; margin-top: 4px; }
+.penempatan .tk span { display: block; font-size: 16px; color: var(--teks-redup); margin-top: 2px; }
+.penempatan .tk:not(:last-child)::after { content: "\2192"; position: absolute; right: -14px; top: 50%; transform: translate(50%, -50%); color: var(--teks-samar); font-size: 18px; }
+.slide.aktif .qa::before { animation: kedip 1.6s ease-in-out infinite; }
+@keyframes kedip { 50% { opacity: .25; } }
+
+/* ---------- Kendali di luar panggung ---------- */
+.kendali {
+  position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px; z-index: 5;
+  background: rgba(10, 17, 32, .82); border: 1px solid var(--garis); border-radius: 999px; padding: 6px 8px;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: opacity .4s; opacity: 0;
+}
+body.gerak .kendali, .kendali:hover, .kendali:focus-within { opacity: 1; }
+.kendali button {
+  background: transparent; color: var(--teks); border: 1px solid transparent; border-radius: 999px;
+  width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: grid; place-items: center;
+}
+.kendali button:hover, .kendali button:focus-visible { border-color: var(--neon-garis); color: var(--neon); outline: none; }
+.kendali .hitung { font-family: var(--huruf-mono); font-size: 14px; color: var(--teks-redup); min-width: 64px; text-align: center; }
+.kemajuan { position: fixed; left: 0; top: 0; height: 3px; background: var(--neon); box-shadow: 0 0 10px var(--neon); transition: width .5s ease; z-index: 5; }
+#catatan {
+  position: fixed; left: 50%; bottom: 64px; transform: translateX(-50%);
+  width: min(1000px, calc(100vw - 32px)); max-height: 46vh; overflow: auto; z-index: 6;
+  background: rgba(8, 14, 27, .97); border: 1px solid var(--garis); border-radius: 14px;
+  padding: 18px 22px; font-size: 15px; line-height: 1.6; color: var(--teks); display: none;
+}
+body.catatan-on #catatan { display: block; }
+#catatan h4 { margin: 0 0 8px; font-family: var(--huruf-mono); font-size: 12px; letter-spacing: .16em; color: var(--neon); text-transform: uppercase; }
+#catatan ul { margin: 6px 0 0; padding-left: 20px; }
+#catatan li { margin: 4px 0; }
+#catatan code { font-family: var(--huruf-mono); color: var(--biru-terang); }
+aside.catatan { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .slide.aktif { transition: none; transform: none; }
+  *, *::before, *::after { animation: none !important; }
+  .titik { opacity: .9; }
+}
+
+/* ---------- Cetak: satu halaman per slide (animasi berhenti di keadaan akhir) ---------- */
+@page { size: 1600px 900px; margin: 0; }
+@media print {
+  html, body { height: auto; overflow: visible; background: var(--latar); }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #panggung { position: static; transform: none; box-shadow: none; height: auto; overflow: visible; }
+  #panggung::before { display: none; }
+  .slide { position: relative; height: 900px; opacity: 1; visibility: visible; transform: none; break-after: page; }
+  *, *::before, *::after { animation: none !important; }
+  .titik { opacity: .9; }
+  .tombol-tahan .isi { opacity: .5; }
+  .kendali, .kemajuan, #catatan { display: none !important; }
+}
+i.asing { font-style: italic !important; color: inherit !important; font-family: inherit !important; margin: 0 !important; display: inline !important; width: auto !important; height: auto !important; background: none !important; }
+
+.kamus-kolom { align-items: start; gap: 28px; }
+table.kamus { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+table.kamus td { padding: 5px 10px; border-bottom: 1px solid var(--garis-lembut); color: var(--teks-redup); vertical-align: top; }
+table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%; font-family: var(--huruf-mono); }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 48 48">
+    <path d="M24 3 41 9.5V22c0 11-7.4 19-17 23C14.4 41 7 33 7 22V9.5Z" fill="rgba(62,240,161,.07)" stroke="#3ef0a1" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="24" cy="24" r="10.5" fill="none" stroke="#3ef0a1" stroke-opacity=".4" stroke-width="1.2"/>
+    <circle cx="24" cy="24" r="5.5" fill="none" stroke="#3ef0a1" stroke-opacity=".4" stroke-width="1.2"/>
+    <path d="M24 24 32.5 17.5" stroke="#3ef0a1" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="24" cy="24" r="2.2" fill="#3ef0a1"/><circle cx="29.5" cy="29" r="1.6" fill="#f2c14e"/>
+  </symbol>
+  <symbol id="gembok" viewBox="0 0 16 16">
+    <rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="currentColor"/>
+    <path d="M5.2 7V5a2.8 2.8 0 0 1 5.6 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+  </symbol>
+</svg>
+
+<div class="kemajuan" id="kemajuan"></div>
+
+<main id="panggung" aria-live="polite">
+
+<!-- =============================== SLIDE 1 =============================== -->
+<section class="slide" data-judul="Latar Belakang">
+  <div class="kepala">
+    <div class="penanda"><b>01</b>Latar Belakang dan Urgensi</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+
+  <div class="latar">
+    <div>
+      <p class="kicker">Pelajaran yang sudah dibayar mahal</p>
+      <h2 class="punchline">Berkaca dari kelumpuhan PDNS 2024, <em>kecepatan isolasi adalah segalanya.</em></h2>
+
+      <div class="lini">
+        <div class="peristiwa" style="--i:0"><b>MEI 2023 · BSI</b>
+          <p>ATM dan <i>mobile banking</i> terganggu 8–11 Mei. <span>Penyusupan diduga dimulai sejak libur Lebaran; pelaku mengklaim mencuri 1,5 TB data.</span></p></div>
+        <div class="peristiwa" style="--i:1"><b>JUNI 2024 · PDNS</b>
+          <p>Penyusup aktif dua hari tanpa ada yang bertindak. <span>Cadangan dimatikan tiga menit sebelum enkripsi, hanya ±2% data punya cadangan, dan layanan imigrasi lumpuh.</span></p></div>
+      </div>
+
+      <div class="proyeksi" style="--i:2">
+        <p class="label-kecil">Proyeksi ancaman · fasilitas kesehatan satuan</p>
+        <p class="tanya-besar">Bagaimana jika esok hari serangan serupa melumpuhkan integrasi Information Technology (IT) dan Operational Technology (OT) di infrastruktur kesehatan satuan kita?</p>
+        <div class="dampak">
+          <span><i>IT</i>rekam medis dan layanan klinis</span>
+          <span><i>OT</i>genset dan kelistrikan ruang operasi</span>
+        </div>
+        <p class="nyawa">Di RSPAD atau rumah sakit jajaran Kesdam, lambat merespons bukan sekadar soal data hilang, tetapi soal <b>nyawa dan keamanan nasional</b>.</p>
+      </div>
+    </div>
+
+    <div class="kliping">
+      <figure class="berita satu">
+        <svg viewBox="0 0 540 250" role="img" aria-label="Ilustrasi insiden PDNS Juni 2024: penyusup masuk dua hari sebelumnya, cadangan dimatikan tiga menit sebelum enkripsi, hanya sekitar 2 persen data punya cadangan">
+          <rect width="540" height="250" fill="#0d1729"/>
+          <text x="20" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" letter-spacing="1.5" fill="#ff5c74">PDNS SURABAYA · JUNI 2024</text>
+          <rect x="398" y="15" width="122" height="22" rx="5" fill="rgba(255,92,116,.15)" stroke="#ff5c74"/>
+          <text x="459" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" fill="#ff5c74" text-anchor="middle" letter-spacing="1">RANSOMWARE</text>
+          <g>
+            <rect x="24" y="52" width="122" height="150" rx="8" fill="#101a2d" stroke="#2a3a58"/>
+            <g fill="#14213a" stroke="#22314d"><rect x="34" y="62" width="102" height="26" rx="3"/><rect x="34" y="96" width="102" height="26" rx="3"/><rect x="34" y="130" width="102" height="26" rx="3"/><rect x="34" y="164" width="102" height="26" rx="3"/></g>
+            <g fill="#ff5c74"><circle cx="45" cy="75" r="3"/><circle cx="45" cy="109" r="3"/><circle cx="45" cy="143" r="3"/><circle cx="45" cy="177" r="3"/></g>
+            <circle cx="85" cy="127" r="27" fill="#0b1324" stroke="#ff5c74" stroke-width="2.5"/>
+            <rect x="73" y="125" width="24" height="18" rx="3" fill="#ff5c74"/>
+            <path d="M78 125v-6a7 7 0 0 1 14 0v6" fill="none" stroke="#ff5c74" stroke-width="3"/>
+            <text x="85" y="226" font-size="12.5" fill="#d7e3f2" text-anchor="middle">Layanan imigrasi lumpuh</text>
+          </g>
+          <line x1="190" y1="78" x2="512" y2="78" stroke="#2a3a58" stroke-width="2"/>
+          <line x1="205" y1="78" x2="480" y2="78" stroke="#ff5c74" stroke-width="2" stroke-dasharray="4 4" opacity=".6"/>
+          <g font-size="11.5" fill="#8798b1">
+            <circle cx="205" cy="78" r="7" fill="#0d1729" stroke="#f2c14e" stroke-width="2.5"/>
+            <text x="205" y="106" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace" font-weight="700" fill="#f2c14e">T−2 HARI</text>
+            <text x="205" y="122" text-anchor="middle">penyusup masuk,</text><text x="205" y="136" text-anchor="middle">tanpa tindakan</text>
+            <circle cx="345" cy="78" r="7" fill="#0d1729" stroke="#f2c14e" stroke-width="2.5"/>
+            <text x="345" y="106" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace" font-weight="700" fill="#f2c14e">T−3 MENIT</text>
+            <text x="345" y="122" text-anchor="middle">cadangan</text><text x="345" y="136" text-anchor="middle">dimatikan</text>
+            <circle cx="480" cy="78" r="9" fill="#ff5c74"/>
+            <text x="480" y="106" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace" font-weight="700" fill="#ff5c74">T0</text>
+            <text x="480" y="122" text-anchor="middle">enkripsi</text><text x="480" y="136" text-anchor="middle">massal</text>
+          </g>
+          <text x="190" y="176" font-size="12.5" fill="#d7e3f2">Data yang punya cadangan</text>
+          <text x="512" y="178" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="22" font-weight="800" fill="#ff5c74" text-anchor="end">±2%</text>
+          <rect x="190" y="188" width="322" height="14" rx="4" fill="#1f2d47"/>
+          <rect x="190" y="188" width="8" height="14" rx="4" fill="#ff5c74"/>
+          <text x="190" y="226" font-size="11.5" fill="#5b6c87">Tebusan USD 8 juta · layanan banyak instansi terganggu</text>
+        </svg>
+        <figcaption><b>ILUSTRASI</b>Diolah dari detikINET dan CNBC Indonesia</figcaption>
+      </figure>
+      <figure class="berita dua">
+        <svg viewBox="0 0 540 250" role="img" aria-label="Ilustrasi insiden BSI Mei 2023: ATM dan mobile banking terganggu 8 sampai 11 Mei, pelaku mengklaim mencuri 1,5 TB data">
+          <rect width="540" height="250" fill="#0d1729"/>
+          <text x="20" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" letter-spacing="1.5" fill="#ff5c74">BANK SYARIAH INDONESIA · MEI 2023</text>
+          <rect x="356" y="15" width="164" height="22" rx="5" fill="rgba(255,92,116,.15)" stroke="#ff5c74"/>
+          <text x="438" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="11" fill="#ff5c74" text-anchor="middle" letter-spacing="1">DUGAAN RANSOMWARE</text>
+          <g>
+            <rect x="26" y="58" width="78" height="104" rx="8" fill="#101a2d" stroke="#2a3a58"/>
+            <rect x="36" y="68" width="58" height="38" rx="3" fill="#14213a" stroke="#22314d"/>
+            <g fill="#22314d"><rect x="38" y="114" width="12" height="9" rx="2"/><rect x="54" y="114" width="12" height="9" rx="2"/><rect x="70" y="114" width="12" height="9" rx="2"/><rect x="38" y="127" width="12" height="9" rx="2"/><rect x="54" y="127" width="12" height="9" rx="2"/><rect x="70" y="127" width="12" height="9" rx="2"/></g>
+            <rect x="42" y="145" width="46" height="5" rx="2" fill="#0b1324"/>
+            <rect x="118" y="72" width="40" height="76" rx="7" fill="#101a2d" stroke="#2a3a58"/>
+            <rect x="123" y="80" width="30" height="56" rx="3" fill="#14213a"/>
+            <g stroke="#ff5c74" stroke-width="3" stroke-linecap="round"><path d="M57 79l16 16M73 79l-16 16M131 100l14 14M145 100l-14 14"/></g>
+            <text x="92" y="186" font-size="12.5" fill="#d7e3f2" text-anchor="middle">ATM dan <tspan font-style="italic">mobile banking</tspan></text>
+            <text x="92" y="202" font-size="12.5" fill="#d7e3f2" text-anchor="middle">terganggu</text>
+          </g>
+          <g font-family="ui-monospace,Menlo,Consolas,monospace" text-anchor="middle">
+            <rect x="196" y="56" width="72" height="80" rx="8" fill="rgba(255,92,116,.14)" stroke="#ff5c74"/>
+            <text x="232" y="90" font-size="26" font-weight="800" fill="#ff5c74">8</text><text x="232" y="106" font-size="10" fill="#8798b1">MEI</text><text x="232" y="125" font-size="10" fill="#ff5c74">GANGGUAN</text>
+            <rect x="276" y="56" width="72" height="80" rx="8" fill="rgba(242,193,78,.12)" stroke="#f2c14e"/>
+            <text x="312" y="90" font-size="26" font-weight="800" fill="#f2c14e">9</text><text x="312" y="106" font-size="10" fill="#8798b1">MEI</text><text x="312" y="125" font-size="10" fill="#f2c14e">BERANGSUR</text>
+            <rect x="356" y="56" width="72" height="80" rx="8" fill="rgba(242,193,78,.12)" stroke="#f2c14e"/>
+            <text x="392" y="90" font-size="26" font-weight="800" fill="#f2c14e">10</text><text x="392" y="106" font-size="10" fill="#8798b1">MEI</text><text x="392" y="125" font-size="10" fill="#f2c14e">BERANGSUR</text>
+            <rect x="436" y="56" width="76" height="80" rx="8" fill="rgba(62,240,161,.12)" stroke="#3ef0a1"/>
+            <text x="474" y="90" font-size="26" font-weight="800" fill="#3ef0a1">11</text><text x="474" y="106" font-size="10" fill="#8798b1">MEI</text><text x="474" y="125" font-size="10" fill="#3ef0a1">PULIH</text>
+          </g>
+          <text x="196" y="174" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="22" font-weight="800" fill="#ff5c74">1,5 TB</text>
+          <text x="290" y="166" font-size="12.5" fill="#d7e3f2">data nasabah diklaim dicuri pelaku</text>
+          <text x="290" y="181" font-size="11" fill="#5b6c87">(klaim pelaku, belum terverifikasi)</text>
+          <text x="196" y="226" font-size="11.5" fill="#5b6c87">Penyusupan diduga sejak libur Lebaran (dugaan analis)</text>
+        </svg>
+        <figcaption><b>ILUSTRASI</b>Diolah dari Bisnis.com (CISSReC, Vaksincom)</figcaption>
+      </figure>
+    </div>
+  </div>
+  <div class="petunjuk">← → berpindah · F layar penuh · N catatan</div>
+
+  <aside class="catatan">
+    <h4>Catatan pembicara · Slide 1 · Latar belakang (±40 detik)</h4>
+    <p><b>Alur: sejarah → proyeksi.</b> Jangan sebut fitur Nusantara Shield di slide ini.</p>
+    <ul>
+      <li><b>Sejarah:</b> "Mei 2023, layanan BSI terganggu empat hari; penyusupan diduga dimulai sejak libur Lebaran. Juni 2024, Pusat Data Nasional Sementara lumpuh. Penyusup sudah aktif dua hari, cadangan dimatikan tiga menit sebelum enkripsi, dan hanya sekitar 2 persen data yang punya cadangan."</li>
+      <li><b>Proyeksi (sebut sebagai bayangan, bukan kejadian):</b> "Bayangkan kelumpuhan seperti Pusat Data Nasional Sementara (PDNS) terjadi pada infrastruktur kesehatan satuan, seperti RSPAD Gatot Soebroto atau rumah sakit jajaran Kesdam: rekam medis dan layanan klinis terkunci, dan sistem kendali fasilitas seperti genset dan kelistrikan ruang operasi berpotensi diambil alih. Di sana, lambat merespons bukan soal data, tetapi soal nyawa."</li>
+      <li><b>Bukti bahwa ini bukan khayalan:</b> Agustus 2026, <i class="asing">ransomware</i> di Health Sciences Centre Winnipeg, Kanada, mengenai pendingin udara dan akses pintu rumah sakit. Pelayanan pasien selamat karena jaringan klinis dan fasilitas dipisah.</li>
+      <li><b>Jangan katakan:</b> PDNS lumpuh "karena isolasi lambat", atau BSI "merusak bukti". Tidak ada sumber yang menyatakan itu. Yang terdokumentasi: tanda bahaya terlambat dikenali, dan forensik BSI masih ditunggu saat layanan dipulihkan.</li>
+      <li><b>Dua panel di kanan adalah ilustrasi</b> yang diolah dari pemberitaan (detikINET, CNBC Indonesia, Bisnis.com), bukan tangkapan layar berita. Angka "1,5 TB" adalah klaim pelaku yang belum terverifikasi.</li>
+    </ul>
+  </aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>01 / 07</span></div>
+</section>
+
+<!-- =============================== SLIDE 2 =============================== -->
+<section class="slide" data-judul="Ringkasan Eksekutif">
+  <div class="kepala">
+    <div class="penanda"><b>02</b>Ringkasan Eksekutif</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+
+  <div class="ringkas">
+    <div>
+      <p class="label-kecil">Proposal Solusi · Kategori 02 Penangkalan</p>
+      <h1>Nusantara <span>Shield</span></h1>
+      <p class="slogan">Perwira Staf Siber Digital bagi posko satuan: menjaga <b class="it">jaringan perkantoran (IT)</b> dan <b class="it">sistem kendali fasilitas (OT)</b> dalam satu layar. Mengamati tanpa henti, menyajikan taktik berdoktrin, dan <b>keputusan tetap di tangan manusia.</b></p>
+      <div class="urutan">
+        <span>AMANKAN BUKTI</span><i>→</i><span>ISOLASI</span><i>→</i><span>LAPSIT</span><i>→</i><span>PULIHKAN</span>
+      </div>
+      <div class="strip-angka">
+        <div class="angka"><b>±1,2 dtk</b><span>keputusan → jaringan terputus, bukti sudah aman</span></div>
+        <div class="angka"><b>2,8%</b><span>CPU (prosesor) <i class="asing">server</i> untuk 300 layar (dari 10,8%)</span></div>
+        <div class="angka"><b>−80%</b><span>lalu lintas jaringan saat serangan intensif</span></div>
+        <div class="angka"><b>196</b><span>uji otomatis, termasuk 10 uji AI lokal</span></div>
+      </div>
+    </div>
+
+    <div class="radar-bingkai">
+      <div class="radar" role="img" aria-label="Radar anomali: jarak dari pusat menunjukkan zona jaringan, warna menunjukkan keparahan">
+        <div class="sapu"></div>
+        <span class="zona" style="top:52%">INTERNAL</span>
+        <span class="zona" style="top:calc(50% + 63px)">DMZ</span>
+        <span class="zona" style="top:calc(50% + 119px)">LUAR GERBANG</span>
+        <i class="titik kritis"  style="left:256px;top:67px;--t:.44s"></i>
+        <i class="titik normal"  style="left:223px;top:161px;--t:.89s"></i>
+        <i class="titik waspada" style="left:248px;top:215px;--t:1.33s"></i>
+        <i class="titik kritis"  style="left:120px;top:309px;--t:2.22s"></i>
+        <i class="titik blokir"  style="left:78px;top:204px;--t:2.78s"></i>
+        <i class="titik normal"  style="left:132px;top:157px;--t:3.22s"></i>
+        <i class="titik kritis"  style="left:95px;top:81px;--t:3.56s"></i>
+      </div>
+      <div class="legenda">
+        <span><i style="background:var(--neon)"></i>Normal</span>
+        <span><i style="background:var(--kuning)"></i>Berisiko</span>
+        <span><i style="background:var(--merah)"></i>Ancaman</span>
+        <span><i style="background:var(--biru-terang);border-radius:2px"></i>Diblokir</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lemah">
+    <div class="kartu-dasar">
+      <p class="label-kecil">Titik lemah 01</p>
+      <h3>Banjir peringatan</h3>
+      <p>Ratusan peringatan per hari, sebagian besar tidak menyangkut aset satuan. Ancaman nyata tenggelam.</p>
+      <p class="jawab">→ Korelasi Cyber Threat Intelligence (CTI) × aset IT dan OT: hanya aset berisiko yang naik WASPADA.</p>
+    </div>
+    <div class="kartu-dasar">
+      <p class="label-kecil">Titik lemah 02</p>
+      <h3>Penahanan lambat dan ragu</h3>
+      <p>Izin berjenjang, tombol bermakna ganda, laporan disusun manual di tengah krisis.</p>
+      <p class="jawab">→ <i class="asing">Playbook</i> praotorisasi: tahan tombol 0,6 dtk, Laporan Situasi (LAPSIT) otomatis.</p>
+    </div>
+    <div class="kartu-dasar">
+      <p class="label-kecil">Titik lemah 03</p>
+      <h3>Bukti rusak saat pemulihan</h3>
+      <p>Server di-<i>restart</i> atau dipulihkan sebelum bukti disalin; rantai barang bukti putus.</p>
+      <p class="jawab">→ Secure Hash Algorithm 256-bit (SHA-256) sebelum isolasi; pemulihan dikunci sampai <i class="asing">hash</i> cocok.</p>
+    </div>
+  </div>
+
+  <aside class="catatan">
+    <h4>Catatan pembicara · Slide 2 · Ringkasan eksekutif</h4>
+    <p><b>Solusi:</b> "Nusantara Shield adalah Perwira Staf Siber Digital: mengenali ancaman IT maupun OT lebih awal, mengamankan bukti, lalu memutus jalur penyerang IT/OT dalam ±1,2 detik, tanpa mematikan genset. Keputusan tetap di tangan manusia."</p>
+    <ul>
+      <li>Tiga kartu merah = peta jalan presentasi. Setiap slide berikutnya menutup satu titik lemah.</li>
+      <li>Radar: <b>jarak dari pusat = zona jaringan</b> (internal, DMZ, luar gerbang); <b>warna = keparahan</b>. Arah titik hanya penanda alamat Internet Protocol (IP), <b>bukan lokasi geografis</b>.</li>
+      <li>±1,2 dtk: dari operator selesai menahan tombol sampai jaringan aset terputus, dengan bukti sudah diamankan lebih dulu.</li>
+      <li>2,8% CPU dan −80% lalu lintas diukur pada 300 layar serentak (uvicorn + Chromium, 15–17 Okt 2026).</li>
+      <li>Kategori: <b>02 Penangkalan</b>, sesuai contoh panitia: <i class="asing">Threat Intelligence Platform</i> dan <i class="asing">Automated Incident Response</i>.</li>
+    </ul>
+  </aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>02 / 07</span></div>
+</section>
+
+<!-- =============================== SLIDE 2 =============================== -->
+<section class="slide" data-judul="Doktrin dan UI/UX">
+  <div class="kepala">
+    <div class="penanda"><b>03</b>Doktrin dan UI/UX · Siklus OODA</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+  <h2>Doktrin di atas improvisasi: <em>bukti dulu, baru putus.</em></h2>
+  <p class="sub">Mesin mengamati dan menyiapkan; operator memutuskan; <i class="asing">server</i> mengeksekusi dalam urutan yang dikunci.</p>
+
+  <div class="doktrin">
+    <div>
+      <svg class="ooda" viewBox="0 0 400 400" role="img" aria-label="Siklus OODA: Amati, Orientasi, Putuskan, Bertindak">
+        <defs>
+          <marker id="panah-ooda" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3ef0a1"/></marker>
+        </defs>
+        <circle cx="200" cy="200" r="146" fill="none" stroke="#1f2d47" stroke-dasharray="2 6"/>
+        <path class="busur" d="M254.9 82.2A130 130 0 0 1 317.8 145.1" marker-end="url(#panah-ooda)"/>
+        <path class="busur" d="M317.8 254.9A130 130 0 0 1 254.9 317.8" marker-end="url(#panah-ooda)"/>
+        <path class="busur" d="M145.1 317.8A130 130 0 0 1 82.2 254.9" marker-end="url(#panah-ooda)"/>
+        <path class="busur" d="M82.2 145.1A130 130 0 0 1 145.1 82.2" marker-end="url(#panah-ooda)"/>
+        <circle cx="200" cy="200" r="58" fill="#0c1526" stroke="#1f2d47"/>
+        <text x="200" y="196" text-anchor="middle" font-size="22" font-weight="800" fill="#3ef0a1" letter-spacing="3">OODA</text>
+        <text x="200" y="214" text-anchor="middle" font-size="11.5" fill="#8798b1">manusia</text>
+        <text x="200" y="228" text-anchor="middle" font-size="11.5" fill="#8798b1">memutuskan</text>
+        <g class="simpul" style="--t:0s"><circle cx="200" cy="70" r="54"/><text class="j" x="200" y="68" text-anchor="middle">AMATI</text><text class="s" x="200" y="86" text-anchor="middle">sensor · CTI</text></g>
+        <g class="simpul" style="--t:2s"><circle cx="330" cy="200" r="54"/><text class="j" x="330" y="198" text-anchor="middle">ORIENTASI</text><text class="s" x="330" y="216" text-anchor="middle">CTI + AI × aset</text></g>
+        <g class="simpul" style="--t:4s"><circle cx="200" cy="330" r="54"/><text class="j" x="200" y="328" text-anchor="middle">PUTUSKAN</text><text class="s" x="200" y="346" text-anchor="middle">tahan 0,6 dtk</text></g>
+        <g class="simpul" style="--t:6s"><circle cx="70" cy="200" r="54"/><text class="j" x="70" y="198" text-anchor="middle">BERTINDAK</text><text class="s" x="70" y="216" text-anchor="middle">langkah 2–5</text></g>
+      </svg>
+      <p class="ooda-keterangan"><b>Satu tombol, satu makna.</b> Konfirmasi dengan menahan tombol, bukan jendela "Anda yakin?". Isolasi dan pemulihan adalah dua pintu terpisah.</p>
+    </div>
+
+    <div>
+      <div class="langkah">
+        <div class="baris-langkah">
+          <span class="no">1</span>
+          <div><h3>Deteksi</h3><p>Radar, peta, dan Action Center menyorot aset terdampak. Korelasi CTI dan AI lokal (deteksi anomali) menaikkan aset IT maupun OT yang berisiko lebih awal.</p></div>
+          <div class="lencana kuning">WASPADA ≥50%<small>peluang serangan per aset</small></div>
+        </div>
+        <div class="baris-langkah bukti">
+          <span class="no">2</span>
+          <div><h3>Amankan bukti</h3><p>Salin memori, log, dan trafik; hitung SHA-256 tiap berkas; terbitkan berita acara. Tidak bisa dibatalkan.</p></div>
+          <div class="lencana biru">BB-2026-001<small>SHA-256 · buku tambah-saja</small></div>
+        </div>
+        <div class="baris-langkah isolasi">
+          <span class="no">3</span>
+          <div><h3>Isolasi (IT · OT)</h3><p>±1,2 dtk setelah bukti aman: aset IT diputus; jalur kantor → zona kendali OT diputus lewat sakelar terkelola, genset tetap menyala. Tanpa bukti: ditolak (409).</p></div>
+          <div class="tahan">
+            <div class="tombol-tahan"><div class="isi"></div><span>⚡ TAHAN · ISOLASI</span></div>
+            <div class="skala-ms"><span>0 ms</span><span>tahan</span><span>600 ms</span></div>
+          </div>
+        </div>
+        <div class="baris-langkah">
+          <span class="no">4</span>
+          <div><h3>LAPSIT otomatis</h3><p>Terbit ke pimpinan hanya setelah semua pemutusan tuntas, merujuk nomor barang bukti.</p></div>
+          <div class="lencana biru">IR-2026-001<small>nomor register berurutan</small></div>
+        </div>
+        <div class="baris-langkah pulih">
+          <span class="no">5</span>
+          <div><h3>Pulihkan</h3><p>Dibuka hanya bila aset terisolasi, <i class="asing">playbook</i> dicentang, dan SHA-256 bukti cocok ulang.</p></div>
+          <div class="lencana kunci"><svg aria-hidden="true"><use href="#gembok"/></svg>PULIHKAN · terkunci</div>
+        </div>
+      </div>
+      <div class="darurat"><b>ISOLASI DARURAT</b><span>Bila alat forensik gagal: alasan tertulis ≥15 karakter dan tombol ditahan 1,5 dtk. Tercatat di Buku Rantai Bukti, log audit Hash-based Message Authentication Code (HMAC), dan LAPSIT.</span></div>
+    </div>
+  </div>
+
+  <aside class="catatan">
+    <h4>Catatan pembicara · Slide 3 · Doktrin dan SOP F-04</h4>
+    <p>Tekankan: <b>kecepatan dan ketertiban forensik tidak lagi saling bertentangan.</b> Operator tidak perlu mengingat urutan; <i class="asing">server</i> yang menjaganya. Ini menjawab temuan audit F-04 (<i class="asing">chain of custody</i>).</p>
+    <ul>
+      <li><b>Bahasa yang sama dengan buku Onno W. Purbo dan Gildas Deograt Lumy (2025):</b> lima langkah ini adalah siklus <i class="asing">detect → contain → eradicate → recover</i>, ditutup <i class="asing">After-Action Review</i> (AAR) di langkah Evaluasi. Kontainmen tidak mematikan fungsi layanan (<i class="asing">mission continuity</i>, contoh genset), dan pemulihan tidak menghapus jejak forensik.</li>
+      <li>Urutan dikunci di <b><i class="asing">server</i></b>, bukan hanya di tampilan: jalan pintas lewat tombol, centang manual, atau antrean semuanya ditolak dengan kode 409.</li>
+      <li>Kenapa menahan tombol 0,6 detik? Lebih cepat daripada dialog konfirmasi, dan klik tak sengaja tidak memicu apa pun.</li>
+      <li>Isolasi darurat hanya tersedia bila bukti <b>belum</b> bisa diamankan. Bila bukti sudah aman, jalur darurat ditolak. Setelah ancaman tertahan, bukti susulan wajib diamankan dan pemulihan tetap terkunci sampai <i class="asing">hash</i> cocok.</li>
+      <li><b>IT · OT (sudah berjalan, dikunci 6 uji):</b> (1) Peringatan dini: tombol <b>Latihan OT: siarkan kabar Modbus</b> → <b>Pengendali genset</b> (192.0.2.120:502) naik <b>WASPADA ±66%</b> → <b>Perketat</b>. (2) Isolasi OT: Latihan → target <b>Kendali Fasilitas RS</b> → <b>Sabotase OT</b> → tahan ⚡ → bukti disegel → ±1,2 dtk kemudian <i class="asing">webhook</i> (simulasi) ke sakelar terkelola memutus jalur kantor → zona kendali; genset <b>tetap menyala</b> (kendali lokal) → LAPSIT SEV-1 ke Komandan Satuan (Dansat).</li>
+      <li>Yang <b>belum</b> ada: sensor protokol industri dan sambungan ke sakelar fisik sungguhan (di purwarupa: simulasi <i class="asing">webhook</i>).</li>
+      <li><b>Bila juri bertanya "kenapa tidak langsung matikan perangkat OT?":</b> di OT, memutus mendadak bisa menghentikan proses fisik (listrik, pompa, genset). Praktik baku (NIST SP 800-82) adalah memutus <b>jalur antara jaringan kantor dan zona kendali</b>, lewat prosedur keselamatan, bukan mematikan pengendalinya.</li>
+      <li>Pemisahan wewenang: <b>Pengamat</b> hanya melihat; <b>Operator</b> bertindak. Akun operator hanya lewat kode undangan (<code>NS_KODE_OPERATOR</code>) atau dibuatkan operator lain.</li>
+      <li>Semua label (jabatan penerima laporan, nama satuan) berasal dari satu kamus istilah <code>app/istilah.py</code>, sehingga bisa disesuaikan tanpa mengubah logika.</li>
+    </ul>
+  </aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>03 / 07</span></div>
+</section>
+
+<!-- =============================== SLIDE 3 =============================== -->
+<section class="slide" data-judul="Keunggulan Server">
+  <div class="kepala">
+    <div class="penanda"><b>04</b>Keunggulan <i class="asing">Server</i> · Skalabilitas dan Uji</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 196 uji.</em></h2>
+
+  <div class="dua-kolom">
+    <div>
+      <div class="grafik kartu-dasar">
+        <div class="grafik-kepala">
+          <h3>Beban CPU <i class="asing">server</i><small>300 layar tersambung serentak · siaga</small></h3>
+          <span class="turun">−74%</span>
+        </div>
+        <div class="baris"><span class="lbl">Sebelum</span><div class="batang sebelum"><i></i></div><span class="nilai">10,8%</span></div>
+        <div class="baris"><span class="lbl">Sesudah</span><div class="batang sesudah"><i></i></div><span class="nilai sesudah">2,8%</span></div>
+        <p class="sumber"><b>Sebelum</b> = v5.1 asli · <b>Sesudah</b> = versi final. Uvicorn, uji beban 17 Okt 2026. AI lokal menambah ±0,05 ms kerja per detik.</p>
+      </div>
+      <div class="mini">
+        <div><b>8,4 → <em>1,7</em></b><span>MB/s lalu lintas saat serangan intensif (−80%)</span></div>
+        <div><b>90 → <em>71 MB</em></b><span>memori <i class="asing">server</i> untuk 300 layar, sebelum AI (pustaka AI +±130 MB)</span></div>
+        <div><b>44 → <em>0 ms</em></b><span>kerja grafis kanvas yang tidak terlihat</span></div>
+      </div>
+      <div class="komponen">
+        <span>Dapur tunggal</span><span>AI lokal Isolation Forest</span><span>Hub siaran delta</span><span>Gerbang ASGI 16 KB</span><span>Buku HMAC berantai</span><span>Brankas bukti</span>
+      </div>
+      <p class="komponen-ket">Satu dapur memasak gambaran situasi sekali per detik untuk semua layar; layar hanya menerima <b class="neon">ralat (delta)</b>, bukan gambar utuh. Cocok untuk jaringan satuan berpita sempit.</p>
+    </div>
+
+    <div>
+      <div class="terminal">
+        <div class="terminal-kepala"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>nusantara-shield-v5.1 · ./run_tests.sh</span></div>
+        <div class="terminal-isi">
+          <p class="t-perintah"><b>$</b> ./run_tests.sh <span style="color:var(--teks-samar)"># pytest -v -ra</span></p>
+          <div class="t-baris t-ai" style="--i:0"><span>▶ AI lokal<small>Isolation Forest · luring · alasan</small></span><em>10 PASSED</em></div>
+          <div class="t-baris" style="--i:1"><span>▶ Manajemen akun<small>pendaftaran, dasbor akun</small></span><em>18 PASSED</em></div>
+          <div class="t-baris" style="--i:2"><span>▶ Intelijen ancaman dan SOAR<small>prediksi, isolasi</small></span><em>18 PASSED</em></div>
+          <div class="t-baris" style="--i:3"><span>▶ Kamus istilah<small>istilah satuan</small></span><em>29 PASSED</em></div>
+          <div class="t-baris" style="--i:4"><span>▶ Keamanan dan akses<small><i class="asing">login</i>, peran, batas laju</small></span><em>38 PASSED</em></div>
+          <div class="t-baris" style="--i:5"><span>▶ Rantai komando dan LAPSIT<small><i class="asing">pre-authorized</i></small></span><em>22 PASSED</em></div>
+          <div class="t-baris t-ot" style="--i:6"><span>▶ Sinergi IT/OT<small>Modbus → WASPADA · isolasi OT</small></span><em>6 PASSED</em></div>
+          <div class="t-baris" style="--i:7"><span>▶ Rantai bukti forensik<small>bukti sebelum isolasi</small></span><em>36 PASSED</em></div>
+          <div class="t-baris" style="--i:8"><span>▶ Telemetri dan siaran<small>dapur tunggal, delta</small></span><em>19 PASSED</em></div>
+          <div class="t-akhir" style="--i:9">═══ 196 passed in 42.97s ═══</div>
+        </div>
+      </div>
+      <p class="terminal-ket">Uji mengunci <b>aturan doktrin</b>, bukan sekadar fungsi: isolasi tanpa bukti ditolak 409 · pemulihan terkunci bila <i class="asing">hash</i> berbeda · sabotase OT diputus ±1,2 dtk tanpa mematikan genset · sandi tidak pernah tercatat di log · AI menilai tanpa satu pun koneksi jaringan · data layar hasil rakitan delta identik dengan <i class="asing">server</i>.</p>
+    </div>
+  </div>
+
+  <aside class="catatan">
+    <h4>Catatan pembicara · Slide 4 · Arsitektur <i class="asing">server</i> (Dokumentasi Teknis §2)</h4>
+    <p>Analogi: dulu setiap meja punya koki pribadi yang memasak menu yang sama. Kini satu koki memasak sekali, dan satu pengeras suara membacakannya ke semua meja. Layar hanya menerima "lembar ralat", bukan koran utuh.</p>
+    <ul>
+      <li>Komponen: Loket Application Programming Interface (API) <code>app/main.py</code> · Gerbang keamanan <code>app/keamanan.py</code> · Dapur situasi <code>app/telemetri.py</code> · Engine Deteksi Anomali <code>app/ai_anomali.py</code> · Brankas bukti <code>app/bukti.py</code> · Buku berantai <code>app/audit.py</code> · Hub siaran <code>app/siaran.py</code> + <code>app/delta.py</code> · Dasbor <code>static/</code>.</li>
+      <li>Gerbang ASGI memeriksa ukuran kiriman sebelum menyentuh logika aplikasi; lebih dari 16 KB diputus dengan kode 413.</li>
+      <li>Batas yang sebaiknya disebut sendiri: sistem berjalan sebagai <b>satu proses <i class="asing">server</i></b>. Operasi multiproses adalah langkah lanjutan.</li>
+      <li>Uji bisa dijalankan ulang juri dalam ±45 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli: 196 passed in 42.97s (174 uji asal + 12 uji IT/OT dan istilah + 10 uji AI lokal).</li>
+      <li>Kebutuhan minimum: Python 3.10+, 2 inti, 512 MB memori bebas, 50 MB penyimpanan (paket rilis 187 KB). Memori terukur ±71 MB sebelum AI; pustaka scikit-learn dan numpy menambah ±130 MB.</li>
+    </ul>
+  </aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>04 / 07</span></div>
+</section>
+
+<!-- =============================== SLIDE 4 =============================== -->
+<section class="slide" data-judul="Mode Berdaulat">
+  <div class="kepala">
+    <div class="penanda"><b>05</b>Mode Berdaulat · Sovereign Mode</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+  <h2>Inti + AI anomali berjalan luring. <em>LLM narasi: peta jalan.</em></h2>
+
+  <div class="berdaulat">
+    <div class="panel kartu-dasar berjalan">
+      <span class="status hijau">● SUDAH BERJALAN · INTI v5.1 + AI LOKAL</span>
+      <h3>Nusantara Shield Core: 100% luring</h3>
+      <svg class="perimeter" viewBox="0 0 600 190" role="img" aria-label="Server di dalam jaringan tertutup satuan; layanan awan dan CDN tidak dipakai">
+        <rect x="120" y="14" width="360" height="166" rx="18" fill="rgba(62,240,161,.05)" stroke="#3ef0a1" stroke-width="1.6" stroke-dasharray="8 6"/>
+        <text x="300" y="38" text-anchor="middle" font-size="12" fill="#3ef0a1" letter-spacing="3">JARINGAN TERTUTUP SATUAN</text>
+        <rect x="262" y="54" width="76" height="110" rx="7" fill="#14213a" stroke="#3ef0a1" stroke-width="1.4"/>
+        <text x="300" y="72" text-anchor="middle" font-size="9" fill="#f2c14e">SERVER · AI</text>
+        <g fill="#0c1526" stroke="#1f2d47"><rect x="272" y="80" width="56" height="14" rx="2"/><rect x="272" y="100" width="56" height="14" rx="2"/><rect x="272" y="120" width="56" height="14" rx="2"/><rect x="272" y="140" width="56" height="14" rx="2"/></g>
+        <g fill="#3ef0a1"><circle class="lampu-on" cx="280" cy="87" r="2.4"/><circle cx="280" cy="107" r="2.4"/><circle class="lampu-on" cx="280" cy="127" r="2.4"/><circle cx="280" cy="147" r="2.4"/></g>
+        <g stroke="#5cc8ff" stroke-opacity=".6" stroke-width="1.4"><path d="M213 82H262M213 136H262M387 82H338M387 136H338"/></g>
+        <g fill="#14213a" stroke="#5cc8ff" stroke-opacity=".8"><rect x="155" y="68" width="58" height="30" rx="4"/><rect x="155" y="122" width="58" height="30" rx="4"/><rect x="387" y="68" width="58" height="30" rx="4"/><rect x="387" y="122" width="58" height="30" rx="4"/></g>
+        <text x="184" y="174" text-anchor="middle" font-size="10" fill="#8798b1">layar operator</text>
+        <text x="416" y="174" text-anchor="middle" font-size="10" fill="#8798b1">layar pengamat</text>
+        <path d="M18 82h62a13 13 0 0 0-3-25 18 18 0 0 0-33-6 12 12 0 0 0-22 9 11 11 0 0 0-4 22z" fill="#14213a" stroke="#8798b1"/>
+        <path d="M520 82h62a13 13 0 0 0-3-25 18 18 0 0 0-33-6 12 12 0 0 0-22 9 11 11 0 0 0-4 22z" fill="#14213a" stroke="#8798b1"/>
+        <g stroke="#8798b1" stroke-dasharray="4 4" stroke-width="1.4"><path d="M84 72H120M480 72H516"/></g>
+        <g stroke="#ff5c74" stroke-width="3" stroke-linecap="round"><path d="M95 63l14 18M109 63l-14 18M491 63l14 18M505 63l-14 18"/></g>
+        <text x="50" y="104" text-anchor="middle" font-size="10" fill="#8798b1">awan / API luar</text>
+        <text x="550" y="104" text-anchor="middle" font-size="10" fill="#8798b1">CDN dan fon luar</text>
+        <text x="50" y="118" text-anchor="middle" font-size="10" fill="#ff5c74">tidak dipakai</text>
+        <text x="550" y="118" text-anchor="middle" font-size="10" fill="#ff5c74">tidak dipakai</text>
+      </svg>
+      <div class="cek">
+        <div><i>✓</i><span><b><i class="asing">On-premise</i> penuh:</b> layanan web, akun dan data (berkas lokal), SHA-256 bukti, log HMAC, tombol isolasi, LAPSIT.</span></div>
+        <div><i>✓</i><span><b>Tanpa CDN, Google Fonts, atau skrip daring.</b> Internet diputus, dasbor tetap berjalan.</span></div>
+        <div><i>✓</i><span><b>AI deteksi anomali berjalan lokal:</b> Isolation Forest (scikit-learn) dilatih dan dihitung di <i class="asing">server</i> satuan (<i class="asing">local inference</i>), tanpa API luar; siap <i class="asing">air-gapped</i>.</span></div>
+        <div><i>✓</i><span><b>Internet hanya sekali,</b> saat <span class="mono">pip install</span>. Data latihan sintetis Request for Comments (RFC) 5737.</span></div>
+      </div>
+    </div>
+
+    <div class="panel kartu-dasar rancangan">
+      <span class="status kuning">◌ PETA JALAN · BELUM ADA DI PURWARUPA</span>
+      <h3>Dua jalur konektivitas dan Asisten Narasi</h3>
+      <table class="banding">
+        <thead>
+          <tr><th></th><th class="hybrid">Mode Hybrid<small>N8N · KONEKSI TERKENDALI</small></th><th class="lokal">Mode AI Lokal<small>AIR-GAPPED</small></th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Orkestrasi</td><td>n8n dipasang sendiri (self-hosted) di <i class="asing">server</i> satuan</td><td>Penjadwal lokal di <i class="asing">server</i> satuan</td></tr>
+          <tr><td>Umpan intelijen</td><td>BSSN/MISP masuk satu arah lewat gerbang satuan</td><td>Impor berkas indikator lewat media yang diperiksa</td></tr>
+          <tr><td>Asisten Narasi</td><td>LLM awan, hanya bila kebijakan mengizinkan</td><td>LLM lokal (mis. Llama 3 lewat Ollama) sebagai layanan terpisah di <i class="asing">server</i> satuan</td></tr>
+          <tr><td>Peran LLM</td><td colspan="2">Menyusun draf LAPSIT dan meringkas korelasi untuk diperiksa operator</td></tr>
+          <tr><td>Bila gagal</td><td colspan="2">Koneksi atau LLM mati → sistem jatuh ke <b class="neon">Mode Berdaulat</b>; inti tetap jalan</td></tr>
+        </tbody>
+      </table>
+      <div class="aturan"><b>Aturan tetap di semua mode:</b> AI hanya menyarankan, tidak pernah mengeksekusi. Isolasi tetap butuh operator menahan tombol; bukti tetap diamankan lebih dulu; semua tercatat di log HMAC.</div>
+    </div>
+  </div>
+
+  <aside class="catatan">
+    <h4>Catatan pembicara · Slide 5 · Kedaulatan sistem (Proposal §5.1, Dokumentasi §4)</h4>
+    <p><b>Kalimat kunci:</b> "Yang kami demonstrasikan hari ini adalah inti di panel kiri, termasuk AI deteksi anomali, dan semuanya sudah berjalan tanpa internet. Panel kanan adalah peta jalan, belum dibangun."</p>
+    <ul>
+      <li><b>Pesan karya sendiri:</b> "Bapak/Ibu, pada Mode Berdaulat tidak ada satu pun data posko yang keluar ke server asing, termasuk server AI asing. Korelasi ancaman, skor anomali AI, sidik jari bukti, dan laporan dihitung di <i class="asing">server</i> milik satuan sendiri. Sistem ini kami bangun sendiri, dan kodenya dapat diperiksa baris per baris."</li>
+      <li><b>Bukti langsung:</b> cabut internet saat demo. Dasbor, <i class="asing">playbook</i>, dan tombol isolasi tetap berjalan. Bila kabel LAN dicabut, <i class="asing">server</i> dan dasbor di laptop yang sama tetap bekerja.</li>
+      <li>"Apakah AI sudah dipakai di sistem?" <b>Ya, untuk deteksi anomali.</b> Isolation Forest (scikit-learn) dilatih dan dijalankan di <i class="asing">server</i> satuan; lalu lintas tidak wajar menaikkan aset ke WASPADA dengan alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal". Ini <i class="asing">local inference</i>: tanpa API luar, sehingga siap dipasang <i class="asing">air-gapped</i>. AI hanya menaikkan status; memutus tetap keputusan operator. Model bahasa (Llama 3/Ollama) untuk draf LAPSIT masih peta jalan, sengaja tidak dimasukkan ke <i class="asing">server</i> inti agar CPU hemat. Asisten AI juga dipakai pengembang saat menulis kode, sebagaimana diizinkan panitia.</li>
+      <li>Kenapa dua jalur? Hybrid cocok untuk markas yang punya gerbang internet terkendali; AI Lokal (Asisten Narasi) untuk satuan yang wajib <i class="asing">air-gapped</i>. Keduanya opsional dan bisa dimatikan tanpa mengganggu inti.</li>
+      <li>Pemasangan (Dokumentasi §4.1): <code>python3 -m venv .venv</code> → aktifkan → <code>pip install -r requirements.txt</code> → <code>python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</code>. Buka 127.0.0.1:8000.</li>
+      <li>Variabel penting: <code>NS_OPERATOR_PASSWORD</code>/<code>NS_VIEWER_PASSWORD</code> (sandi bawaan, min. 12), <code>NS_AUDIT_KEY</code> (kunci HMAC, mengaktifkan penyimpanan permanen), <code>NS_KODE_OPERATOR</code> (kode undangan operator).</li>
+    </ul>
+  </aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>05 / 07</span></div>
+</section>
+
+<!-- =============================== SLIDE 5 =============================== -->
+<section class="slide" data-judul="Kesimpulan dan Tanya Jawab">
+  <div class="kepala">
+    <div class="penanda"><b>06</b>Kesimpulan</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+  <h2>Cepat. Tertib forensik. <em>Berdaulat.</em></h2>
+
+  <div class="penutup">
+    <div class="besar kartu-dasar" style="--i:0"><b>±1,2 dtk</b><strong>Penahanan ancaman</strong><span>dari keputusan operator sampai jaringan terputus, bukti sudah aman.</span></div>
+    <div class="besar kartu-dasar" style="--i:1"><b class="biru">2,8%</b><strong>CPU <i class="asing">server</i></strong><span>untuk 300 layar komando, turun dari 10,8% (−74%).</span></div>
+    <div class="besar kartu-dasar" style="--i:2"><b>−80%</b><strong>Lalu lintas jaringan</strong><span>8,4 → 1,7 MB/s saat serangan intensif.</span></div>
+    <div class="besar kartu-dasar" style="--i:3"><b class="biru">196</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin dan AI lokal; lulus semua.</span></div>
+  </div>
+
+  <div class="jaminan">
+    <span>SEPENUHNYA DEFENSIF</span>
+    <span>LURING PENUH</span>
+    <span>KEPUTUSAN DI TANGAN MANUSIA</span>
+    <span>DATA SINTETIS (RFC 5737)</span>
+    <span>DIUKUR, BUKAN DIPROYEKSIKAN</span>
+  </div>
+
+  <p class="pernyataan">Nusantara Shield menggeser postur posko siber satuan dari reaktif menjadi proaktif: ancaman terlihat lebih awal, penahanan dalam hitungan detik, dan <span class="neon">tidak ada pemulihan yang menghapus barang bukti.</span></p>
+
+    <div class="penempatan">
+    <div class="label">USULAN PENEMPATAN<small>belum diuji di satuan</small></div>
+    <div class="tk"><b>SATUAN · LAPIS TAKTIS</b><strong>Posko siber RS TNI AD</strong><span>operator jaga · Dansat (pengamat)</span></div>
+    <div class="tk"><b>KODAM</b><strong>Sansidam</strong><span>Sandi dan Siber Kodam · Tim Penangkalan Siber</span></div>
+    <div class="tk"><b>PUSAT · LAPIS OPERASIONAL</b><strong>Pussiberad · Kartika CSIRT</strong><span>terima LAPSIT dan bukti</span></div>
+  </div>
+
+  <div class="qa">Siap untuk tanya jawab</div>
+
+  <aside class="catatan">
+    <h4>Catatan pembicara · Slide 6 · Bekal tanya jawab</h4>
+    <ul>
+      <li><b>"Dipasang di mana, siapa operatornya?"</b> Di posko siber tiap rumah sakit Tentara Nasional Indonesia Angkatan Darat (TNI AD), satu <i class="asing">server</i> luring per satuan. Operatornya petugas TI rumah sakit atau Bintara Siber; Dansat sebagai pengamat. Laporan dan bukti naik ke Sandi dan Siber Kodam (Sansidam) (Tim Penangkalan Siber) lalu ke Pusat Siber Angkatan Darat (Pussiberad) dan Kartika Computer Security Incident Response Team (CSIRT). Pengiriman otomatis ke pusat belum dibangun.</li>
+      <li><b>"Bagaimana angka ini diukur?"</b> Uvicorn sungguhan dengan 100 dan 300 klien siaran serentak; CPU dan memori dibaca dari proses <i class="asing">server</i>; Chromium untuk waktu skrip kanvas.</li>
+      <li><b>"Bagaimana jika alat forensik gagal saat serangan menyebar?"</b> Isolasi Darurat: alasan tertulis ≥15 karakter, tahan 1,5 detik, tercatat di tiga tempat. Pemulihan tetap terkunci sampai bukti susulan diamankan dan <i class="asing">hash</i> cocok.</li>
+      <li><b>"Bagaimana mencegah log diubah diam-diam?"</b> Log audit dan Buku Rantai Bukti berantai HMAC-SHA256: satu catatan diubah, rantai langsung putus dan ketahuan.</li>
+      <li><b>"Apakah sistem memakai AI atau internet?"</b> AI ya, internet tidak. Engine Deteksi Anomali (Isolation Forest) sudah berjalan luring di <i class="asing">server</i> satuan dan menilai 9 aset dalam ±10 milidetik. Engine Asisten Narasi (LLM lokal) dan Mode Hybrid n8n adalah peta jalan, belum dibangun.</li>
+      <li><b>"Kenapa rumah sakit?"</b> TNI AD punya aset kesehatan vital (RSPAD, rumah sakit jajaran Kesdam), tempat konvergensi IT dan OT menyangkut nyawa. Data kesehatan bernilai tinggi (279 juta data penduduk dijual pada 2021, sampelnya diduga dari BPJS Kesehatan), dan <i class="asing">ransomware</i> sudah menyasar OT rumah sakit (Winnipeg, Agustus 2026). Di purwarupa, "Rumah Sakit Pemerintah" dan genset adalah data contoh.</li>
+      <li><b>"Bagaimana dengan OT?"</b> Pengendali genset (Modbus, port 502) ada di inventaris yang sama dengan aset IT. Kabar ancaman Modbus atau perintah tulis Modbus yang tidak wajar (dibaca AI lokal) menaikkannya ke WASPADA, dan skenario Sabotase OT memutus jalur kantor ↔ zona kendali ±1,2 detik setelah bukti aman, mengikuti National Institute of Standards and Technology (NIST) SP 800-82: jalurnya yang diputus, genset tetap menyala. Perintah ke sakelar di purwarupa masih simulasi.</li>
+      <li><b>"Apakah ini alat ofensif?"</b> Tidak. Sepenuhnya defensif; data latihan sintetis dari blok alamat dokumentasi RFC 5737.</li>
+      <li><b>"Bagaimana jika banyak proses / <i class="asing">server</i>?"</b> Saat ini satu proses; Hub dapat dipindah ke perantara pesan bersama sebagai tahap lanjut.</li>
+      <li>Saat demo: isi <code>NS_AUDIT_KEY</code> agar nomor LAPSIT dan buku HMAC berlanjut setelah <i class="asing">server</i> dinyalakan ulang.</li>
+    </ul>
+  </aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>06 / 07</span></div>
+</section>
+
+<!-- =============================== SLIDE 7 · LAMPIRAN =============================== -->
+<section class="slide" data-judul="Lampiran: Kamus Singkatan">
+  <div class="kepala">
+    <div class="penanda"><b>07</b>Lampiran · Kamus Singkatan</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+  <h2>Kamus singkatan. <em>Kepanjangan dulu, singkatan sesudahnya.</em></h2>
+  <div class="dua-kolom kamus-kolom"><table class="kamus"><tbody><tr><td><b>AAR</b></td><td>After-Action Review</td></tr><tr><td><b>API</b></td><td>Application Programming Interface</td></tr><tr><td><b>BSSN</b></td><td>Badan Siber dan Sandi Negara</td></tr><tr><td><b>CDN</b></td><td>Content Delivery Network</td></tr><tr><td><b>CDOC</b></td><td>Cyber Defense Operation Center</td></tr><tr><td><b>CPU</b></td><td>Central Processing Unit</td></tr><tr><td><b>CSIRT</b></td><td>Computer Security Incident Response Team</td></tr><tr><td><b>CTI</b></td><td>Cyber Threat Intelligence</td></tr><tr><td><b>DDoS</b></td><td>Distributed Denial of Service</td></tr><tr><td><b>DMZ</b></td><td>Demilitarized Zone</td></tr><tr><td><b>HMAC</b></td><td>Hash-based Message Authentication Code</td></tr><tr><td><b>IP</b></td><td>Internet Protocol</td></tr><tr><td><b>IT</b></td><td>Information Technology</td></tr><tr><td><b>LAPSIT</b></td><td>Laporan Situasi</td></tr></tbody></table><table class="kamus"><tbody><tr><td><b>LLM</b></td><td>Large Language Model</td></tr><tr><td><b>MISP</b></td><td>Malware Information Sharing Platform</td></tr><tr><td><b>NIST</b></td><td>National Institute of Standards and Technology</td></tr><tr><td><b>OODA</b></td><td>Observe–Orient–Decide–Act</td></tr><tr><td><b>OSINT</b></td><td>Open Source Intelligence</td></tr><tr><td><b>OT</b></td><td>Operational Technology</td></tr><tr><td><b>PDNS</b></td><td>Pusat Data Nasional Sementara</td></tr><tr><td><b>RDP</b></td><td>Remote Desktop Protocol</td></tr><tr><td><b>RFC</b></td><td>Request for Comments</td></tr><tr><td><b>SHA-256</b></td><td>Secure Hash Algorithm 256-bit</td></tr><tr><td><b>SIMRS</b></td><td>Sistem Informasi Manajemen Rumah Sakit</td></tr><tr><td><b>SOAR</b></td><td>Security Orchestration, Automation and Response</td></tr><tr><td><b>Sansidam</b></td><td>Sandi dan Siber Kodam</td></tr><tr><td><b>SOC</b></td><td>Security Operations Center</td></tr><tr><td><b>SSE</b></td><td>Server-Sent Events</td></tr></tbody></table></div>
+  <aside class="catatan"><h4>Catatan pembicara · Lampiran</h4><p>Tampilkan slide ini bila juri bertanya arti sebuah singkatan. Arti sederhana tiap istilah ada di lampiran Proposal dan Dokumentasi Teknis.</p></aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>07 / 07</span></div>
+</section>
+
+</main>
+
+<nav class="kendali" aria-label="Navigasi slide">
+  <button id="mundur" title="Sebelumnya (←)" aria-label="Slide sebelumnya">‹</button>
+  <span class="hitung" id="hitung">1 / 6</span>
+  <button id="maju" title="Berikutnya (→)" aria-label="Slide berikutnya">›</button>
+  <button id="tombolCatatan" title="Catatan pembicara (N)" aria-label="Catatan pembicara">✎</button>
+  <button id="tombolPenuh" title="Layar penuh (F)" aria-label="Layar penuh">⛶</button>
+</nav>
+<div id="catatan" role="note"></div>
+
+<script>
+"use strict";
+(() => {
+  const panggung = document.getElementById("panggung");
+  const slide = [...document.querySelectorAll(".slide")];
+  const hitung = document.getElementById("hitung");
+  const kemajuan = document.getElementById("kemajuan");
+  const catatan = document.getElementById("catatan");
+  let kini = 0;
+
+  // Panggung 1600×900 diskalakan agar pas di layar apa pun (proyektor, laptop, layar lebar).
+  function skalakan() {
+    const s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    panggung.style.setProperty("--skala", s);
+  }
+
+  function ke(n) {
+    n = Math.max(0, Math.min(slide.length - 1, n));
+    slide.forEach((el, i) => {
+      el.classList.toggle("aktif", i === n);
+      el.classList.toggle("lalu", i < n);
+    });
+    kini = n;
+    hitung.textContent = `${n + 1} / ${slide.length}`;
+    kemajuan.style.width = `${((n + 1) / slide.length) * 100}%`;
+    const c = slide[n].querySelector("aside.catatan");
+    catatan.innerHTML = c ? c.innerHTML : "";
+    document.title = `${n + 1}/${slide.length} · ${slide[n].dataset.judul} — Nusantara Shield`;
+    try { history.replaceState(null, "", `#${n + 1}`); } catch (_) { /* file:// di beberapa peramban */ }
+  }
+
+  function layarPenuh() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+    else document.exitFullscreen?.();
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    const k = e.key;
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(k)) { e.preventDefault(); ke(kini + 1); }
+    else if (["ArrowLeft", "PageUp", "Backspace"].includes(k)) { e.preventDefault(); ke(kini - 1); }
+    else if (k === "Home") ke(0);
+    else if (k === "End") ke(slide.length - 1);
+    else if (/^[1-9]$/.test(k)) ke(Number(k) - 1);
+    else if (k === "f" || k === "F") layarPenuh();
+    else if (k === "n" || k === "N") document.body.classList.toggle("catatan-on");
+  });
+
+  // Klik di panggung: sepertiga kiri = mundur, sisanya = maju.
+  panggung.addEventListener("click", (e) => {
+    const r = panggung.getBoundingClientRect();
+    ke((e.clientX - r.left) < r.width / 3 ? kini - 1 : kini + 1);
+  });
+
+  // Geser di layar sentuh.
+  let x0 = null;
+  window.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  window.addEventListener("touchend", (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 50) ke(kini + (dx < 0 ? 1 : -1));
+    x0 = null;
+  });
+
+  document.getElementById("maju").addEventListener("click", () => ke(kini + 1));
+  document.getElementById("mundur").addEventListener("click", () => ke(kini - 1));
+  document.getElementById("tombolCatatan").addEventListener("click", () => document.body.classList.toggle("catatan-on"));
+  document.getElementById("tombolPenuh").addEventListener("click", layarPenuh);
+
+  // Kendali muncul saat tetikus bergerak, lalu menghilang agar layar bersih.
+  let tunda;
+  window.addEventListener("mousemove", () => {
+    document.body.classList.add("gerak");
+    clearTimeout(tunda);
+    tunda = setTimeout(() => document.body.classList.remove("gerak"), 1800);
+  });
+
+  window.addEventListener("resize", skalakan);
+  skalakan();
+  const awal = parseInt(location.hash.slice(1), 10);
+  ke(Number.isFinite(awal) ? awal - 1 : 0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+# Dokumentasi Teknis — Nusantara Shield v5.1
+
+**Platform Respons Insiden Siber Otomatis dengan Rantai Bukti Forensik**
+
+| | |
+| --- | --- |
+| **Versi** | 5.1 (Fase 7: aset rumah sakit dan isolasi Operational Technology (OT)) · 20 Oktober 2026 |
+| **Status uji** | **196 / 196 uji otomatis lulus** · diverifikasi dari paket rilis bersih |
+| **AI** | **Engine Deteksi Anomali berjalan lokal**: Isolation Forest (scikit-learn), dilatih dan dijalankan di _server_ satuan, tanpa Application Programming Interface (API) luar |
+| **Arsitektur** | _Server_ FastAPI (Python) · peramban Vanilla JS + Canvas · siaran langsung Server-Sent Events (SSE) · buku berantai HMAC-SHA256 |
+| **Mode operasi** | **Luring penuh**: tanpa internet, Content Delivery Network (CDN), atau layanan awan saat berjalan |
+| **Data** | Sintetis: Internet Protocol (IP) blok dokumentasi Request for Comments (RFC) 5737, nama orang dan satuan fiktif |
+
+---
+
+## 1. Spesifikasi Lingkungan dan Dependensi
+
+### 1.1 Kebutuhan Perangkat
+
+| Komponen | Kebutuhan minimum | Catatan operasional |
+| --- | --- | --- |
+| **Sistem operasi** | Linux, macOS, atau Windows 10+ | Uji otomatis diverifikasi di Linux; Windows memakai `run_tests.bat` |
+| **Python** | **3.10 atau lebih baru** | Satu-satunya _runtime_ yang perlu dipasang |
+| **Prosesor** | 2 inti | Terukur **2,8% Central Processing Unit (CPU)** untuk 300 layar pemantau serentak |
+| **Memori** | 512 MB bebas | Terukur **±71 MB** untuk 300 layar sebelum AI; pustaka AI (scikit-learn dan numpy) menambah **±130 MB** |
+| **Penyimpanan** | 50 MB | Paket rilis **187 KB**; sisanya pustaka Python |
+| **Peramban** | Chrome, Edge, atau Firefox versi terbaru | Tanpa *plugin*; bekerja di jaringan tertutup |
+| **Jaringan** | Internet **hanya sekali**, saat `pip install` | Setelah terpasang, seluruh operasi luring |
+| **Port** | 8000/TCP (dapat diubah) | Hanya untuk akses dari jaringan internal satuan |
+
+### 1.2 Dependensi Perangkat Lunak
+
+| Pustaka | Versi | Fungsi dalam sistem |
+| --- | --- | --- |
+| **fastapi** | ≥0.115 | Loket API, validasi masukan, otorisasi per peran |
+| **uvicorn[standard]** | ≥0.30 | _Server_ web asinkron (siaran langsung SSE) |
+| **reportlab** | ≥4.0 | Ekspor laporan situasi (LAPSIT) ke PDF |
+| **scikit-learn** | ≥1.3 | AI lokal: model Isolation Forest untuk deteksi anomali (membawa numpy); berjalan luring |
+| **pytest** | ≥8.0 | Menjalankan 196 uji otomatis |
+| **httpx** | ≥0.27 | Klien uji untuk loket API |
+
+### 1.3 Pengaturan Utama (*Environment Variable*)
+
+| Variabel | Fungsi | Bila tidak diisi |
+| --- | --- | --- |
+| `NS_OPERATOR_PASSWORD` · `NS_VIEWER_PASSWORD` | Sandi akun bawaan (min. 12 karakter) | Sandi acak dicetak sekali di terminal |
+| `NS_AUDIT_KEY` | Kunci Hash-based Message Authentication Code (HMAC) buku audit dan buku bukti; mengaktifkan penyimpanan permanen | Buku hanya di memori (mode demo) |
+| `NS_KODE_OPERATOR` | Kode undangan untuk mendaftar sebagai operator | Pendaftaran operator mandiri **tertutup** |
+| `NS_DAFTAR_PENGAMAT` | `1` = siapa pun boleh mendaftar sebagai pengamat | Terbuka |
+| `NS_HTTPS` | `1` = aktifkan HTTP Strict Transport Security (HSTS) di belakang Hypertext Transfer Protocol Secure (HTTPS) | Nonaktif |
+
+---
+
+## 2. Arsitektur Alur Data
+
+### 2.1 Alur Data dalam Siklus OODA
+
+```mermaid
+graph TD
+    A["<b>AMATI</b><br/>Aset IT &amp; OT · Radio CTI / OSINT"]
+    B["<b>ORIENTASI</b><br/>Korelasi CTI ⇄ inventaris aset + skor anomali AI lokal<br/>→ peluang serangan per aset"]
+    C(["<b>PUTUSKAN</b> · Operator menahan tombol 0,6 detik"])
+    subgraph BERTINDAK["BERTINDAK · urutan dikunci server"]
+        direction LR
+        D1["① Amankan bukti<br/>SHA-256"] --> D2["② Isolasi<br/>jaringan"] --> D3["③ LAPSIT<br/>otomatis"]
+    end
+    E[("<b>JEJAK HMAC</b><br/>Buku Rantai Bukti · Log audit")]
+    A --> B --> C
+    C -->|"perintah lewat gerbang keamanan"| BERTINDAK
+    BERTINDAK --> E
+
+    classDef amati fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#064e3b
+    classDef orientasi fill:#eef2f7,stroke:#64748b,stroke-width:2px,color:#0f172a
+    classDef putuskan fill:#0b1a33,stroke:#0b1a33,stroke-width:2px,color:#ffffff
+    classDef bertindak fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef jejak fill:#e2e8f0,stroke:#0b1a33,stroke-width:2px,color:#0f172a
+    class A amati
+    class B orientasi
+    class C putuskan
+    class D1,D2,D3 bertindak
+    class E jejak
+    style BERTINDAK fill:#fff7f7,stroke:#dc2626,stroke-width:1.5px,stroke-dasharray:5 4,color:#7f1d1d
+```
+
+> **Cara membaca:** data mengalir dari atas ke bawah mengikuti siklus Observe–Orient–Decide–Act (OODA). **Satu-satunya titik keputusan adalah operator** (kuning). Semua yang di bawahnya dieksekusi mesin dalam urutan terkunci, dan setiap langkah meninggalkan jejak di buku berantai HMAC (ungu).
+
+### 2.2 Komponen Sistem
+
+| Komponen | Berkas | Tanggung jawab |
+| --- | --- | --- |
+| **Loket API** | `app/main.py` | Menerima perintah, validasi masukan, otorisasi per peran |
+| **Gerbang keamanan** | `app/keamanan.py` | _Login_, token, peran, batas laju, batas ukuran kiriman 16 KB |
+| **Engine Deteksi Anomali (AI lokal)** | `app/ai_anomali.py` | Melatih Isolation Forest dari profil lalu lintas normal saat _server_ menyala; menilai enam ciri lalu lintas tiap aset; menyusun alasan yang bisa dibaca |
+| **Dapur situasi** | `app/telemetri.py` | Topologi (zona Information Technology (IT) dan zona kendali OT), korelasi Cyber Threat Intelligence (CTI), _playbook_ 4 skenario (termasuk Sabotase OT), **kunci urutan bukti → isolasi → pulihkan** |
+| **Brankas bukti** | `app/bukti.py` | Salinan barang bukti, sidik jari Secure Hash Algorithm 256-bit (SHA-256), berita acara |
+| **Buku berantai** | `app/audit.py` | HMAC-SHA256 berantai untuk log audit dan Buku Rantai Bukti |
+| **Hub siaran** | `app/siaran.py`, `app/delta.py` | Satu siaran untuk semua layar; hanya ralat (delta) yang dikirim |
+| **Dasbor** | `static/` | Peta, radar, Action Center, alat operator, manajemen akun |
+
+Dasbor menyajikan tiga lapis tampilan pusat komando siber: **_strategic heatmap_** (Peta Global, kotak Postur), **_operational incident board_** (Action Center, Laporan Situasi (LAPSIT)), dan **_tactical endpoint list_** (Topologi Internal, daftar aset).
+
+### 2.3 Kinerja Terukur
+
+| Ukuran (300 layar serentak) | Sebelum optimasi | Sesudah |
+| --- | --- | --- |
+| CPU _server_ | 10,8% | **2,8%** |
+| Memori _server_ | 90 MB | **71 MB** |
+| Lalu lintas saat serangan intensif | 8,4 MB/s | **1,7 MB/s** (−80%) |
+| Kerja grafis kanvas yang tidak terlihat | 44 ms/detik | **0 ms** |
+
+Setelah AI lokal ditambahkan: melatih model ±0,16 detik sekali saat _server_ menyala; menilai 9 aset ±10 milidetik, hanya saat keadaan lalu lintas berubah (hasil disimpan per keadaan). Rata-rata tambahan kerja _server_ ±0,05 milidetik per detik.
+
+### 2.4 Engine Deteksi Anomali (AI Lokal)
+
+**Status: sudah beroperasi penuh di purwarupa, luring.** Engine ini mencari lalu lintas yang **tidak wajar** tanpa menunggu kabar CTI dan tanpa daftar _signature_ serangan.
+
+| Bagian | Isi |
+| --- | --- |
+| **Model** | Isolation Forest (scikit-learn): 100 pohon, benih acak tetap 2026 sehingga hasilnya dapat diulang dan diaudit |
+| **Data latih** | 1.500 contoh lalu lintas **normal** sintetis, dibuat dan dilatih di _server_ saat menyala (±0,16 detik); tidak ada berkas model yang diunduh |
+| **Enam ciri per aset** | Jumlah koneksi, volume data, ragam _port_ tujuan, _login_ gagal, operasi tulis (untuk genset: perintah tulis Modbus), porsi koneksi ke luar jaringan |
+| **Skor** | 0 sampai 1. Lalu lintas wajar ±0,39; pola tidak wajar 0,61–0,70. **Ambang 0,58**. |
+| **Ke peluang serangan** | p<sub>AI</sub> = min(0,95; 0,5 + (skor − 0,58) × 4), lalu digabung dengan CTI: **p = 1 − (1 − p<sub>CTI</sub>)(1 − p<sub>AI</sub>)**. **Perketat** memotong p<sub>AI</sub> sebesar 70%. |
+| **Alasan (_explainability_)** | Dua ciri yang paling menyimpang ditulis dalam bahasa manusia, misalnya *"perintah tulis Modbus 10× normal, porsi koneksi ke luar jaringan 8× normal"* |
+| **Batas wewenang** | AI hanya **menaikkan status** (WASPADA) dan mencatat di log. Ia tidak pernah memutus jaringan; keputusan tetap di tangan operator (_human-in-the-loop_). Aset yang sedang insiden diurus _playbook_, bukan prediksi AI. |
+
+**_Local inference_ dan _air-gapped_ adalah dua hal berbeda.** _Local inference_ berarti model dihitung di _server_ sendiri, bukan lewat API di internet; engine ini memenuhinya sejak sekarang. _Air-gapped_ berarti jaringan satuan sama sekali tidak tersambung ke internet. Karena engine ini tidak membuka koneksi apa pun (dikunci uji yang memblokir _socket_), ia **siap** dipasang di jaringan _air-gapped_; paket pustakanya cukup dibawa lewat media yang sudah diperiksa.
+
+**Peta jalan: Engine Asisten Narasi.** Model bahasa lokal (misalnya Llama 3 lewat Ollama) untuk menyusun draf LAPSIT **belum ada** di purwarupa. Model berat ini sengaja tidak dimasukkan ke _server_ inti agar CPU tetap hemat; rencananya berjalan sebagai layanan terpisah di _server_ satuan dan drafnya tetap diperiksa operator.
+
+> **Batas purwarupa:** ciri lalu lintas masih **sintetis**. Di lapangan, ciri yang sama diambil dari sensor jaringan (misalnya Zeek atau Suricata), lalu model dilatih ulang dari lalu lintas normal satuan itu sendiri.
+
+---
+
+## 3. SOP Respons Insiden (Workflow F-04)
+
+### 3.1 Alur Baku
+
+<div class="ilustrasi" id="ilustrasi-rantai">
+<svg viewBox="0 0 760 300" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alur baku rantai bukti forensik F-04: deteksi, amankan bukti, isolasi, pulihkan" style="font-family:Inter,'Segoe UI','DejaVu Sans',Arial,sans-serif">
+  <defs>
+    <radialGradient id="rbBg" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#13284a"/><stop offset="1" stop-color="#0b1a33"/></radialGradient>
+    <pattern id="rbGrid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#64748b" stroke-opacity=".12" stroke-width="1"/></pattern>
+    <marker id="rbPanah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f5c451"/></marker>
+  </defs>
+  <rect width="760" height="300" rx="12" fill="url(#rbBg)"/>
+  <rect width="760" height="300" rx="12" fill="url(#rbGrid)"/>
+  <text x="380" y="31" font-size="17" font-weight="800" fill="#f1f5f9" text-anchor="middle" letter-spacing="1.5">RANTAI BUKTI FORENSIK · ALUR BAKU F-04</text>
+  <text x="380" y="51" font-size="11.5" fill="#94a3b8" text-anchor="middle">Bukti diamankan sebelum jaringan diputus · pemulihan dibuka hanya bila sidik jari bukti cocok</text>
+  <rect x="10" y="68" width="158" height="180" rx="12" fill="#0b1a33" fill-opacity=".85" stroke="#f59e0b" stroke-width="2"/><rect x="24" y="66" width="130" height="4" rx="2" fill="#f59e0b"/><text x="22" y="94" font-size="12" font-weight="700" fill="#f59e0b" font-family="ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace">01</text><text x="44" y="94" font-size="12.5" font-weight="800" fill="#f1f5f9" letter-spacing=".5">DETEKSI</text><circle cx="89.0" cy="136" r="20" fill="none" stroke="#f59e0b" stroke-opacity=".5" stroke-width="1.4"/><circle cx="89.0" cy="136" r="11" fill="none" stroke="#f59e0b" stroke-opacity=".35" stroke-width="1.2"/><path d="M89.0 124L101.0 145H77.0Z" fill="#0b1a33" stroke="#f59e0b" stroke-width="2" stroke-linejoin="round"/><path d="M89.0 132V138" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round"/><circle cx="89.0" cy="141.5" r="1.3" fill="#f59e0b"/><text x="22" y="190.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">Insiden tampil di radar</text>
+  <text x="22" y="204.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">& Action Center. Korelasi</text>
+  <text x="22" y="219.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">CTI + AI lokal menaikkan</text>
+  <text x="22" y="233.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">aset ke status WASPADA.</text><path d="M173 136H198" stroke="#f5c451" stroke-width="2.4" marker-end="url(#rbPanah)"/><rect x="204" y="68" width="158" height="180" rx="12" fill="#0b1a33" fill-opacity=".85" stroke="#60a5fa" stroke-width="2"/><rect x="218" y="66" width="130" height="4" rx="2" fill="#60a5fa"/><text x="216" y="94" font-size="12" font-weight="700" fill="#60a5fa" font-family="ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace">02</text><text x="238" y="94" font-size="12.5" font-weight="800" fill="#f1f5f9" letter-spacing=".5">AMANKAN BUKTI</text><rect x="245.0" y="122" width="76" height="28" rx="5" fill="#0b1a33" stroke="#60a5fa" stroke-width="1.6"/><text x="283.0" y="141" font-size="14" font-weight="700" fill="#60a5fa" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace">SHA-256</text><text x="283.0" y="165" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace">9f3a…c27e</text><text x="216" y="190.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">Salin memori, log, trafik.</text>
+  <text x="216" y="204.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">Hitung SHA-256 tiap</text>
+  <text x="216" y="219.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">berkas. Berita acara</text>
+  <text x="216" y="233.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">BB-2026-001 terbit.</text><path d="M365 136H392" stroke="#f5c451" stroke-width="2.4" marker-end="url(#rbPanah)"/><circle cx="380.0" cy="110" r="12" fill="#0b1a33" stroke="#dc2626" stroke-width="1.8"/><rect x="375.2" y="109.2" width="9.600000000000001" height="7.2" rx="1.5" fill="#dc2626"/><path d="M377.12 109.2V106.4A2.8800000000000003 2.8800000000000003 0 0 1 382.88 106.4V109.2" fill="none" stroke="#dc2626" stroke-width="1.36"/><rect x="398" y="68" width="158" height="180" rx="12" fill="#0b1a33" fill-opacity=".85" stroke="#dc2626" stroke-width="2"/><rect x="412" y="66" width="130" height="4" rx="2" fill="#dc2626"/><text x="410" y="94" font-size="12" font-weight="700" fill="#dc2626" font-family="ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace">03</text><text x="432" y="94" font-size="12.5" font-weight="800" fill="#f1f5f9" letter-spacing=".5">ISOLASI</text><path d="M443.0 136H467.0M487.0 136H511.0" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/><rect x="463.0" y="129" width="8" height="14" rx="2" fill="#dc2626"/><rect x="483.0" y="129" width="8" height="14" rx="2" fill="#dc2626"/><path d="M474.0 122L480.0 130M481.0 142L475.0 150M477.0 134V138" stroke="#f59e0b" stroke-width="1.6" stroke-linecap="round"/><text x="410" y="190.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">Jaringan diputus ±1,2</text>
+  <text x="410" y="204.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">detik setelah bukti aman.</text>
+  <text x="410" y="219.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">Tanpa bukti: ditolak</text>
+  <text x="410" y="233.5" font-size="10.5" fill="#cbd5e1" text-anchor="start"><tspan font-style="italic">server</tspan> (409).</text><path d="M559 136H586" stroke="#f5c451" stroke-width="2.4" marker-end="url(#rbPanah)"/><circle cx="574.0" cy="110" r="12" fill="#0b1a33" stroke="#dc2626" stroke-width="1.8"/><rect x="569.2" y="109.2" width="9.600000000000001" height="7.2" rx="1.5" fill="#dc2626"/><path d="M571.12 109.2V106.4A2.8800000000000003 2.8800000000000003 0 0 1 576.88 106.4V109.2" fill="none" stroke="#dc2626" stroke-width="1.36"/><rect x="592" y="68" width="158" height="180" rx="12" fill="#0b1a33" fill-opacity=".85" stroke="#10b981" stroke-width="2"/><rect x="606" y="66" width="130" height="4" rx="2" fill="#10b981"/><text x="604" y="94" font-size="12" font-weight="700" fill="#10b981" font-family="ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace">04</text><text x="626" y="94" font-size="12.5" font-weight="800" fill="#f1f5f9" letter-spacing=".5">PULIHKAN</text><circle cx="671.0" cy="136" r="17" fill="none" stroke="#10b981" stroke-width="2"/><path d="M663.0 136L669.0 142L680.0 129" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><text x="604" y="190.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">Dibuka hanya bila SHA-256</text>
+  <text x="604" y="204.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">bukti cocok ulang.</text>
+  <text x="604" y="219.0" font-size="10.5" fill="#cbd5e1" text-anchor="start">Tidak cocok: tetap</text>
+  <text x="604" y="233.5" font-size="10.5" fill="#cbd5e1" text-anchor="start">terkunci.</text>
+  <rect x="10" y="260" width="740" height="30" rx="8" fill="#64748b" fill-opacity=".16" stroke="#64748b" stroke-opacity=".4"/>
+  <circle cx="30" cy="275" r="9" fill="#0b1a33" stroke="#dc2626" stroke-width="1.5"/><rect x="26.28" y="274.38" width="7.4399999999999995" height="5.58" rx="1.5" fill="#dc2626"/><path d="M27.768 274.38V272.21A2.232 2.232 0 0 1 32.232 272.21V274.38" fill="none" stroke="#dc2626" stroke-width="1.054"/>
+  <text x="46" y="279" font-size="11" fill="#cbd5e1"><tspan font-weight="700" fill="#f1f5f9">Gerbang <tspan font-style="italic">server</tspan>:</tspan> langkah berikutnya ditolak (409) sampai syarat terpenuhi</text>
+  <text x="740" y="279" font-size="11" fill="#cbd5e1" text-anchor="end">Semua langkah tercatat di <tspan font-weight="700" fill="#10b981">log audit HMAC</tspan></text>
+</svg>
+<p class="keterangan"><em>Ringkasan alur baku F-04. Rincian tiap langkah ada di tabel dan diagram urutan berikut.</em></p>
+</div>
+
+Kolom pertama memetakan langkah ke siklus _incident response_ **_detect_ → _contain_ → _eradicate_ → _recover_** (Purbo dan Lumy, 2025).
+
+| Langkah | Tindakan | Siapa | Pengaman yang ditegakkan _server_ |
+| --- | --- | --- | --- |
+| **1 · Deteksi** (_detect_) | Insiden tampil di radar, peta, dan Action Center | Sistem | Korelasi CTI dan skor anomali AI lokal menaikkan aset berisiko ke **WASPADA** lebih awal |
+| **2 · Amankan bukti** (_chain of custody_) | Salin memori, log, dan trafik (pada purwarupa: berkas simulasi); hitung **SHA-256** tiap berkas; tulis berita acara | Sistem, dipicu operator | Bukti yang sudah diamankan **tidak bisa dibatalkan** (buku tambah-saja) |
+| **3 · Isolasi** (_contain_) | Putus jaringan aset terdampak, ±1,2 detik setelah bukti aman | Operator **menahan tombol ⚡ 0,6 detik** | Setiap pemutusan tanpa bukti **ditolak 409**, baik lewat tombol, centang manual, maupun antrean |
+| **4 · Lapor** | **LAPSIT** bernomor terbit ke pimpinan | Sistem | Terbit **hanya setelah semua** tindakan pemutusan tuntas |
+| **5 · Pulihkan** (_eradicate_, _recover_) | Hidupkan layanan dari cadangan teruji | Operator | **Terkunci** sampai aset terisolasi, _playbook_ dicentang, dan **SHA-256 bukti cocok ulang** |
+| **6 · Evaluasi** (_After-Action Review_) | Tinjau akar masalah dan perbarui _playbook_ | Kasi Siber | Langkah terakhir _playbook_; seluruh jejak tersedia di log audit HMAC |
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Op as Operator
+    participant SV as Server
+    participant BB as Buku Rantai Bukti
+    participant LA as Log audit HMAC
+    participant PM as Pimpinan
+
+    Op->>SV: Tahan ⚡ ISOLASI (0,6 dtk)
+    rect rgba(220, 38, 38, 0.10)
+        Note over SV,BB: TITIK KRITIS · isolasi dikunci (409)
+        SV->>BB: Amankan bukti · SHA-256
+        BB-->>SV: Berita acara BB-2026-001
+        BB-->>LA: Dicerminkan
+    end
+    Note over SV: Kunci dibuka
+    SV->>SV: ±1,2 dtk: isolasi jaringan
+    SV->>PM: LAPSIT (rujuk BB-2026-001)
+    SV->>LA: LAPSIT dicatat
+    Op->>SV: PULIHKAN
+    rect rgba(16, 185, 129, 0.10)
+        SV->>BB: Cocokkan ulang SHA-256
+        alt Cocok
+            SV-->>Op: Layanan dipulihkan
+        else Tidak cocok
+            SV-->>Op: 409 · pemulihan dikunci
+        end
+    end
+```
+
+### 3.2 Isolasi Darurat (*Emergency Override*)
+
+> **Prinsip:** penahanan ancaman yang menyebar cepat **tidak boleh disandera** oleh kegagalan alat forensik. Pengecualian ini **wajib dipertanggungjawabkan**.
+
+- **Kapan tersedia:** hanya bila bukti **belum** dapat diamankan, misalnya agen forensik tidak merespons. Bila bukti sudah aman, isolasi darurat ditolak.
+- **Syarat eksekusi:**
+    - alasan tertulis, **minimal 15 karakter**;
+    - tombol **⚠ ISOLASI DARURAT** ditahan **1,5 detik**, lebih lama dari jalur standar.
+- **Jejak yang tercipta seketika:**
+    1. halaman **Buku Rantai Bukti**, berisi alasan, petugas, dan waktu;
+    2. entri **log audit HMAC** dengan sidik jari yang sama;
+    3. alasan tercantum di **LAPSIT** kepada pimpinan.
+- **Setelah ancaman tertahan:** bukti **susulan** wajib diamankan. Pemulihan tetap terkunci sampai sidik jarinya cocok.
+
+### 3.3 Latihan Sinergi IT/OT
+
+Purwarupa memantau aset OT **Pengendali genset** (`192.0.2.120`, **Modbus/TCP _port_ 502**) di **zona kendali (OT)** topologi, milik layanan *Kendali Fasilitas RS · genset & catu daya*. Aset IT pasangannya adalah *Rumah Sakit Pemerintah · Sistem Informasi Manajemen Rumah Sakit (SIMRS)*. Alur demonstrasi yang dapat diulang:
+
+| Langkah | Tindakan operator | Yang terjadi |
+| --- | --- | --- |
+| **1** | Panel **Prediksi CTI + AI** → buka *Berita intelijen aktif* → tekan **Latihan OT: siarkan kabar Modbus (genset)** | Kabar **CTI-109** (celah protokol Modbus) masuk Radio CTI |
+| **2** | Amati topologi dan radar | Genset naik ke **WASPADA**, *risiko ± 66 %* (0,80 keyakinan × 0,75 paparan × 1,1 sektor energi), **sebelum** ada serangan |
+| **3** | Tekan **Perketat** pada genset | Paparan dipotong 70%; peluang turun di bawah 30%, status kembali normal; tercatat di log audit |
+| **4** | Panel **Latihan** → target **Kendali Fasilitas RS** → skenario **Sabotase OT** | Genset **KRITIS** (perintah tulis Modbus asing); penyerang `203.0.113.45:502` tampil di peta |
+| **5** | Tahan **⚡ EKSEKUSI ISOLASI** 0,6 detik | Bukti disegel SHA-256 (lalu lintas Modbus, log _workstation_ teknisi, konfigurasi pengendali). **±1,2 detik** kemudian, _webhook_ (simulasi) ke sakelar terkelola memutus **jalur kantor → zona kendali**; genset tetap menyala dengan kendali lokal. Akses jarak jauh dicabut, lalu LAPSIT SEV-1 terbit. |
+| **6** | Centang *Cek fisik*, tekan **♻ PULIHKAN** | Jalur kendali disambung kembali **hanya** bila sidik jari SHA-256 bukti cocok ulang |
+
+**Latihan AI (tanpa kabar CTI).** Setelah keadaan dikembalikan (tombol **Reset demo**), tekan **Latihan AI: suntik lalu lintas Modbus tak wajar (genset)** di panel Prediksi CTI + AI. Engine Deteksi Anomali memberi skor **±0,67** (di atas ambang 0,58), genset naik ke **WASPADA** dengan alasan *"perintah tulis Modbus 10× normal"*, dan log mencatat **"AI lokal ▶ lalu lintas tidak wajar …"**. Aset lain tetap normal. Suntikan berakhir sendiri setelah 5 menit dan log mencatat lalu lintas kembali wajar.
+
+> **Batas purwarupa:** perintah ke sakelar masih **simulasi webhook**, dan sensor protokol industri belum dibangun. Desainnya sudah mengikuti prosedur keselamatan OT (NIST SP 800-82): yang diputus adalah **jalur antara jaringan kantor dan zona kendali**, bukan pengendalinya.
+
+### 3.4 Pemisahan Wewenang
+
+| Peran | Wewenang | Cara memperoleh akun |
+| --- | --- | --- |
+| **Pengamat** | Melihat seluruh dasbor | Akun bawaan, atau daftar sendiri di halaman masuk |
+| **Operator** | Melihat, memicu latihan, isolasi IT/OT, pemulihan, mengelola akun | Akun bawaan, **kode undangan** (`NS_KODE_OPERATOR`), atau dibuatkan operator lain |
+
+---
+
+## 4. Instruksi Pemasangan (*Deployment*)
+
+### 4.1 Menjalankan _Server_
+
+```bash
+# 1. Masuk ke folder proyek
+cd nusantara-shield-v5.1
+
+# 2. Buat lingkungan Python lokal (sekali saja)
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+
+# 3. Pasang dependensi (satu-satunya langkah yang butuh internet)
+pip install -r requirements.txt
+
+# 4. Nyalakan server
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log --no-server-header
+```
+
+Buka **http://127.0.0.1:8000**. Sandi akun bawaan tercetak di terminal saat _server_ menyala.
+
+### 4.2 Menjalankan Uji Otomatis
+
+```bash
+./run_tests.sh          # macOS / Linux
+run_tests.bat           # Windows
+```
+
+Cuplikan **keluaran asli** `./run_tests.sh` (tiga uji pertama tiap kelompok ditampilkan; daftar lengkap tercetak di terminal):
+
+<div style="background:#0f172a;border-radius:10px;overflow:hidden;border:1px solid #1e293b;box-shadow:0 8px 24px rgba(15,23,42,.35);font-family:ui-monospace,Menlo,Consolas,'DejaVu Sans Mono',monospace;font-size:7.4pt;line-height:1.5;margin:10px 0;break-inside:avoid">
+  <div style="display:flex;align-items:center;gap:7px;padding:8px 12px;background:#1e293b;border-bottom:1px solid #334155">
+    <span style="width:11px;height:11px;border-radius:50%;background:#ef4444;display:inline-block"></span>
+    <span style="width:11px;height:11px;border-radius:50%;background:#f59e0b;display:inline-block"></span>
+    <span style="width:11px;height:11px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+    <span style="flex:1;text-align:center;color:#94a3b8;font-size:7.6pt;margin-right:40px">operator@posko-siber: ~/nusantara-shield-v5.1 — ./run_tests.sh</span>
+  </div>
+  <div style="padding:10px 14px 12px;color:#e2e8f0">
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#4ade80">operator@posko-siber</span><span style="color:#94a3b8">:~/nusantara-shield-v5.1$</span> ./run_tests.sh</div>
+    <div style="color:#fbbf24;white-space:pre-wrap;word-break:break-all;margin:0">▶ Menjalankan uji otomatis Nusantara Shield v5.1 — setiap uji tampil satu baris beserta hasilnya</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">============================= test session starts ==============================</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">platform linux -- Python 3.13.16, pytest-9.1.1, pluggy-1.7.0 -- /usr/bin/python3</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">rootdir: …/nusantara-shield-v5.1</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">configfile: pytest.ini</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">testpaths: tests</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">plugins: anyio-4.15.1</div>
+    <div style="color:#94a3b8;white-space:pre-wrap;word-break:break-all;margin:0">collecting ... collected 196 items</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ AI lokal: deteksi anomali Isolation Forest, luring, dengan alasan yang bisa dibaca ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_ai.py::</span><span style="color:#e2e8f0">test_model_dilatih_lokal_dengan_benih_tetap_dan_hasilnya_dapat_diaudit</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[0%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_ai.py::</span><span style="color:#e2e8f0">test_lalu_lintas_wajar_tidak_memicu_alarm_palsu</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[1%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_ai.py::</span><span style="color:#e2e8f0">test_latihan_modbus_menaikkan_genset_ke_waspada_tanpa_kabar_cti</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[1%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 7 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Manajemen akun: pendaftaran pengamat/operator, dasbor akun operator ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_akun.py::</span><span style="color:#e2e8f0">test_pengamat_mendaftar_sendiri_lalu_login_dan_hanya_bisa_melihat</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[5%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_akun.py::</span><span style="color:#e2e8f0">test_operator_mandiri_tanpa_kode_atau_kode_salah_ditolak</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[6%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_akun.py::</span><span style="color:#e2e8f0">test_operator_dengan_kode_undangan_sah_bisa_mengubah</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[6%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 15 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Intelijen ancaman (CTI) &amp; SOAR: prediksi, pengerasan, isolasi, peta ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_cti_soar.py::</span><span style="color:#e2e8f0">test_loket_baru_wajib_login_dan_hanya_operator[/api/cti/siarkan-data0]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[14%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_cti_soar.py::</span><span style="color:#e2e8f0">test_loket_baru_wajib_login_dan_hanya_operator[/api/soar/jalankan-data1]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[15%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_cti_soar.py::</span><span style="color:#e2e8f0">test_loket_baru_wajib_login_dan_hanya_operator[/api/soar/perketat-data2]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[15%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 15 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Kamus istilah: tidak ada label yang tertanam di luar app/istilah.py ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_istilah.py::</span><span style="color:#e2e8f0">test_tidak_ada_label_tertanam_di_luar_kamus[Amankan bukti]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[23%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_istilah.py::</span><span style="color:#e2e8f0">test_tidak_ada_label_tertanam_di_luar_kamus[BUKTI DIAMANKAN]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[24%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_istilah.py::</span><span style="color:#e2e8f0">test_tidak_ada_label_tertanam_di_luar_kamus[Buku Rantai Bukti]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[25%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 26 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Keamanan &amp; akses: login, peran, batas laju, header, batas ukuran kiriman, log audit ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_keamanan.py::</span><span style="color:#e2e8f0">test_semua_endpoint_wajib_login[get-/api/layanan-None]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[38%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_keamanan.py::</span><span style="color:#e2e8f0">test_semua_endpoint_wajib_login[post-/api/indikator/cari-data1]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[39%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_keamanan.py::</span><span style="color:#e2e8f0">test_semua_endpoint_wajib_login[post-/api/simulasi-data2]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[39%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 35 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Rantai komando &amp; laporan: isolasi pre-authorized, LAPSIT, Quick Call ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_komando.py::</span><span style="color:#e2e8f0">test_quick_call_wajib_login_dan_hanya_operator</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[58%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_komando.py::</span><span style="color:#e2e8f0">test_quick_call_menolak_input_aneh[data0]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[58%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_komando.py::</span><span style="color:#e2e8f0">test_quick_call_menolak_input_aneh[data1]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[59%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 19 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Sinergi IT/OT: kabar Modbus menaikkan pengendali genset ke WASPADA ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_ot.py::</span><span style="color:#e2e8f0">test_genset_terdaftar_sebagai_aset_ot_di_topologi_dan_radar</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[69%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_ot.py::</span><span style="color:#e2e8f0">test_kabar_modbus_menaikkan_genset_ke_waspada_sebelum_serangan</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[69%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_ot.py::</span><span style="color:#e2e8f0">test_perketat_genset_menurunkan_peluang_di_bawah_ambang</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[70%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 3 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Rantai bukti forensik: bukti sebelum isolasi, isolasi darurat, cocok hash ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_rantai_bukti.py::</span><span style="color:#e2e8f0">test_setiap_playbook_diawali_amankan_bukti_sebelum_pemutusan[ransomware]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[72%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_rantai_bukti.py::</span><span style="color:#e2e8f0">test_setiap_playbook_diawali_amankan_bukti_sebelum_pemutusan[ddos]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[72%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_rantai_bukti.py::</span><span style="color:#e2e8f0">test_setiap_playbook_diawali_amankan_bukti_sebelum_pemutusan[sabotase_ot]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[73%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 33 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="color:#38bdf8;font-weight:700;margin:8px 0 2px;white-space:pre-wrap;word-break:break-all;margin:0">── ▶ Telemetri &amp; siaran: panel bergerak, dapur tunggal, tambalan delta ──</div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_telemetri.py::</span><span style="color:#e2e8f0">test_telemetri_wajib_login[/api/telemetri]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[90%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_telemetri.py::</span><span style="color:#e2e8f0">test_telemetri_wajib_login[/api/telemetri/siaran]</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[91%]</span></div>
+    <div style="white-space:pre-wrap;word-break:break-all;margin:0"><span style="color:#64748b">test_telemetri.py::</span><span style="color:#e2e8f0">test_pengamat_boleh_melihat_tetapi_tidak_memicu</span> <span style="color:#4ade80;font-weight:700">PASSED</span> <span style="color:#64748b">[91%]</span></div>
+    <div style="color:#64748b;font-style:italic;white-space:pre-wrap;word-break:break-all;margin:0">   ⋯ 16 uji lain dalam kelompok ini · semuanya PASSED</div>
+    <div style="margin-top:10px;padding:6px 10px;border-radius:6px;background:rgba(74,222,128,.12);color:#4ade80;font-weight:700;text-align:center;white-space:pre-wrap;word-break:break-all;margin:0">═══════ 196 passed in 42.97s ═══════</div>
+  </div>
+</div>
+
+
+Setiap uji tampil satu baris beserta hasilnya. Target: `196 passed`.
+
+| Kelompok uji | Jumlah | Yang dijamin |
+| --- | --- | --- |
+| Keamanan dan akses | 38 | _Login_, peran, batas laju, _header_ keamanan, batas ukuran kiriman, log audit antimanipulasi |
+| Rantai bukti forensik | 36 | Bukti sebelum isolasi, isolasi darurat beralasan, pemulihan wajib cocok _hash_; berlaku juga untuk Sabotase OT |
+| Kamus istilah | 29 | Seluruh label (kini istilah satuan) berasal dari satu kamus |
+| Rantai komando dan laporan | 22 | Isolasi praotorisasi, LAPSIT tepat sekali, nomor tidak berulang |
+| Telemetri dan siaran | 19 | Satu dapur untuk semua layar, ralat delta identik dengan _server_ |
+| Intelijen ancaman dan Security Orchestration, Automation and Response (SOAR) | 18 | Peringatan dini, pengerasan aset, isolasi bertahap |
+| Manajemen akun | 18 | Pendaftaran aman, pemisahan peran, dasbor akun operator |
+| AI lokal | 10 | Model dilatih lokal dengan benih tetap; tanpa alarm palsu; Modbus tak wajar → WASPADA beserta alasan; gabungan dengan CTI; Perketat; penilaian dalam milidetik; berjalan tanpa jaringan |
+| Sinergi IT/OT | 6 | Genset (Modbus 502) terdaftar; kabar Modbus → WASPADA; Perketat; tanpa alarm palsu IT ⇄ OT; Sabotase OT: bukti → putus jalur ±1,2 dtk, genset tetap menyala; pemulihan terkunci bila _hash_ beda |
+
+### 4.3 Mengemas untuk Distribusi
+
+```bash
+python tools/kemas_rilis.py      # → dist/nusantara-shield-v5.1.zip (± 187 KB)
+```
+
+Paket dibuat **tanpa** `.venv`, `.env`, data operasional, dan *cache*. Penerima cukup mengulang langkah 4.1.
+
+---
+
+## 5. Cara Penggunaan Singkat
+
+1. **Masuk.** Buka alamat _server_ di peramban, lalu masuk sebagai `operator` (boleh bertindak) atau `pengamat` (hanya melihat). Sandi diambil dari pengaturan `NS_OPERATOR_PASSWORD` dan `NS_VIEWER_PASSWORD`, atau dicetak di terminal saat _server_ menyala.
+2. **Baca situasi.** Kotak Postur, Topologi Internal atau Peta Global, Radar Anomali, dan pita Radio CTI menunjukkan kondisi seluruh aset.
+3. **Latih skenario.** Pada panel Latihan, pilih target layanan dan skenario (_Ransomware_, Distributed Denial of Service (DDoS), Backup mati, atau Sabotase OT). Tombol latihan OT menyiarkan kabar Modbus untuk melihat peringatan dini; tombol **Latihan AI** menyuntik lalu lintas tak wajar untuk melihat AI lokal bekerja.
+4. **Tangani insiden.** Di Action Center, tahan tombol **EKSEKUSI ISOLASI** selama 0,6 detik. Bukti disegel lebih dulu, lalu pemutusan berjalan dan LAPSIT terbit.
+5. **Pulihkan dan laporkan.** Centang langkah _playbook_ yang tersisa; tombol Pulihkan terbuka setelah sidik jari bukti cocok ulang. LAPSIT dapat diekspor ke PDF dari tab "Audit & SITREP".
+
+---
+
+## 6. Riwayat Pengembangan dan Atribusi
+
+**Deklarasi (pasal 5.3 Syarat dan Ketentuan).** Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program (12 Oktober 2026), dari versi 1 hingga versi 5.1 yang diserahkan. Selain pustaka sumber terbuka di bawah ini, tidak ada kode dari karya pihak lain atau karya tim yang dibuat sebelum tanggal tersebut.
+
+**Atribusi (pasal 5.4).**
+
+| Komponen | Kegunaan | Lisensi |
+| --- | --- | --- |
+| **FastAPI** (beserta Starlette dan Pydantic) | Kerangka _server_ dan validasi masukan | MIT dan BSD-3-Clause |
+| **Uvicorn** | _Server_ web asinkron | BSD-3-Clause |
+| **ReportLab** | Ekspor LAPSIT ke PDF | BSD |
+| **scikit-learn** dan **NumPy** | AI lokal: model Isolation Forest untuk deteksi anomali | BSD-3-Clause |
+| **pytest** dan **HTTPX** | Uji otomatis | MIT dan BSD-3-Clause |
+| **Mermaid** dan **Playwright (Chromium)** | Hanya untuk menggambar diagram dan mencetak dokumen ini; tidak dipakai aplikasi | MIT, Apache-2.0, dan BSD-3-Clause |
+| **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi (AI di dalam aplikasi adalah model lokal scikit-learn di atas) | Layanan komersial |
+| **Blok alamat IP RFC 5737** | Data latihan sintetis | Standar terbuka IETF |
+
+**Rujukan kerangka.** Purbo, O. W., dan Lumy, G. D. (2025). _Cyber Warfare & Pertahanan Siber Indonesia_. Peraturan Presiden Nomor 82 Tahun 2022 tentang Pelindungan Infrastruktur Informasi Vital. National Institute of Standards and Technology (NIST) SP 800-82.
+
+---
+
+## Lampiran: Kamus Istilah
+
+Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutkan menurut abjad.
+
+| Istilah | Kepanjangan atau arti | Penjelasan sederhana |
+| --- | --- | --- |
+| **AAR** | _After-Action Review_ (tinjauan pascatindakan) | Rapat evaluasi setelah insiden: apa yang terjadi, apa penyebabnya, dan apa yang diperbaiki. |
+| **Action Center** | Pusat tindakan | Panel di dasbor tempat operator melihat insiden dan menekan tombol isolasi. |
+| **AI lokal** | Kecerdasan buatan yang berjalan di komputer sendiri | Model yang dilatih dan dihitung di _server_ satuan, tanpa mengirim data ke internet. |
+| **_Air-gapped_** | Jaringan terpisah dari internet | Jaringan yang secara fisik tidak tersambung ke internet sama sekali. |
+| **Alamat IP** | Alamat _Internet Protocol_ | Nomor unik setiap perangkat di jaringan, seperti nomor rumah. |
+| **API** | _Application Programming Interface_ | "Loket" tempat layar dan _server_ saling meminta data. |
+| **Aset** | Barang yang dilindungi | Perangkat atau sistem penting: komputer, _server_, basis data, genset. |
+| **Bintara Siber** | Prajurit Tentara Nasional Indonesia Angkatan Darat (TNI AD) berpangkat bintara di bidang siber | Calon operator harian sistem ini di satuan. |
+| **BSSN** | Badan Siber dan Sandi Negara | Lembaga keamanan siber nasional. |
+| **CDN** | _Content Delivery Network_ | Layanan luar untuk memuat huruf atau skrip situs web. Nusantara Shield tidak memakainya. |
+| **CDOC** | Cyber Defense Operation Center | Pusat operasi pertahanan siber di tingkat satuan. |
+| **CPU** | Central Processing Unit | Otak komputer; persentasenya menunjukkan seberapa sibuk server. |
+| **CSIRT** | _Computer Security Incident Response Team_ | Tim tanggap insiden siber. Kartika CSIRT adalah milik TNI AD. |
+| **CTI** | _Cyber Threat Intelligence_ (intelijen ancaman siber) | Kabar dari luar tentang ancaman yang sedang beredar, misalnya celah baru pada suatu perangkat. |
+| **Dansat** | Komandan Satuan | Pimpinan unit; di sistem ini berperan sebagai pengamat yang menerima laporan. |
+| **DDoS** | _Distributed Denial of Service_ | Serangan banjir permintaan agar layanan lumpuh karena kewalahan. |
+| **Deteksi anomali** | Pengenalan perilaku tidak wajar | Menandai lalu lintas yang menyimpang dari kebiasaan, tanpa perlu daftar serangan yang sudah dikenal. |
+| **DMZ** | Demilitarized Zone | Zona penyangga antara internet dan jaringan dalam, seperti lobi. |
+| **Enkripsi** | Penyandian data | Mengubah data menjadi sandi. _Ransomware_ memakainya untuk mengunci data korban. |
+| **_Explainability_** | Keterjelasan | AI wajib menyebut alasannya dalam bahasa manusia, misalnya "perintah tulis Modbus 10× normal". |
+| **Forensik digital** | Penyelidikan bukti elektronik | Mengamankan dan memeriksa jejak digital agar pelaku bisa ditelusuri dan bukti sah. |
+| **_Hash_ / SHA-256** | Sidik jari digital | Rumus yang mengubah isi berkas menjadi 64 karakter. Isi berubah satu huruf, sidik jarinya berubah total. |
+| **HMAC** | _Hash-based Message Authentication Code_ | Segel digital berkunci. Setiap catatan log disegel dan terhubung ke catatan sebelumnya, sehingga perubahan diam-diam langsung ketahuan. |
+| **HSTS** | HTTP Strict Transport Security | Aturan agar peramban selalu memakai sambungan terenkripsi. |
+| **HTTPS** | Hypertext Transfer Protocol Secure | Sambungan web yang dienkripsi. |
+| **_Human-in-the-loop_** | Manusia tetap memegang keputusan | Mesin hanya menyarankan; tindakan memutus jaringan harus disetujui operator. |
+| **Isolasi** | Pemutusan jaringan | Memutus jalur perangkat yang diserang agar serangan tidak menyebar. |
+| **Isolation Forest** | Nama algoritma _machine learning_ | Cara mesin menemukan data yang aneh: data yang tidak wajar paling cepat "terpisah" dari kelompoknya. |
+| **IT** | _Information Technology_ (teknologi informasi) | Komputer kantor, _server_, dan jaringannya. |
+| **Kodam** | Komando Daerah Militer | Komando TNI AD tingkat wilayah (provinsi). |
+| **LAPSIT** | Laporan Situasi | Laporan resmi singkat tentang insiden: apa, di mana, kapan, dan tindakan yang diambil. |
+| **LLM** | _Large Language Model_ (model bahasa besar) | AI penyusun teks, misalnya Llama 3. Di proyek ini masih rencana. |
+| **_Local inference_** | Perhitungan AI di komputer sendiri | Model dijalankan di _server_ sendiri, bukan lewat layanan di internet. Berbeda dengan _air-gapped_. |
+| **Log audit** | Catatan jejak | Daftar siapa melakukan apa dan kapan di dalam sistem. |
+| **Luring** | Di luar jaringan (_offline_) | Berjalan tanpa sambungan internet. |
+| **_Machine learning_** | Pembelajaran mesin | Komputer belajar pola dari contoh data, bukan dari aturan yang ditulis satu per satu. |
+| **MISP** | Malware Information Sharing Platform | Platform berbagi kabar ancaman antarlembaga. |
+| **ML** | Machine Learning | Cara komputer belajar pola dari contoh data. |
+| **Modbus** | Bahasa komunikasi mesin industri | Protokol untuk memerintah mesin seperti genset; memakai _port_ 502. |
+| **NIST** | National Institute of Standards and Technology | Lembaga standar Amerika Serikat; SP 800-82 adalah panduan keamanan sistem industri. |
+| **_On-premise_** | Terpasang di tempat sendiri | Dipasang di perangkat milik satuan, bukan disewa dari layanan awan. |
+| **OODA** | _Observe–Orient–Decide–Act_ | Siklus keputusan: Amati, Orientasi, Putuskan, Bertindak. Siapa yang lebih cepat, dia unggul. |
+| **Operator** | Petugas jaga sistem | Satu-satunya peran yang boleh menekan tombol tindakan. |
+| **OSINT** | Open Source Intelligence | Intelijen dari sumber terbuka, misalnya berita dan buletin keamanan. |
+| **OT** | _Operational Technology_ (teknologi operasional) | Perangkat yang mengendalikan mesin fisik, seperti genset dan catu daya rumah sakit. |
+| **PDNS** | Pusat Data Nasional Sementara | Pusat data pemerintah yang lumpuh diserang ransomware pada Juni 2024. |
+| **Perketat** | Pengerasan (_hardening_) | Tombol untuk mengurangi celah sebuah aset sebelum diserang. |
+| **_Playbook_** | Buku panduan langkah | Urutan tindakan baku untuk setiap jenis insiden. |
+| **_Port_** | Pintu layanan | Nomor "pintu" di perangkat; tiap layanan punya nomornya sendiri. |
+| **Purwarupa** | _Prototype_ | Versi percobaan untuk membuktikan gagasan, belum dipakai di lapangan. |
+| **Pussiberad** | Pusat Siber Angkatan Darat | Satuan pusat TNI AD yang menangani pertahanan siber; penyelenggara lomba. |
+| **_Ransomware_** | Program penyandera data | Program jahat yang mengunci data lalu meminta tebusan. |
+| **RDP** | Remote Desktop Protocol | Cara mengendalikan komputer dari jarak jauh. |
+| **RFC 5737** | Standar alamat IP contoh | Blok alamat IP khusus dokumentasi yang tidak dipakai di internet sungguhan, sehingga aman untuk demo. |
+| **Sansidam** | Sandi dan Siber Kodam | Unit sandi dan siber di tingkat Kodam yang membantu satuan di wilayahnya. |
+| **Satuan** | Unit organisasi militer | Misalnya rumah sakit TNI AD beserta personelnya. |
+| **_Server_** | Komputer pelayan | Komputer yang melayani komputer lain; di sini tempat Nusantara Shield berjalan. |
+| **SEV-1** | _Severity 1_ (tingkat keparahan tertinggi) | Label untuk insiden paling gawat. |
+| **SIMRS** | Sistem Informasi Manajemen Rumah Sakit | Sistem komputer rekam medis dan layanan pasien. |
+| **SOAR** | _Security Orchestration, Automation and Response_ | Otomasi langkah respons keamanan, misalnya pemutusan jalur yang sudah disetujui. |
+| **SOC** | _Security Operations Center_ (pusat operasi keamanan) | Ruang dan tim yang memantau keamanan jaringan setiap saat. |
+| **SSE** | _Server-Sent Events_ | Cara _server_ mengirim kabar terbaru ke layar secara langsung. |
+| **SSH** | Secure Shell | Akses jarak jauh ke server lewat baris perintah. |
+| **STIX** | Structured Threat Information Expression | Format standar untuk menulis kabar ancaman. |
+| **TAXII** | Trusted Automated Exchange of Intelligence Information | Cara standar mengirim kabar ancaman antarsistem. |
+| **TNI AD** | Tentara Nasional Indonesia Angkatan Darat | Matra darat dari angkatan bersenjata Indonesia. |
+| **Uji otomatis** | _Automated test_ | Daftar periksa yang dijalankan komputer untuk memastikan setiap aturan sistem benar. |
+| **WASPADA** | Status siaga | Tanda kuning: aset berisiko tinggi diserang, walaupun serangan belum terjadi. |
+| **_Webhook_** | Panggilan otomatis | Pesan otomatis dari satu sistem ke sistem lain, misalnya perintah ke sakelar jaringan. |
+| **Zona kendali** | Jaringan khusus mesin (OT) | Bagian jaringan tempat pengendali mesin fisik berada, dipisah dari jaringan kantor. |

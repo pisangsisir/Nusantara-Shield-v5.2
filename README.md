@@ -7,6 +7,18 @@ Peladen FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak au
 - Berjalan **luring** (tanpa internet): tidak ada CDN, font, atau gambar dari luar.
 - Tidak menyimpan data pribadi; log audit tidak menyimpan alamat IP pengunjung.
 
+## Struktur Repositori
+
+```
+app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
+static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
+tests/          196 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tools/          alat bantu (pengemasan rilis)
+docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), dan diagram alur
+presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
+CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (20 Okt 2026)
+```
+
 ## Daftar isi
 
 1. [Cara menjalankan](#1-cara-menjalankan)

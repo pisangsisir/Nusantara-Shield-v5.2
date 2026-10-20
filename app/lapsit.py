@@ -1,5 +1,5 @@
 """
-sitrep.py — Membuat Laporan Situasi (SITREP) dalam format PDF.
+lapsit.py — Membuat laporan situasi dalam format PDF (label resmi diambil dari kamus istilah).
 
 Analogi: notulen rapat darurat yang dicetak otomatis. Isinya ringkasan
 status semua layanan, insiden yang sedang berjalan, dan bukti bahwa buku
@@ -28,10 +28,10 @@ def buat_pdf(layanan: list[dict], hasil_audit: dict, pembuat: str) -> bytes:
     buffer = BytesIO()
     dok = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
                             topMargin=16 * mm, bottomMargin=16 * mm,
-                            title="SITREP Nusantara Shield", author="Nusantara Shield")
+                            title="LAPSIT Nusantara Shield", author="Nusantara Shield")
     waktu = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     isi = [
-        Paragraph("SITREP — Nusantara Shield", gaya["Title"]),
+        Paragraph("LAPSIT — Nusantara Shield", gaya["Title"]),
         Paragraph(f"Dibuat: {escape(waktu)} · oleh akun: {escape(pembuat)}", gaya["Normal"]),
         Paragraph("<i>Dokumen demo. Seluruh data sintetis, tidak memuat data pribadi.</i>",
                   gaya["Normal"]),

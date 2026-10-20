@@ -88,9 +88,9 @@ def test_loket_izin_lama_sudah_tidak_ada(klien, jalur):
 
 # ---------- data korporat ----------
 @pytest.mark.parametrize("lid,kunci_jabatan,cabang", [
-    ("imigrasi", "pic_cabang_utama", "Kantor Pusat Jakarta"),
-    ("pajak", "pic_basis_data", "Cabang Surabaya"),
-    ("kesehatan", "pic_cabang", "Cabang Makassar"),
+    ("imigrasi", "pic_cabang_utama", "RSPAD Gatot Soebroto, Jakarta"),
+    ("pajak", "pic_basis_data", "Markas Utama Surabaya"),
+    ("kesehatan", "pic_cabang", "RS Kesdam Makassar"),
 ])
 def test_setiap_aset_punya_pic_teknis_cabang(klien, lid, kunci_jabatan, cabang):
     h = masuk(klien)
@@ -128,7 +128,7 @@ def test_isolasi_langsung_tanpa_izin_dan_ir_terkirim_otomatis(klien):
     assert ir["kepada"] == nama_manajemen() and ir["tindakan"] == ["Blokir IP anomali"]
     assert ir["rincian"] == [{"id": "blokir_ip", "label": "Blokir IP anomali", "status": "selesai",
                               "metode": "soar", "detik": 5}]
-    assert ir["detik"] == 5 and ir["cabang"] == "Cabang Makassar"
+    assert ir["detik"] == 5 and ir["cabang"] == "RS Kesdam Makassar"
     assert ir["bukti"]["nomor"].startswith("BB-") and len(ir["bukti"]["sha256"]) == 64 and ir["darurat"] is None
     k = klien.get("/api/telemetri", headers=h).json()
     assert k["komando"]["kesehatan"]["ir"]["nomor"] == ir["nomor"] and k["ir"][0]["nomor"] == ir["nomor"]

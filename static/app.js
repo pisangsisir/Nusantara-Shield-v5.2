@@ -1173,7 +1173,7 @@ async function majukanWaktu(ev) {
   if (j) { toast(`Waktu maju ${jam} jam.`); setelahAksi(); }
 }
 
-// ---------------------------------------------------------------- Alat: audit & SITREP
+// ---------------------------------------------------------------- Alat: audit & LAPSIT
 async function muatAudit(diam = false) {
   const j = await coba(() => api("/api/audit"));
   if (!j) return;
@@ -1208,15 +1208,15 @@ async function verifikasi(ev) {
   sp.className = `spanduk ${j.utuh ? "baik" : "buruk"}`;
   sp.replaceChildren(ikon(j.utuh ? "hijau" : "merah"), el("span", { teks: `${j.pesan} (${j.jumlah} catatan diperiksa)` }));
 }
-async function eksporSitrep(ev) {
-  const r = await coba(() => sibuk(ev.currentTarget, () => api("/api/sitrep", { metode: "POST", mentah: true })));
+async function eksporLapsit(ev) {
+  const r = await coba(() => sibuk(ev.currentTarget, () => api("/api/lapsit", { metode: "POST", mentah: true })));
   if (!r) return;
   const blob = await r.blob();
   const cocok = /filename="([^"]+)"/.exec(r.headers.get("Content-Disposition") || "");
-  const a = el("a", { href: URL.createObjectURL(blob), download: cocok ? cocok[1] : "SITREP.pdf" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: cocok ? cocok[1] : "LAPSIT.pdf" });
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  toast("SITREP PDF berhasil dibuat.");
+  toast("LAPSIT PDF berhasil dibuat.");
   muatAudit();
 }
 async function resetDemo() {
@@ -1453,7 +1453,7 @@ document.addEventListener("DOMContentLoaded", () => {
   gambarRiwayat();
   $$(".majukan").forEach((b) => b.addEventListener("click", majukanWaktu));
   $("#tombol-verifikasi").addEventListener("click", verifikasi);
-  $("#tombol-sitrep").addEventListener("click", eksporSitrep);
+  $("#tombol-lapsit").addEventListener("click", eksporLapsit);
   $("#tombol-reset").addEventListener("click", resetDemo);
   $("#saring-aksi").addEventListener("change", () => gambarAudit(true));
 

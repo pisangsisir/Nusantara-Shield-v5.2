@@ -1,7 +1,7 @@
 # Nusantara Shield v5.1
 
 Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hackathon 2026.
-Peladen FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
+*Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
 - Semua data **sintetis**: alamat IP dari blok dokumentasi RFC 5737, nama orang & instansi **fiktif**.
 - Berjalan **luring** (tanpa internet): tidak ada CDN, font, atau gambar dari luar.
@@ -13,11 +13,14 @@ Peladen FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak au
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
 tests/          196 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
-tools/          alat bantu (pengemasan rilis)
+tools/          alat bantu: pengemasan rilis, perbaikan .venv (perbaiki_venv.sh)
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), dan diagram alur
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
 CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (20 Okt 2026)
 ```
+
+> **Folder proyek dipindah lalu muncul `cannot execute: No such file or directory` atau `No module named 'numpy'`?**
+> `.venv` mencatat jalur folder secara mutlak sehingga rusak bila dipindah. Jalankan `bash tools/perbaiki_venv.sh`, lalu `source .venv/bin/activate` dan `./run_tests.sh`.
 
 ## Daftar isi
 
@@ -56,7 +59,7 @@ source .venv/bin/activate
 # 3. Pasang perlengkapan
 pip install -r requirements.txt
 
-# 4. Nyalakan peladen
+# 4. Nyalakan server
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log --no-server-header
 ```
 
@@ -71,10 +74,10 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log --no
 ```
 
 Buka **http://127.0.0.1:8000**. Sandi sementara akun bawaan `operator` dan `pengamat` tercetak di
-terminal saat peladen menyala. Dua opsi pada perintah uvicorn sengaja dipakai:
+terminal saat *server* menyala. Dua opsi pada perintah uvicorn sengaja dipakai:
 
 - `--no-access-log` — alamat IP pengunjung tidak dicatat (minimisasi data).
-- `--no-server-header` — peladen tidak mengumumkan mereknya kepada penyerang.
+- `--no-server-header` — *server* tidak mengumumkan mereknya kepada penyerang.
 
 ### Mode permanen (opsional)
 
@@ -124,7 +127,7 @@ flowchart TB
         OSINT["📻 Radio CTI / OSINT<br/>berita ancaman tiap 30 dtk"]
     end
 
-    subgraph S2["② Peladen FastAPI"]
+    subgraph S2["② Server FastAPI"]
         KORELASI["🔎 Korelasi CTI ⇄ inventaris aset<br/>peluang serangan per aset"]
         DAPUR["🍳 Dapur tunggal<br/>masak gambaran situasi 1×/detik"]
         HUB["📢 Hub siaran SSE<br/>potret utuh sekali, lalu tambalan delta"]
@@ -164,7 +167,7 @@ flowchart TB
     class BUKTI,LAPSIT,AUDIT jejak
 ```
 
-**Cara membacanya:** data dari sensor & radio CTI (①) dimasak SEKALI per detik oleh peladen (②) lalu
+**Cara membacanya:** data dari sensor & radio CTI (①) dimasak SEKALI per detik oleh *server* (②) lalu
 disiarkan ke semua layar (③). Ketika operator menekan tombol, perintahnya melewati gerbang keamanan dan
 kunci urutan; setiap keputusan meninggalkan jejak di buku-buku berantai HMAC (④) yang tidak bisa diubah
 diam-diam.
@@ -176,7 +179,7 @@ sequenceDiagram
     autonumber
     actor Op as Operator
     participant UI as Browser
-    participant SV as Peladen
+    participant SV as Server
     participant BB as Buku Rantai Bukti
     participant LA as Log audit (HMAC)
     participant MJ as Manajemen
@@ -219,8 +222,8 @@ sequenceDiagram
 | Action Center | Satu kartu per insiden: status bukti, ⚡ isolasi, isolasi darurat, langkah playbook, ♻ pemulihan | Panel komando |
 | Beban Jaringan | Gauge + riwayat 48 detik | Meteran air |
 | Aset (triase) | Status 6 layanan contoh; klik untuk laci PIC & Quick Call | Papan triase IGD |
-| Log | Peristiwa dari peladen (ringkas 2 baris ⇄ semua) | Rekam gejala pasien |
-| Alat operator | Cek indikator, kepatuhan backup, Audit & SITREP PDF, **Akun** (khusus operator) | Pos satpam & buku piket |
+| Log | Peristiwa dari *server* (ringkas 2 baris ⇄ semua) | Rekam gejala pasien |
+| Alat operator | Cek indikator, kepatuhan backup, Audit & LAPSIT PDF, **Akun** (khusus operator) | Pos satpam & buku piket |
 
 ---
 
@@ -260,7 +263,7 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - Pengamat tidak bisa mengubah data; tebak sandi dibatasi 5×/menit
 - Input aneh & indikator tidak valid ditolak; kiriman > 16 KB ditolak sebelum mencapai router (termasuk *chunked*)
 - Header keamanan terpasang (juga pada penolakan); dokumentasi API dimatikan; CORS menolak situs asing
-- Log audit menyimpan data seminimal mungkin dan mendeteksi manipulasi; SITREP PDF terbentuk
+- Log audit menyimpan data seminimal mungkin dan mendeteksi manipulasi; LAPSIT PDF terbentuk
 
 **Manajemen akun** — `tests/test_akun.py` (18 uji)
 - Pengamat bisa daftar sendiri lalu login, tetapi hanya bisa melihat
@@ -273,7 +276,7 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - DDoS menggerakkan semua panel; langkah playbook memutus kabel di peta & radar; kronologi diteteskan bertahap
 - Siaran menutup diri saat logout; jumlah siaran per akun dibatasi
 - Satu dapur: biaya tidak bertambah dengan jumlah layar; dapur tetap hidup walau satu masakan gagal
-- Tambalan delta: layar yang merakit tambalan selalu identik dengan peladen, dan tambalan jauh lebih kecil
+- Tambalan delta: layar yang merakit tambalan selalu identik dengan *server*, dan tambalan jauh lebih kecil
 
 **Intelijen ancaman & SOAR** — `tests/test_cti_soar.py` (18 uji)
 - Berita relevan menaikkan aset ke waspada sebelum serangan; berita tak relevan hanya dicatat; berita memudar
@@ -336,7 +339,7 @@ dibatasi lajunya dan dicatat di log audit.
 | `POST /api/komando/panggil` | operator | Quick Call ke PIC cabang (simulasi) |
 | `GET /api/bukti` | semua | Buku Rantai Bukti + verifikasi rantai |
 | `GET /api/audit` · `GET /api/audit/verifikasi` | semua | Log audit + verifikasi rantai |
-| `POST /api/sitrep` | semua | Ekspor SITREP PDF |
+| `POST /api/lapsit` | semua | Ekspor LAPSIT PDF |
 | `POST /api/indikator/cari`, `/api/backup/catat`, `/api/demo/majukan-waktu`, `/api/reset-demo` | campuran | Alat operator |
 | `GET /api/health` · `GET /api/istilah` | publik | Status minimal · kamus label |
 
@@ -346,7 +349,7 @@ dibatasi lajunya dan dicatat di log audit.
 
 | Syarat | Penerapan | Berkas |
 | --- | --- | --- |
-| Autentikasi | Token acak 8 jam; peladen hanya menyimpan hash token; sandi PBKDF2 200.000 putaran | `app/keamanan.py` |
+| Autentikasi | Token acak 8 jam; *server* hanya menyimpan hash token; sandi PBKDF2 200.000 putaran | `app/keamanan.py` |
 | Otorisasi | Peran `pengamat` (lihat) dan `operator` (lihat, ubah, kelola akun) | `app/keamanan.py` |
 | Pendaftaran aman | Operator hanya dengan kode undangan atau oleh operator; pembatasan laju | `app/keamanan.py`, `app/main.py` |
 | Batas laju | Login 5/menit, daftar 5/5 menit, ubah 30/menit, PDF 5/menit, baca 120/menit | `app/keamanan.py` |
@@ -357,7 +360,7 @@ dibatasi lajunya dan dicatat di log audit.
 | Jejak audit | Dua buku berantai HMAC-SHA256 (log audit & Buku Rantai Bukti) | `app/audit.py`, `app/bukti.py` |
 | Siaran aman | Token di header (bukan URL), diperiksa ulang tiap 2 detik; maks 4 siaran/akun | `app/main.py` |
 
-Batas yang perlu diketahui: peladen berjalan sebagai **satu proses** (Hub siaran ada di memori proses itu).
+Batas yang perlu diketahui: *server* berjalan sebagai **satu proses** (Hub siaran ada di memori proses itu).
 
 ---
 
@@ -375,7 +378,7 @@ app/delta.py          tambalan delta untuk siaran
 app/istilah.py        kamus label (satu-satunya sumber istilah)
 app/penomoran.py      nomor laporan & berita acara yang tidak pernah berulang
 app/data_contoh.py    data sintetis, skenario, playbook
-app/sitrep.py         pembuat PDF
+app/lapsit.py         pembuat PDF
 static/index.html     kerangka dasbor
 static/app.js         login & pendaftaran, siaran, semua panel, alat operator
 static/radar.js       Radar Anomali (Canvas)
@@ -400,13 +403,25 @@ pytest.ini            pengaturan tampilan pytest
 - Pengambilan bukti forensik adalah **simulasi**: isi "berkas" dibangkitkan acak agar sidik jarinya unik dan
   bisa diverifikasi; tidak ada memori atau log sungguhan yang disalin.
 
+**Status fitur — jujur dan tegas.**
+
+| Sudah berjalan (purwarupa v5.1) | Belum dibangun (peta jalan: Mode Hybrid dan eskalasi) |
+| --- | --- |
+| Operasi luring penuh di 1 satuan/RS (*on-premise*) | Pengiriman LAPSIT otomatis berjenjang ke Sansidam (Kodam) dan Kartika CSIRT (Pussiberad) |
+| Peran Pengamat dan Operator | Akses dan tampilan lintas satuan untuk pemantauan serentak di Mabes |
+| Isolasi dengan tombol ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal (Llama 3 8B lewat Ollama) untuk draf LAPSIT |
+| Rantai bukti HMAC-SHA256 | |
+| Korelasi CTI dan Engine Deteksi Anomali (Isolation Forest, luring) | |
+| Simulasi OT genset (Modbus 502) | |
+| Pembuatan LAPSIT dan ekspor PDF | |
+
 **Langkah berikutnya (setelah lomba):**
 1. Ganti data contoh dengan umpan indikator resmi (misalnya dari BSSN atau komunitas MISP).
 2. Simpan status di basis data; Hub siaran di perantara pesan bersama agar bisa lebih dari satu proses.
 3. Login lewat sistem identitas instansi (SSO) dengan verifikasi dua langkah.
 4. Jalankan di belakang HTTPS (`NS_HTTPS=1`).
 5. **Engine Deteksi Anomali (AI lokal) sudah berjalan** (`app/ai_anomali.py`). Yang masih **rencana**: Engine Asisten
-   Narasi (LLM lokal, mis. Llama 3 lewat Ollama) untuk draf LAPSIT, serta otomasi alur kerja (n8n).
+   Narasi (LLM lokal Llama 3 8B lewat Ollama) untuk draf LAPSIT, serta otomasi alur kerja (n8n).
    Ciri lalu lintas AI di purwarupa masih sintetis; penerapan nyata mengambilnya dari sensor satuan (Wazuh, Suricata, Zeek).
 6. Perluasan OT: sensor protokol industri (Modbus/DNP3) dan webhook ke sakelar terkelola **sungguhan**
    (di purwarupa, perintah sakelar masih simulasi) — **rencana**.

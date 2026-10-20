@@ -47,7 +47,7 @@ def token(klien, nama="operator", sandi="sandi-operator-uji-123"):
     ("post", "/api/demo/majukan-waktu", {"jam": 6}),
     ("post", "/api/reset-demo", None),
     ("get", "/api/audit", None),
-    ("post", "/api/sitrep", None),
+    ("post", "/api/lapsit", None),
 ])
 def test_semua_endpoint_wajib_login(klien, metode, jalur, data):
     r = getattr(klien, metode)(jalur, **({"json": data} if data else {}))
@@ -161,8 +161,8 @@ def test_kepatuhan_backup(klien):
     assert status["imigrasi"] == "kuning"  # 6 + 24 jam > batas 24 jam
 
 
-def test_sitrep_pdf(klien):
-    r = klien.post("/api/sitrep", headers=token(klien))
+def test_lapsit_pdf(klien):
+    r = klien.post("/api/lapsit", headers=token(klien))
     assert r.status_code == 200 and r.content.startswith(b"%PDF")
 
 

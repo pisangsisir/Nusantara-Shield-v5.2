@@ -751,7 +751,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Urutan dikunci di <b><i class="asing">server</i></b>, bukan hanya di tampilan: jalan pintas lewat tombol, centang manual, atau antrean semuanya ditolak dengan kode 409.</li>
       <li>Kenapa menahan tombol 0,6 detik? Lebih cepat daripada dialog konfirmasi, dan klik tak sengaja tidak memicu apa pun.</li>
       <li>Isolasi darurat hanya tersedia bila bukti <b>belum</b> bisa diamankan. Bila bukti sudah aman, jalur darurat ditolak. Setelah ancaman tertahan, bukti susulan wajib diamankan dan pemulihan tetap terkunci sampai <i class="asing">hash</i> cocok.</li>
-      <li><b>IT · OT (sudah berjalan, dikunci 6 uji):</b> (1) Peringatan dini: tombol <b>Latihan OT: siarkan kabar Modbus</b> → <b>Pengendali genset</b> (192.0.2.120:502) naik <b>WASPADA ±66%</b> → <b>Perketat</b>. (2) Isolasi OT: Latihan → target <b>Kendali Fasilitas RS</b> → <b>Sabotase OT</b> → tahan ⚡ → bukti disegel → ±1,2 dtk kemudian <i class="asing">webhook</i> (simulasi) ke sakelar terkelola memutus jalur kantor → zona kendali; genset <b>tetap menyala</b> (kendali lokal) → LAPSIT SEV-1 ke Komandan Satuan (Dansat).</li>
+      <li><b>IT · OT (sudah berjalan, dikunci 6 uji):</b> (1) Peringatan dini: tombol <b>Latihan OT: siarkan kabar Modbus</b> → <b>Pengendali genset</b> (192.0.2.120:502) naik <b>WASPADA ±66%</b> → <b>Perketat</b>. (2) Isolasi OT: Latihan → target <b>Genset RS Kesdam</b> → <b>Sabotase OT</b> → tahan ⚡ → bukti disegel → ±1,2 dtk kemudian <i class="asing">webhook</i> (simulasi) ke sakelar terkelola memutus jalur kantor → zona kendali; genset <b>tetap menyala</b> (kendali lokal) → LAPSIT SEV-1 ke Komandan Satuan (Dansat).</li>
       <li>Yang <b>belum</b> ada: sensor protokol industri dan sambungan ke sakelar fisik sungguhan (di purwarupa: simulasi <i class="asing">webhook</i>).</li>
       <li><b>Bila juri bertanya "kenapa tidak langsung matikan perangkat OT?":</b> di OT, memutus mendadak bisa menghentikan proses fisik (listrik, pompa, genset). Praktik baku (NIST SP 800-82) adalah memutus <b>jalur antara jaringan kantor dan zona kendali</b>, lewat prosedur keselamatan, bukan mematikan pengendalinya.</li>
       <li>Pemisahan wewenang: <b>Pengamat</b> hanya melihat; <b>Operator</b> bertindak. Akun operator hanya lewat kode undangan (<code>NS_KODE_OPERATOR</code>) atau dibuatkan operator lain.</li>
@@ -859,25 +859,25 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <text x="550" y="118" text-anchor="middle" font-size="10" fill="#ff5c74">tidak dipakai</text>
       </svg>
       <div class="cek">
-        <div><i>✓</i><span><b><i class="asing">On-premise</i> penuh:</b> layanan web, akun dan data (berkas lokal), SHA-256 bukti, log HMAC, tombol isolasi, LAPSIT.</span></div>
-        <div><i>✓</i><span><b>Tanpa CDN, Google Fonts, atau skrip daring.</b> Internet diputus, dasbor tetap berjalan.</span></div>
-        <div><i>✓</i><span><b>AI deteksi anomali berjalan lokal:</b> Isolation Forest (scikit-learn) dilatih dan dihitung di <i class="asing">server</i> satuan (<i class="asing">local inference</i>), tanpa API luar; siap <i class="asing">air-gapped</i>.</span></div>
-        <div><i>✓</i><span><b>Internet hanya sekali,</b> saat <span class="mono">pip install</span>. Data latihan sintetis Request for Comments (RFC) 5737.</span></div>
+        <div><i>✓</i><span><b><i class="asing">On-premise</i> penuh di 1 satuan/RS:</b> tanpa awan, CDN, atau skrip daring; internet hanya sekali saat <span class="mono">pip install</span>.</span></div>
+        <div><i>✓</i><span><b>Peran Pengamat dan Operator;</b> isolasi dengan tombol ditahan 0,6 dtk; LAPSIT dan ekspor PDF.</span></div>
+        <div><i>✓</i><span><b>Rantai bukti HMAC-SHA256,</b> korelasi CTI, dan simulasi OT genset (Modbus 502).</span></div>
+        <div><i>✓</i><span><b>Engine Deteksi Anomali (berfungsi penuh):</b> <i class="asing">Isolation Forest</i> (scikit-learn), 100% luring di <i class="asing">backend</i>; skor anomali lalu lintas IT/OT tiap detik.</span></div>
       </div>
     </div>
 
     <div class="panel kartu-dasar rancangan">
       <span class="status kuning">◌ PETA JALAN · BELUM ADA DI PURWARUPA</span>
-      <h3>Dua jalur konektivitas dan Asisten Narasi</h3>
+      <h3>Eskalasi, Mode Hybrid, dan Asisten Narasi</h3>
       <table class="banding">
         <thead>
-          <tr><th></th><th class="hybrid">Mode Hybrid<small>N8N · KONEKSI TERKENDALI</small></th><th class="lokal">Mode AI Lokal<small>AIR-GAPPED</small></th></tr>
+          <tr><th></th><th class="hybrid">Mode Hybrid<small>N8N · KONEKSI TERKENDALI</small></th><th class="lokal">Mode Luring<small>LOCAL INFERENCE</small></th></tr>
         </thead>
         <tbody>
-          <tr><td>Orkestrasi</td><td>n8n dipasang sendiri (self-hosted) di <i class="asing">server</i> satuan</td><td>Penjadwal lokal di <i class="asing">server</i> satuan</td></tr>
+          <tr><td>(1) Eskalasi</td><td colspan="2">Pengiriman LAPSIT otomatis berjenjang ke Sansidam (Kodam) dan Kartika CSIRT (Pussiberad)</td></tr>
+          <tr><td>(2) Lintas satuan</td><td colspan="2">Akses dan tampilan lintas satuan untuk pemantauan serentak di Mabes</td></tr>
           <tr><td>Umpan intelijen</td><td>BSSN/MISP masuk satu arah lewat gerbang satuan</td><td>Impor berkas indikator lewat media yang diperiksa</td></tr>
-          <tr><td>Asisten Narasi</td><td>LLM awan, hanya bila kebijakan mengizinkan</td><td>LLM lokal (mis. Llama 3 lewat Ollama) sebagai layanan terpisah di <i class="asing">server</i> satuan</td></tr>
-          <tr><td>Peran LLM</td><td colspan="2">Menyusun draf LAPSIT dan meringkas korelasi untuk diperiksa operator</td></tr>
+          <tr><td>Asisten Narasi</td><td>LLM awan, hanya bila kebijakan mengizinkan</td><td>Llama 3 8B lewat Ollama di <i class="asing">server</i> satuan (<i class="asing">local inference</i>)</td></tr>
           <tr><td>Bila gagal</td><td colspan="2">Koneksi atau LLM mati → sistem jatuh ke <b class="neon">Mode Berdaulat</b>; inti tetap jalan</td></tr>
         </tbody>
       </table>
@@ -891,7 +891,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <ul>
       <li><b>Pesan karya sendiri:</b> "Bapak/Ibu, pada Mode Berdaulat tidak ada satu pun data posko yang keluar ke server asing, termasuk server AI asing. Korelasi ancaman, skor anomali AI, sidik jari bukti, dan laporan dihitung di <i class="asing">server</i> milik satuan sendiri. Sistem ini kami bangun sendiri, dan kodenya dapat diperiksa baris per baris."</li>
       <li><b>Bukti langsung:</b> cabut internet saat demo. Dasbor, <i class="asing">playbook</i>, dan tombol isolasi tetap berjalan. Bila kabel LAN dicabut, <i class="asing">server</i> dan dasbor di laptop yang sama tetap bekerja.</li>
-      <li>"Apakah AI sudah dipakai di sistem?" <b>Ya, untuk deteksi anomali.</b> Isolation Forest (scikit-learn) dilatih dan dijalankan di <i class="asing">server</i> satuan; lalu lintas tidak wajar menaikkan aset ke WASPADA dengan alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal". Ini <i class="asing">local inference</i>: tanpa API luar, sehingga siap dipasang <i class="asing">air-gapped</i>. AI hanya menaikkan status; memutus tetap keputusan operator. Model bahasa (Llama 3/Ollama) untuk draf LAPSIT masih peta jalan, sengaja tidak dimasukkan ke <i class="asing">server</i> inti agar CPU hemat. Asisten AI juga dipakai pengembang saat menulis kode, sebagaimana diizinkan panitia.</li>
+      <li>"Apakah AI sudah dipakai di sistem?" <b>Ya, untuk deteksi anomali.</b> Isolation Forest (scikit-learn) dilatih dan dijalankan di <i class="asing">server</i> satuan; lalu lintas tidak wajar menaikkan aset ke WASPADA dengan alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal". Ini <i class="asing">local inference</i>: tanpa API luar, sehingga siap dipasang <i class="asing">air-gapped</i>. AI hanya menaikkan status; memutus tetap keputusan operator. Model bahasa (Llama 3 8B lewat Ollama) untuk draf LAPSIT masih peta jalan, sengaja tidak dimasukkan ke <i class="asing">server</i> inti agar CPU hemat. Asisten AI juga dipakai pengembang saat menulis kode, sebagaimana diizinkan panitia.</li>
       <li>Kenapa dua jalur? Hybrid cocok untuk markas yang punya gerbang internet terkendali; AI Lokal (Asisten Narasi) untuk satuan yang wajib <i class="asing">air-gapped</i>. Keduanya opsional dan bisa dimatikan tanpa mengganggu inti.</li>
       <li>Pemasangan (Dokumentasi §4.1): <code>python3 -m venv .venv</code> → aktifkan → <code>pip install -r requirements.txt</code> → <code>python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</code>. Buka 127.0.0.1:8000.</li>
       <li>Variabel penting: <code>NS_OPERATOR_PASSWORD</code>/<code>NS_VIEWER_PASSWORD</code> (sandi bawaan, min. 12), <code>NS_AUDIT_KEY</code> (kunci HMAC, mengaktifkan penyimpanan permanen), <code>NS_KODE_OPERATOR</code> (kode undangan operator).</li>
@@ -941,8 +941,8 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li><b>"Bagaimana angka ini diukur?"</b> Uvicorn sungguhan dengan 100 dan 300 klien siaran serentak; CPU dan memori dibaca dari proses <i class="asing">server</i>; Chromium untuk waktu skrip kanvas.</li>
       <li><b>"Bagaimana jika alat forensik gagal saat serangan menyebar?"</b> Isolasi Darurat: alasan tertulis ≥15 karakter, tahan 1,5 detik, tercatat di tiga tempat. Pemulihan tetap terkunci sampai bukti susulan diamankan dan <i class="asing">hash</i> cocok.</li>
       <li><b>"Bagaimana mencegah log diubah diam-diam?"</b> Log audit dan Buku Rantai Bukti berantai HMAC-SHA256: satu catatan diubah, rantai langsung putus dan ketahuan.</li>
-      <li><b>"Apakah sistem memakai AI atau internet?"</b> AI ya, internet tidak. Engine Deteksi Anomali (Isolation Forest) sudah berjalan luring di <i class="asing">server</i> satuan dan menilai 9 aset dalam ±10 milidetik. Engine Asisten Narasi (LLM lokal) dan Mode Hybrid n8n adalah peta jalan, belum dibangun.</li>
-      <li><b>"Kenapa rumah sakit?"</b> TNI AD punya aset kesehatan vital (RSPAD, rumah sakit jajaran Kesdam), tempat konvergensi IT dan OT menyangkut nyawa. Data kesehatan bernilai tinggi (279 juta data penduduk dijual pada 2021, sampelnya diduga dari BPJS Kesehatan), dan <i class="asing">ransomware</i> sudah menyasar OT rumah sakit (Winnipeg, Agustus 2026). Di purwarupa, "Rumah Sakit Pemerintah" dan genset adalah data contoh.</li>
+      <li><b>"Apakah sistem memakai AI atau internet?"</b> AI ya, internet tidak. Engine Deteksi Anomali (Isolation Forest) sudah berjalan luring di <i class="asing">server</i> satuan dan menilai 9 aset dalam ±10 milidetik. Engine Asisten Narasi (Llama 3 8B lewat Ollama), Mode Hybrid, pengiriman LAPSIT otomatis berjenjang ke Sansidam dan Kartika CSIRT, serta tampilan lintas satuan di Mabes adalah peta jalan, belum dibangun.</li>
+      <li><b>"Kenapa rumah sakit?"</b> TNI AD punya aset kesehatan vital (RSPAD, rumah sakit jajaran Kesdam), tempat konvergensi IT dan OT menyangkut nyawa. Data kesehatan bernilai tinggi (279 juta data penduduk dijual pada 2021, sampelnya diduga dari BPJS Kesehatan), dan <i class="asing">ransomware</i> sudah menyasar OT rumah sakit (Winnipeg, Agustus 2026). Di purwarupa, "RS Kesdam", "RSPAD" (portal layanan pasien), dan genset adalah data contoh.</li>
       <li><b>"Bagaimana dengan OT?"</b> Pengendali genset (Modbus, port 502) ada di inventaris yang sama dengan aset IT. Kabar ancaman Modbus atau perintah tulis Modbus yang tidak wajar (dibaca AI lokal) menaikkannya ke WASPADA, dan skenario Sabotase OT memutus jalur kantor ↔ zona kendali ±1,2 detik setelah bukti aman, mengikuti National Institute of Standards and Technology (NIST) SP 800-82: jalurnya yang diputus, genset tetap menyala. Perintah ke sakelar di purwarupa masih simulasi.</li>
       <li><b>"Apakah ini alat ofensif?"</b> Tidak. Sepenuhnya defensif; data latihan sintetis dari blok alamat dokumentasi RFC 5737.</li>
       <li><b>"Bagaimana jika banyak proses / <i class="asing">server</i>?"</b> Saat ini satu proses; Hub dapat dipindah ke perantara pesan bersama sebagai tahap lanjut.</li>

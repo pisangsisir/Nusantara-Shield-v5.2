@@ -53,7 +53,7 @@ from .keamanan import (KONFIG, MIN_SANDI, SIARAN, Akun, BatasBody, GalatAkun, He
                        pendaftaran_pengamat_terbuka, periksa_sandi, pengguna_saat_ini, ringkasan_akun)
 from .delta import beda
 from .siaran import HUB
-from .sitrep import buat_pdf
+from .lapsit import buat_pdf
 from .istilah import ISTILAH
 from .telemetri import AKSI_GABUNGAN, ASET_BERPORT, MENARA, MIN_ALASAN_DARURAT, SEMUA_AKSI_SOAR
 from .ai_anomali import POLA
@@ -700,12 +700,12 @@ def verifikasi_audit(akun: Akun = Depends(butuh_izin("lihat"))) -> dict:
     return LOG.verifikasi()
 
 
-@app.post("/api/sitrep", dependencies=[Depends(batasi("pdf"))])
-def ekspor_sitrep(akun: Akun = Depends(butuh_izin("lihat"))) -> Response:
+@app.post("/api/lapsit", dependencies=[Depends(batasi("pdf"))])
+def ekspor_lapsit(akun: Akun = Depends(butuh_izin("lihat"))) -> Response:
     with _kunci_state:
         data = [_tampilan(l) for l in LAYANAN.values()]
-    LOG.catat(akun.nama, "EKSPOR_SITREP", {"jumlah_layanan": len(data)})
+    LOG.catat(akun.nama, "EKSPOR_LAPSIT", {"jumlah_layanan": len(data)})
     pdf = buat_pdf(data, LOG.verifikasi(), akun.nama)
-    nama_berkas = f"SITREP-NusantaraShield-{datetime.now(timezone.utc):%Y%m%d-%H%M}.pdf"
+    nama_berkas = f"LAPSIT-NusantaraShield-{datetime.now(timezone.utc):%Y%m%d-%H%M}.pdf"
     return Response(pdf, media_type="application/pdf",
                     headers={"Content-Disposition": f'attachment; filename="{nama_berkas}"'})

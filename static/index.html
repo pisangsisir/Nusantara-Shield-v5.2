@@ -260,7 +260,7 @@
                 <button type="button" class="opsi-skenario" data-skenario="ransomware" data-ubah title="Server dikunci penyerang"><b>Ransomware</b></button>
                 <button type="button" class="opsi-skenario" data-skenario="ddos" data-ubah title="Banjir trafik ke portal"><b>DDoS</b></button>
                 <button type="button" class="opsi-skenario" data-skenario="backup_dimatikan" data-ubah title="Tanda awal ransomware"><b>Backup mati</b></button>
-                <button type="button" class="opsi-skenario" data-skenario="sabotase_ot" data-ubah title="Perintah Modbus asing ke pengendali genset (pilih target Fasilitas RS)"><b>Sabotase OT</b></button>
+                <button type="button" class="opsi-skenario" data-skenario="sabotase_ot" data-ubah title="Perintah Modbus asing ke pengendali genset (pilih target Genset RS Kesdam)"><b>Sabotase OT</b></button>
               </div>
             </div>
             <label class="opsi-gangguan kecil"><input type="checkbox" id="sim-gangguan-bukti" data-ubah>
@@ -315,7 +315,7 @@
         <nav class="tab-nav" role="tablist" aria-label="Alat operator">
           <button role="tab" class="tab" id="tab-indikator" aria-controls="panel-indikator" aria-selected="true">Cek indikator</button>
           <button role="tab" class="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" tabindex="-1">Kepatuhan backup</button>
-          <button role="tab" class="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" tabindex="-1">Audit &amp; SITREP</button>
+          <button role="tab" class="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" tabindex="-1">Audit &amp; LAPSIT</button>
           <button role="tab" class="tab" id="tab-akun" aria-controls="panel-akun" aria-selected="false" tabindex="-1" hidden>Akun</button>
         </nav>
 
@@ -373,13 +373,13 @@
           </div>
         </div>
 
-        <!-- Audit & SITREP -->
+        <!-- Audit & LAPSIT -->
         <div role="tabpanel" id="panel-audit" aria-labelledby="tab-audit" hidden>
           <div class="baris-aksi">
             <p class="redup">Setiap catatan memuat sidik jari catatan sebelumnya, seperti buku ekspedisi bernomor. Satu catatan diubah, rantainya langsung putus dan ketahuan.</p>
             <div class="aksi">
               <button id="tombol-verifikasi" class="tombol halus" type="button">Verifikasi rantai</button>
-              <button id="tombol-sitrep" class="tombol utama" type="button">Ekspor SITREP (PDF)</button>
+              <button id="tombol-lapsit" class="tombol utama" type="button">Ekspor LAPSIT (PDF)</button>
             </div>
           </div>
           <div id="hasil-verifikasi" class="spanduk" hidden></div>

@@ -4,12 +4,24 @@
 
 | | |
 | --- | --- |
-| **Versi** | 5.1 (Fase 7: aset rumah sakit dan isolasi Operational Technology (OT)) · 20 Oktober 2026 |
+| **Versi** | 5.1 · Fase 7: aset rumah sakit dan isolasi Operational Technology (OT) · 20 Oktober 2026 |
 | **Status uji** | **196 / 196 uji otomatis lulus** · diverifikasi dari paket rilis bersih |
-| **AI** | **Engine Deteksi Anomali berjalan lokal**: Isolation Forest (scikit-learn), dilatih dan dijalankan di _server_ satuan, tanpa Application Programming Interface (API) luar |
+| **AI** | **Engine Deteksi Anomali berjalan lokal**: _Isolation Forest_ (scikit-learn), dilatih dan dijalankan di _server_ satuan, tanpa Application Programming Interface (API) luar |
 | **Arsitektur** | _Server_ FastAPI (Python) · peramban Vanilla JS + Canvas · siaran langsung Server-Sent Events (SSE) · buku berantai HMAC-SHA256 |
 | **Mode operasi** | **Luring penuh**: tanpa internet, Content Delivery Network (CDN), atau layanan awan saat berjalan |
 | **Data** | Sintetis: Internet Protocol (IP) blok dokumentasi Request for Comments (RFC) 5737, nama orang dan satuan fiktif |
+
+**Status fitur.** Tabel ini membedakan dengan tegas apa yang sudah didemonstrasikan dan apa yang masih rencana.
+
+| Sudah berjalan di purwarupa v5.1 | Belum dibangun (peta jalan: Mode Hybrid dan eskalasi) |
+| --- | --- |
+| Operasi luring penuh di satu satuan/rumah sakit (*on-premise*) | **(1) Pengiriman LAPSIT otomatis berjenjang** ke Sandi dan Siber Kodam (Sansidam) dan Kartika CSIRT (Pussiberad) |
+| Dua peran: Pengamat dan Operator | **(2) Akses dan tampilan lintas satuan** untuk pemantauan serentak di Mabes |
+| Isolasi dengan tombol yang ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal Llama 3 8B lewat Ollama untuk draf LAPSIT |
+| Rantai bukti HMAC-SHA256 | Umpan indikator resmi (BSSN/MISP) lewat gerbang satu arah |
+| Korelasi CTI dan Engine Deteksi Anomali (_Isolation Forest_, luring) | Sensor nyata (Wazuh, Suricata, Zeek) dan sakelar terkelola sungguhan |
+| Simulasi OT genset (Modbus, _port_ 502) | |
+| Pembuatan LAPSIT dan ekspor PDF | |
 
 ---
 
@@ -35,7 +47,7 @@
 | **fastapi** | ≥0.115 | Loket API, validasi masukan, otorisasi per peran |
 | **uvicorn[standard]** | ≥0.30 | _Server_ web asinkron (siaran langsung SSE) |
 | **reportlab** | ≥4.0 | Ekspor laporan situasi (LAPSIT) ke PDF |
-| **scikit-learn** | ≥1.3 | AI lokal: model Isolation Forest untuk deteksi anomali (membawa numpy); berjalan luring |
+| **scikit-learn** | ≥1.3 | AI lokal: model _Isolation Forest_ untuk deteksi anomali (membawa numpy); berjalan luring |
 | **pytest** | ≥8.0 | Menjalankan 196 uji otomatis |
 | **httpx** | ≥0.27 | Klien uji untuk loket API |
 
@@ -90,7 +102,7 @@ graph TD
 | --- | --- | --- |
 | **Loket API** | `app/main.py` | Menerima perintah, validasi masukan, otorisasi per peran |
 | **Gerbang keamanan** | `app/keamanan.py` | _Login_, token, peran, batas laju, batas ukuran kiriman 16 KB |
-| **Engine Deteksi Anomali (AI lokal)** | `app/ai_anomali.py` | Melatih Isolation Forest dari profil lalu lintas normal saat _server_ menyala; menilai enam ciri lalu lintas tiap aset; menyusun alasan yang bisa dibaca |
+| **Engine Deteksi Anomali (AI lokal)** | `app/ai_anomali.py` | Melatih _Isolation Forest_ dari profil lalu lintas normal saat _server_ menyala; menilai enam ciri lalu lintas tiap aset; menyusun alasan yang bisa dibaca |
 | **Dapur situasi** | `app/telemetri.py` | Topologi (zona Information Technology (IT) dan zona kendali OT), korelasi Cyber Threat Intelligence (CTI), _playbook_ 4 skenario (termasuk Sabotase OT), **kunci urutan bukti → isolasi → pulihkan** |
 | **Brankas bukti** | `app/bukti.py` | Salinan barang bukti, sidik jari Secure Hash Algorithm 256-bit (SHA-256), berita acara |
 | **Buku berantai** | `app/audit.py` | HMAC-SHA256 berantai untuk log audit dan Buku Rantai Bukti |
@@ -116,7 +128,7 @@ Setelah AI lokal ditambahkan: melatih model ±0,16 detik sekali saat _server_ me
 
 | Bagian | Isi |
 | --- | --- |
-| **Model** | Isolation Forest (scikit-learn): 100 pohon, benih acak tetap 2026 sehingga hasilnya dapat diulang dan diaudit |
+| **Model** | _Isolation Forest_ (scikit-learn): 100 pohon, benih acak tetap 2026 sehingga hasilnya dapat diulang dan diaudit |
 | **Data latih** | 1.500 contoh lalu lintas **normal** sintetis, dibuat dan dilatih di _server_ saat menyala (±0,16 detik); tidak ada berkas model yang diunduh |
 | **Enam ciri per aset** | Jumlah koneksi, volume data, ragam _port_ tujuan, _login_ gagal, operasi tulis (untuk genset: perintah tulis Modbus), porsi koneksi ke luar jaringan |
 | **Skor** | 0 sampai 1. Lalu lintas wajar ±0,39; pola tidak wajar 0,61–0,70. **Ambang 0,58**. |
@@ -126,7 +138,7 @@ Setelah AI lokal ditambahkan: melatih model ±0,16 detik sekali saat _server_ me
 
 **_Local inference_ dan _air-gapped_ adalah dua hal berbeda.** _Local inference_ berarti model dihitung di _server_ sendiri, bukan lewat API di internet; engine ini memenuhinya sejak sekarang. _Air-gapped_ berarti jaringan satuan sama sekali tidak tersambung ke internet. Karena engine ini tidak membuka koneksi apa pun (dikunci uji yang memblokir _socket_), ia **siap** dipasang di jaringan _air-gapped_; paket pustakanya cukup dibawa lewat media yang sudah diperiksa.
 
-**Peta jalan: Engine Asisten Narasi.** Model bahasa lokal (misalnya Llama 3 lewat Ollama) untuk menyusun draf LAPSIT **belum ada** di purwarupa. Model berat ini sengaja tidak dimasukkan ke _server_ inti agar CPU tetap hemat; rencananya berjalan sebagai layanan terpisah di _server_ satuan dan drafnya tetap diperiksa operator.
+**Peta jalan: Engine Asisten Narasi.** Model bahasa lokal (_Local LLM_) **Llama 3 8B lewat Ollama** untuk menyusun draf LAPSIT **belum ada** di purwarupa. Ia juga dirancang sebagai _local inference_; untuk satuan _air-gapped_, berkas modelnya diunduh sekali lalu dibawa lewat media yang diperiksa. Model berat ini sengaja tidak dimasukkan ke _server_ inti agar CPU tetap hemat; rencananya berjalan sebagai layanan terpisah di _server_ satuan dan drafnya tetap diperiksa operator.
 
 > **Batas purwarupa:** ciri lalu lintas masih **sintetis**. Di lapangan, ciri yang sama diambil dari sensor jaringan (misalnya Zeek atau Suricata), lalu model dilatih ulang dari lalu lintas normal satuan itu sendiri.
 
@@ -226,14 +238,14 @@ sequenceDiagram
 
 ### 3.3 Latihan Sinergi IT/OT
 
-Purwarupa memantau aset OT **Pengendali genset** (`192.0.2.120`, **Modbus/TCP _port_ 502**) di **zona kendali (OT)** topologi, milik layanan *Kendali Fasilitas RS · genset & catu daya*. Aset IT pasangannya adalah *Rumah Sakit Pemerintah · Sistem Informasi Manajemen Rumah Sakit (SIMRS)*. Alur demonstrasi yang dapat diulang:
+Purwarupa memantau aset OT **Pengendali genset** (`192.0.2.120`, **Modbus/TCP _port_ 502**) di **zona kendali (OT)** topologi, milik layanan *Genset & Catu Daya RS Kesdam*. Aset IT pasangannya adalah *RS Kesdam · Sistem Informasi Manajemen Rumah Sakit (SIMRS)*. Semua nama aset adalah data contoh. Alur demonstrasi yang dapat diulang:
 
 | Langkah | Tindakan operator | Yang terjadi |
 | --- | --- | --- |
 | **1** | Panel **Prediksi CTI + AI** → buka *Berita intelijen aktif* → tekan **Latihan OT: siarkan kabar Modbus (genset)** | Kabar **CTI-109** (celah protokol Modbus) masuk Radio CTI |
 | **2** | Amati topologi dan radar | Genset naik ke **WASPADA**, *risiko ± 66 %* (0,80 keyakinan × 0,75 paparan × 1,1 sektor energi), **sebelum** ada serangan |
 | **3** | Tekan **Perketat** pada genset | Paparan dipotong 70%; peluang turun di bawah 30%, status kembali normal; tercatat di log audit |
-| **4** | Panel **Latihan** → target **Kendali Fasilitas RS** → skenario **Sabotase OT** | Genset **KRITIS** (perintah tulis Modbus asing); penyerang `203.0.113.45:502` tampil di peta |
+| **4** | Panel **Latihan** → target **Genset RS Kesdam** → skenario **Sabotase OT** | Genset **KRITIS** (perintah tulis Modbus asing); penyerang `203.0.113.45:502` tampil di peta |
 | **5** | Tahan **⚡ EKSEKUSI ISOLASI** 0,6 detik | Bukti disegel SHA-256 (lalu lintas Modbus, log _workstation_ teknisi, konfigurasi pengendali). **±1,2 detik** kemudian, _webhook_ (simulasi) ke sakelar terkelola memutus **jalur kantor → zona kendali**; genset tetap menyala dengan kendali lokal. Akses jarak jauh dicabut, lalu LAPSIT SEV-1 terbit. |
 | **6** | Centang *Cek fisik*, tekan **♻ PULIHKAN** | Jalur kendali disambung kembali **hanya** bila sidik jari SHA-256 bukti cocok ulang |
 
@@ -377,7 +389,7 @@ Paket dibuat **tanpa** `.venv`, `.env`, data operasional, dan *cache*. Penerima 
 2. **Baca situasi.** Kotak Postur, Topologi Internal atau Peta Global, Radar Anomali, dan pita Radio CTI menunjukkan kondisi seluruh aset.
 3. **Latih skenario.** Pada panel Latihan, pilih target layanan dan skenario (_Ransomware_, Distributed Denial of Service (DDoS), Backup mati, atau Sabotase OT). Tombol latihan OT menyiarkan kabar Modbus untuk melihat peringatan dini; tombol **Latihan AI** menyuntik lalu lintas tak wajar untuk melihat AI lokal bekerja.
 4. **Tangani insiden.** Di Action Center, tahan tombol **EKSEKUSI ISOLASI** selama 0,6 detik. Bukti disegel lebih dulu, lalu pemutusan berjalan dan LAPSIT terbit.
-5. **Pulihkan dan laporkan.** Centang langkah _playbook_ yang tersisa; tombol Pulihkan terbuka setelah sidik jari bukti cocok ulang. LAPSIT dapat diekspor ke PDF dari tab "Audit & SITREP".
+5. **Pulihkan dan laporkan.** Centang langkah _playbook_ yang tersisa; tombol Pulihkan terbuka setelah sidik jari bukti cocok ulang. LAPSIT dapat diekspor ke PDF dari tab "Audit & LAPSIT".
 
 ---
 
@@ -392,7 +404,7 @@ Paket dibuat **tanpa** `.venv`, `.env`, data operasional, dan *cache*. Penerima 
 | **FastAPI** (beserta Starlette dan Pydantic) | Kerangka _server_ dan validasi masukan | MIT dan BSD-3-Clause |
 | **Uvicorn** | _Server_ web asinkron | BSD-3-Clause |
 | **ReportLab** | Ekspor LAPSIT ke PDF | BSD |
-| **scikit-learn** dan **NumPy** | AI lokal: model Isolation Forest untuk deteksi anomali | BSD-3-Clause |
+| **scikit-learn** dan **NumPy** | AI lokal: model _Isolation Forest_ untuk deteksi anomali | BSD-3-Clause |
 | **pytest** dan **HTTPX** | Uji otomatis | MIT dan BSD-3-Clause |
 | **Mermaid** dan **Playwright (Chromium)** | Hanya untuk menggambar diagram dan mencetak dokumen ini; tidak dipakai aplikasi | MIT, Apache-2.0, dan BSD-3-Clause |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi (AI di dalam aplikasi adalah model lokal scikit-learn di atas) | Layanan komersial |
@@ -419,7 +431,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **BSSN** | Badan Siber dan Sandi Negara | Lembaga keamanan siber nasional. |
 | **CDN** | _Content Delivery Network_ | Layanan luar untuk memuat huruf atau skrip situs web. Nusantara Shield tidak memakainya. |
 | **CDOC** | Cyber Defense Operation Center | Pusat operasi pertahanan siber di tingkat satuan. |
-| **CPU** | Central Processing Unit | Otak komputer; persentasenya menunjukkan seberapa sibuk server. |
+| **CPU** | Central Processing Unit | Otak komputer; persentasenya menunjukkan seberapa sibuk _server_. |
 | **CSIRT** | _Computer Security Incident Response Team_ | Tim tanggap insiden siber. Kartika CSIRT adalah milik TNI AD. |
 | **CTI** | _Cyber Threat Intelligence_ (intelijen ancaman siber) | Kabar dari luar tentang ancaman yang sedang beredar, misalnya celah baru pada suatu perangkat. |
 | **Dansat** | Komandan Satuan | Pimpinan unit; di sistem ini berperan sebagai pengamat yang menerima laporan. |
@@ -439,7 +451,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **IT** | _Information Technology_ (teknologi informasi) | Komputer kantor, _server_, dan jaringannya. |
 | **Kodam** | Komando Daerah Militer | Komando TNI AD tingkat wilayah (provinsi). |
 | **LAPSIT** | Laporan Situasi | Laporan resmi singkat tentang insiden: apa, di mana, kapan, dan tindakan yang diambil. |
-| **LLM** | _Large Language Model_ (model bahasa besar) | AI penyusun teks, misalnya Llama 3. Di proyek ini masih rencana. |
+| **LLM** | _Large Language Model_ (model bahasa besar) | AI penyusun teks, misalnya Llama 3 8B. Di proyek ini masih rencana. |
 | **_Local inference_** | Perhitungan AI di komputer sendiri | Model dijalankan di _server_ sendiri, bukan lewat layanan di internet. Berbeda dengan _air-gapped_. |
 | **Log audit** | Catatan jejak | Daftar siapa melakukan apa dan kapan di dalam sistem. |
 | **Luring** | Di luar jaringan (_offline_) | Berjalan tanpa sambungan internet. |
@@ -453,7 +465,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **Operator** | Petugas jaga sistem | Satu-satunya peran yang boleh menekan tombol tindakan. |
 | **OSINT** | Open Source Intelligence | Intelijen dari sumber terbuka, misalnya berita dan buletin keamanan. |
 | **OT** | _Operational Technology_ (teknologi operasional) | Perangkat yang mengendalikan mesin fisik, seperti genset dan catu daya rumah sakit. |
-| **PDNS** | Pusat Data Nasional Sementara | Pusat data pemerintah yang lumpuh diserang ransomware pada Juni 2024. |
+| **PDNS** | Pusat Data Nasional Sementara | Pusat data pemerintah yang lumpuh diserang _ransomware_ pada Juni 2024. |
 | **Perketat** | Pengerasan (_hardening_) | Tombol untuk mengurangi celah sebuah aset sebelum diserang. |
 | **_Playbook_** | Buku panduan langkah | Urutan tindakan baku untuk setiap jenis insiden. |
 | **_Port_** | Pintu layanan | Nomor "pintu" di perangkat; tiap layanan punya nomornya sendiri. |
@@ -470,7 +482,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **SOAR** | _Security Orchestration, Automation and Response_ | Otomasi langkah respons keamanan, misalnya pemutusan jalur yang sudah disetujui. |
 | **SOC** | _Security Operations Center_ (pusat operasi keamanan) | Ruang dan tim yang memantau keamanan jaringan setiap saat. |
 | **SSE** | _Server-Sent Events_ | Cara _server_ mengirim kabar terbaru ke layar secara langsung. |
-| **SSH** | Secure Shell | Akses jarak jauh ke server lewat baris perintah. |
+| **SSH** | Secure Shell | Akses jarak jauh ke _server_ lewat baris perintah. |
 | **STIX** | Structured Threat Information Expression | Format standar untuk menulis kabar ancaman. |
 | **TAXII** | Trusted Automated Exchange of Intelligence Information | Cara standar mengirim kabar ancaman antarsistem. |
 | **TNI AD** | Tentara Nasional Indonesia Angkatan Darat | Matra darat dari angkatan bersenjata Indonesia. |

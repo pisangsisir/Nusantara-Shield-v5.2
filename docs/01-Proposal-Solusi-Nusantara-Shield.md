@@ -14,7 +14,7 @@
 
 ## 1. Ringkasan Eksekutif
 
-> **Serangan siber tidak menunggu rapat staf.** _Ransomware_ mengenkripsi satu server per menit, sementara posko siber masih memilah ratusan peringatan, menunggu izin berjenjang, dan menyusun laporan dengan tangan. Saat jaringan akhirnya diputus atau dipulihkan, jejak penyerang sering sudah terhapus.
+> **Serangan siber tidak menunggu rapat staf.** _Ransomware_ mengenkripsi satu _server_ per menit, sementara posko siber masih memilah ratusan peringatan, menunggu izin berjenjang, dan menyusun laporan dengan tangan. Saat jaringan akhirnya diputus atau dipulihkan, jejak penyerang sering sudah terhapus.
 
 **Nusantara Shield** adalah **Perwira Staf Siber Digital** bagi posko satuan: menjaga **jaringan perkantoran (IT)** dan **sistem kendali fasilitas (OT)** dalam satu layar. Ia mengamati tanpa henti, mencocokkan setiap kabar ancaman dengan aset milik satuan sendiri, dan menyajikan langkah penindakan yang sudah dibakukan dalam doktrin. **Keputusan tetap di tangan manusia.** Begitu operator menahan tombol, sistem mengeksekusi dalam urutan baku:
 
@@ -36,7 +36,7 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 | Waktu dari keputusan operator sampai jaringan terputus, bukti sudah aman | **±1,2 detik** |
 | Beban Central Processing Unit (CPU) _server_ untuk **300 layar** pemantau serentak | **2,8%** (sebelumnya 10,8%) |
 | Lalu lintas jaringan ke 300 layar saat serangan intensif | **−80%** (8,4 → 1,7 MB/s) |
-| Waktu AI lokal menilai lalu lintas 9 aset (Isolation Forest, tanpa internet) | **±10 milidetik** |
+| Waktu AI lokal menilai lalu lintas 9 aset (_Isolation Forest_, tanpa internet) | **±10 milidetik** |
 | Perilaku sistem yang dikunci uji otomatis | **196 uji** |
 
 ---
@@ -139,7 +139,7 @@ Rumah sakit adalah arena tempat konvergensi Information Technology (IT) dan OT p
 
 ### 2.3 Jawaban Nusantara Shield
 
-- **Amati lebih awal, IT maupun OT.** Kabar ancaman dikorelasikan dengan inventaris aset. Kabar celah protokol industri Modbus langsung menaikkan **pengendali genset** ke WASPADA (±66%) sebelum ada serangan, dan satu klik **Perketat** menurunkannya. **AI lokal** (Isolation Forest) juga menilai lalu lintas tiap aset; lalu lintas Modbus tak wajar menaikkan genset ke WASPADA **tanpa menunggu kabar ancaman**, lengkap dengan alasannya.
+- **Amati lebih awal, IT maupun OT.** Kabar ancaman dikorelasikan dengan inventaris aset. Kabar celah protokol industri Modbus langsung menaikkan **pengendali genset** ke WASPADA (±66%) sebelum ada serangan, dan satu klik **Perketat** menurunkannya. **AI lokal** (_Isolation Forest_) juga menilai lalu lintas tiap aset; lalu lintas Modbus tak wajar menaikkan genset ke WASPADA **tanpa menunggu kabar ancaman**, lengkap dengan alasannya.
 - **Bukti dulu, baru putus: IT dan OT.** Bukti disegel dengan sidik jari Secure Hash Algorithm 256-bit (SHA-256), lalu **±1,2 detik** kemudian aset IT diisolasi. Untuk OT, perintah ke sakelar terkelola memutus **jalur kantor → zona kendali**, sehingga peretasan tidak menjalar ke infrastruktur fisik. Genset **tidak dimatikan**, tetapi beralih ke kendali lokal (NIST SP 800-82). Pemutusan tanpa bukti ditolak _server_.
 - **Pemulihan tidak menghapus jejak.** Tombol Pulihkan terkunci sampai sidik jari SHA-256 bukti **dicocokkan ulang**.
 - **Batas yang jujur:** di purwarupa, rumah sakit dan genset adalah data contoh, dan perintah ke sakelar masih berupa **simulasi webhook**. Sensor protokol industri dan sambungan ke sakelar fisik adalah peta jalan.
@@ -154,7 +154,7 @@ Tiga kelemahan berikut lazim ditemui pada pola respons insiden manual:
 | --- | --- | --- | --- |
 | **1** | **Banjir peringatan** (*alert fatigue*) | Ratusan peringatan per hari, sebagian besar tidak menyangkut aset satuan | Ancaman nyata tenggelam; operator lelah dan terlambat bereaksi |
 | **2** | **Penahanan (*containment*) yang lambat dan ragu** | Izin berjenjang, tombol bermakna ganda, laporan disusun manual di tengah krisis | Penyerang leluasa menyebar selama keputusan tertunda |
-| **3** | **Rusaknya bukti forensik saat pemulihan darurat** | Server di-*restart* atau dipulihkan dari cadangan sebelum bukti disalin | Pelaku tidak bisa diidentifikasi; rantai barang bukti (*chain of custody*) tidak dapat dipertanggungjawabkan |
+| **3** | **Rusaknya bukti forensik saat pemulihan darurat** | _Server_ di-*restart* atau dipulihkan dari cadangan sebelum bukti disalin | Pelaku tidak bisa diidentifikasi; rantai barang bukti (*chain of custody*) tidak dapat dipertanggungjawabkan |
 
 > **Inti persoalannya:** kecepatan dan ketertiban forensik selama ini dianggap saling bertentangan. Nusantara Shield membuktikan keduanya bisa dicapai sekaligus.
 
@@ -231,7 +231,7 @@ Dalam bahasa _incident response_ militer, tahap Bertindak setara dengan siklus *
 
 1. **Intelijen proaktif**
     - Kabar ancaman dikorelasikan dengan _port_ dan sektor aset milik satuan, **termasuk aset OT**: kabar celah protokol industri Modbus langsung menaikkan pengendali genset ke WASPADA.
-    - **AI lokal (Engine Deteksi Anomali):** model Isolation Forest (scikit-learn) dilatih di _server_ satuan dari profil lalu lintas normal, lalu menilai enam ciri lalu lintas tiap aset dalam milidetik. Lalu lintas tidak wajar menambah peluang serangan dan disertai alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal" (_explainability_).
+    - **AI lokal (Engine Deteksi Anomali):** model _Isolation Forest_ (scikit-learn) dilatih di _server_ satuan dari profil lalu lintas normal, lalu menilai enam ciri lalu lintas tiap aset dalam milidetik. Lalu lintas tidak wajar menambah peluang serangan dan disertai alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal" (_explainability_).
     - Satu klik **Perketat** menurunkan peluang serangan sebelum ancaman tiba.
 2. **Respons berdoktrin**
     - **Isolasi standar:** bukti diamankan lebih dulu, lalu ±1,2 detik kemudian jaringan diputus.
@@ -260,7 +260,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 | **Mode Berdaulat** — tanpa ketergantungan pihak luar | Berjalan **luring penuh**: tanpa Content Delivery Network (CDN), fon, atau layanan awan. Cocok untuk **jaringan tertutup** satuan. Data latihan sintetis (RFC 5737). |
 | **Doktrin forensik** — *chain of custody* | Bukti diamankan **sebelum** isolasi. Berita acara berantai HMAC. Sidik jari SHA-256 **dicocokkan ulang sebelum pemulihan**; bila tidak cocok, pemulihan dikunci. |
 | **Kecepatan OODA** — bertindak lebih cepat dari lawan | Peringatan dini sebelum serangan; bukti + isolasi ±1,2 detik dari keputusan |
-| **AI tepat guna** — deteksi tanpa _signature_ | Isolation Forest lokal menilai lalu lintas dalam milidetik, menjelaskan alasannya, dan hanya menaikkan status; keputusan memutus tetap di tangan operator (_human-in-the-loop_). Dikunci 10 uji khusus AI. |
+| **AI tepat guna** — deteksi tanpa _signature_ | _Isolation Forest_ lokal menilai lalu lintas dalam milidetik, menjelaskan alasannya, dan hanya menaikkan status; keputusan memutus tetap di tangan operator (_human-in-the-loop_). Dikunci 10 uji khusus AI. |
 | **Pertanggungjawaban komando** | Setiap keputusan (siapa, apa, kapan, alasan) tercatat di dua buku HMAC. LAPSIT terkirim otomatis ke pimpinan. |
 | **Pemisahan wewenang** | Peran **Pengamat** (melihat) dan **Operator** (bertindak). Akun operator hanya lewat kode undangan atau dibuat operator lain. |
 | **Sinergi IT/OT** | Aset rumah sakit (SIMRS) dan aset kendali (**pengendali genset**, Modbus/TCP _port_ 502) berada dalam satu inventaris dan satu layar. Kabar ancaman protokol industri langsung dikorelasikan, dan skenario **Sabotase OT** memutus jalur kantor → zona kendali ±1,2 detik setelah bukti aman. Dikunci 6 uji khusus OT. |
@@ -353,8 +353,8 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 - **Mode Hybrid (rancangan lanjutan, belum ada di purwarupa).** Satu-satunya data yang direncanakan melintasi batas jaringan adalah **umpan indikator ancaman resmi** (BSSN/MISP). Umpan masuk satu arah lewat gerbang yang dikendalikan satuan, atau diimpor sebagai berkas lewat media yang diperiksa. Aplikasi inti tetap luring. Pada purwarupa, umpan CTI memakai data latihan sintetis.
 - **Batas purwarupa.** Pengambilan bukti dan pemutusan jaringan **disimulasikan** atas aset latihan. Yang berjalan nyata: penguncian urutan di _server_, perhitungan sidik jari SHA-256, buku berantai HMAC, LAPSIT, korelasi CTI, dan penilaian AI lokal (atas ciri lalu lintas sintetis).
 - **Dua jenis AI, dengan status yang berbeda:**
-    - **(a) Engine Deteksi Anomali — sudah beroperasi penuh di purwarupa.** Model _machine learning_ ringan (Isolation Forest, scikit-learn) dilatih dan dijalankan di _server_ satuan. Ini **_local inference_**: tidak ada unduhan model, tidak ada pemanggilan Application Programming Interface (API) luar, dan setelah pemasangan tidak butuh internet sama sekali. Karena itu ia siap untuk **penerapan _air-gapped_**: paket pustakanya cukup dibawa lewat media yang diperiksa. Ciri lalu lintasnya di purwarupa masih sintetis.
-    - **(b) Engine Asisten Narasi — peta jalan, belum ada di purwarupa.** Model bahasa lokal (misalnya Llama 3 lewat Ollama) untuk menyusun draf LAPSIT. Model berat ini sengaja **tidak** dimasukkan ke _server_ inti agar beban CPU tetap hemat.
+    - **(a) Engine Deteksi Anomali — sudah beroperasi penuh di purwarupa.** Model _machine learning_ ringan (_Isolation Forest_, scikit-learn) dilatih dan dijalankan 100% luring di _backend_, lalu memberi skor anomali lalu lintas IT dan OT setiap detik. Ini **_local inference_**: tidak ada unduhan model, tidak ada pemanggilan Application Programming Interface (API) luar, dan setelah pemasangan tidak butuh internet sama sekali. Karena itu ia siap untuk **penerapan _air-gapped_**: paket pustakanya cukup dibawa lewat media yang diperiksa. Ciri lalu lintasnya di purwarupa masih sintetis.
+    - **(b) Engine Asisten Narasi — peta jalan, belum ada di purwarupa.** Model bahasa lokal (_Local LLM_) **Llama 3 8B lewat Ollama** untuk menyusun draf LAPSIT. Rencananya juga _local inference_: model dihitung di _server_ satuan, dan untuk satuan _air-gapped_ berkas modelnya diunduh sekali lalu dibawa lewat media yang diperiksa. Model berat ini sengaja **tidak** dimasukkan ke _server_ inti agar beban CPU tetap hemat.
     - Dalam kedua jenis, AI hanya menyarankan dan menaikkan status; memutus jaringan tetap keputusan operator.
 - **AI sebagai alat pengembang.** Selain itu, asisten AI dipakai untuk membantu menulis kode dan dokumentasi, sebagaimana diizinkan panitia (lihat 6.2).
 
@@ -368,12 +368,12 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
     - sambungan _webhook_ terautentikasi ke sakelar terkelola sungguhan;
     - pertukaran CTI dengan Badan Siber dan Sandi Negara (BSSN) dan Kartika Computer Security Incident Response Team (CSIRT) lewat Malware Information Sharing Platform (MISP) atau OpenCTI (STIX/TAXII), menggantikan rancangan Mode Hybrid;
     - akuisisi bukti nyata (misalnya Velociraptor), penerusan kasus ke _case management_ (TheHive), dan pemetaan _alert_ ke MITRE ATT&CK;
-    - AI: ciri lalu lintas nyata dari sensor satuan untuk Engine Deteksi Anomali, dan Engine Asisten Narasi (LLM lokal, misalnya Ollama) untuk draf LAPSIT, dengan _human-in-the-loop_;
+    - AI: ciri lalu lintas nyata dari sensor satuan untuk Engine Deteksi Anomali, dan Engine Asisten Narasi (Llama 3 8B lewat Ollama) untuk draf LAPSIT, dengan _human-in-the-loop_;
     - paket pemasangan luring siap pakai, SSO instansi dengan verifikasi dua langkah, dan operasi multiproses.
 
 ### 5.3 Konsep Penempatan dan Pengguna (Usulan)
 
-Nusantara Shield dirancang dipasang **di posko siber (SOC) setiap satuan yang memiliki aset vital**, dengan satu _server_ luring per satuan, dan dioperasikan oleh unsur siber yang sudah ada dalam struktur Tentara Nasional Indonesia Angkatan Darat (TNI AD). Dalam kerangka tiga lapis komando siber (strategis, operasional, dan taktis; Purbo dan Lumy, 2025), Nusantara Shield adalah alat **lapis taktis**, yaitu _Cyber Defense Operation Center_ (CDOC) di tingkat satuan. Konsep ini disusun dari struktur yang disampaikan secara resmi dan **belum diuji di lingkungan TNI AD**.
+Nusantara Shield dirancang dipasang **di posko siber atau _Security Operations Center_ (SOC) setiap satuan yang memiliki aset vital**, dengan satu _server_ luring per satuan, dan dioperasikan oleh unsur siber yang sudah ada dalam struktur Tentara Nasional Indonesia Angkatan Darat (TNI AD). Dalam kerangka tiga lapis komando siber (strategis, operasional, dan taktis; Purbo dan Lumy, 2025), Nusantara Shield adalah alat **lapis taktis**, yaitu _Cyber Defense Operation Center_ (CDOC) di tingkat satuan. Konsep ini disusun dari struktur yang disampaikan secara resmi dan **belum diuji di lingkungan TNI AD**.
 
 | Tingkat | Unsur | Peran terhadap Nusantara Shield |
 | --- | --- | --- |
@@ -381,9 +381,21 @@ Nusantara Shield dirancang dipasang **di posko siber (SOC) setiap satuan yang me
 | **Komando Daerah Militer (Kodam)** | Sandi dan Siber Kodam (Sansidam), melalui Tim Penangkalan Siber | Pendamping dan cadangan operator; meneruskan laporan ke pusat. |
 | **Pusat** (lapis operasional) | Satuan pelaksana penangkalan Pussiberad dan Kartika CSIRT | Menerima LAPSIT dan berita acara bukti; menganalisis bukti; menyebarkan kabar ancaman ke satuan. |
 
-- **Security Operations Center (SOC) dan ruang komando:** SOC memakai seluruh dasbor setiap hari. Saat krisis, ruang komando cukup menampilkan Executive Overview, Peta Global, dan LAPSIT dengan akun Pengamat.
+- **SOC dan ruang komando:** SOC memakai seluruh dasbor setiap hari. Saat krisis, ruang komando cukup menampilkan Executive Overview, Peta Global, dan LAPSIT dengan akun Pengamat.
 - **Kebutuhan minimum per satuan:** satu laptop atau PC (2 inti, 512 MB memori bebas), jaringan internal, minimal dua akun Operator dan satu akun Pengamat.
-- **Yang sudah berjalan:** _server_ luring di satu satuan, dua peran (Pengamat dan Operator), dan LAPSIT yang dapat diekspor ke PDF. **Yang belum dibangun:** pengiriman laporan otomatis ke Sansidam dan Pussiberad serta tampilan gabungan lintas satuan.
+### 5.4 Status Fitur: Sudah Berjalan dan Peta Jalan
+
+Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar didemonstrasikan.
+
+| Sudah berjalan di purwarupa v5.1 | Belum dibangun (peta jalan: Mode Hybrid dan eskalasi) |
+| --- | --- |
+| Operasi luring penuh di satu satuan/rumah sakit (*on-premise*) | **(1) Pengiriman LAPSIT otomatis berjenjang** ke Sandi dan Siber Kodam (Sansidam) dan Kartika CSIRT (Pussiberad) |
+| Dua peran: Pengamat dan Operator | **(2) Akses dan tampilan lintas satuan** untuk pemantauan serentak di Mabes |
+| Isolasi dengan tombol yang ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal Llama 3 8B lewat Ollama untuk draf LAPSIT |
+| Rantai bukti HMAC-SHA256 | Umpan indikator resmi (BSSN/MISP) lewat gerbang satu arah |
+| Korelasi CTI dan Engine Deteksi Anomali (_Isolation Forest_, luring) | Sensor nyata (Wazuh, Suricata, Zeek) dan sakelar terkelola sungguhan |
+| Simulasi OT genset (Modbus, _port_ 502) | |
+| Pembuatan LAPSIT dan ekspor PDF | |
 
 ---
 
@@ -404,7 +416,7 @@ Sesuai pasal 5.4, berikut pustaka dan alat pihak ketiga yang digunakan:
 | **ReportLab** | Ekspor LAPSIT ke PDF | BSD |
 | **pytest** dan **HTTPX** | Uji otomatis | MIT dan BSD-3-Clause |
 | **Mermaid** dan **Playwright (Chromium)** | Hanya untuk menggambar diagram dan mencetak dokumen ini; tidak dipakai aplikasi | MIT, Apache-2.0, dan BSD-3-Clause |
-| **scikit-learn** dan **NumPy** | Engine Deteksi Anomali (Isolation Forest), berjalan lokal | BSD-3-Clause |
+| **scikit-learn** dan **NumPy** | Engine Deteksi Anomali (_Isolation Forest_), berjalan lokal | BSD-3-Clause |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi | Layanan komersial |
 | **Blok alamat Internet Protocol (IP) Request for Comments (RFC) 5737** | Data latihan sintetis | Standar terbuka IETF |
 
@@ -433,7 +445,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **BSSN** | Badan Siber dan Sandi Negara | Lembaga keamanan siber nasional. |
 | **CDN** | _Content Delivery Network_ | Layanan luar untuk memuat huruf atau skrip situs web. Nusantara Shield tidak memakainya. |
 | **CDOC** | Cyber Defense Operation Center | Pusat operasi pertahanan siber di tingkat satuan. |
-| **CPU** | Central Processing Unit | Otak komputer; persentasenya menunjukkan seberapa sibuk server. |
+| **CPU** | Central Processing Unit | Otak komputer; persentasenya menunjukkan seberapa sibuk _server_. |
 | **CSIRT** | _Computer Security Incident Response Team_ | Tim tanggap insiden siber. Kartika CSIRT adalah milik TNI AD. |
 | **CTI** | _Cyber Threat Intelligence_ (intelijen ancaman siber) | Kabar dari luar tentang ancaman yang sedang beredar, misalnya celah baru pada suatu perangkat. |
 | **Dansat** | Komandan Satuan | Pimpinan unit; di sistem ini berperan sebagai pengamat yang menerima laporan. |
@@ -454,7 +466,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **IT** | _Information Technology_ (teknologi informasi) | Komputer kantor, _server_, dan jaringannya. |
 | **Kodam** | Komando Daerah Militer | Komando TNI AD tingkat wilayah (provinsi). |
 | **LAPSIT** | Laporan Situasi | Laporan resmi singkat tentang insiden: apa, di mana, kapan, dan tindakan yang diambil. |
-| **LLM** | _Large Language Model_ (model bahasa besar) | AI penyusun teks, misalnya Llama 3. Di proyek ini masih rencana. |
+| **LLM** | _Large Language Model_ (model bahasa besar) | AI penyusun teks, misalnya Llama 3 8B. Di proyek ini masih rencana. |
 | **_Local inference_** | Perhitungan AI di komputer sendiri | Model dijalankan di _server_ sendiri, bukan lewat layanan di internet. Berbeda dengan _air-gapped_. |
 | **Log audit** | Catatan jejak | Daftar siapa melakukan apa dan kapan di dalam sistem. |
 | **Luring** | Di luar jaringan (_offline_) | Berjalan tanpa sambungan internet. |
@@ -468,7 +480,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **Operator** | Petugas jaga sistem | Satu-satunya peran yang boleh menekan tombol tindakan. |
 | **OSINT** | Open Source Intelligence | Intelijen dari sumber terbuka, misalnya berita dan buletin keamanan. |
 | **OT** | _Operational Technology_ (teknologi operasional) | Perangkat yang mengendalikan mesin fisik, seperti genset dan catu daya rumah sakit. |
-| **PDNS** | Pusat Data Nasional Sementara | Pusat data pemerintah yang lumpuh diserang ransomware pada Juni 2024. |
+| **PDNS** | Pusat Data Nasional Sementara | Pusat data pemerintah yang lumpuh diserang _ransomware_ pada Juni 2024. |
 | **Perketat** | Pengerasan (_hardening_) | Tombol untuk mengurangi celah sebuah aset sebelum diserang. |
 | **_Playbook_** | Buku panduan langkah | Urutan tindakan baku untuk setiap jenis insiden. |
 | **_Port_** | Pintu layanan | Nomor "pintu" di perangkat; tiap layanan punya nomornya sendiri. |
@@ -485,7 +497,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **SEV-1** | _Severity 1_ (tingkat keparahan tertinggi) | Label untuk insiden paling gawat. |
 | **SIMRS** | Sistem Informasi Manajemen Rumah Sakit | Sistem komputer rekam medis dan layanan pasien. |
 | **SOC** | _Security Operations Center_ (pusat operasi keamanan) | Ruang dan tim yang memantau keamanan jaringan setiap saat. |
-| **SSH** | Secure Shell | Akses jarak jauh ke server lewat baris perintah. |
+| **SSH** | Secure Shell | Akses jarak jauh ke _server_ lewat baris perintah. |
 | **STIX** | Structured Threat Information Expression | Format standar untuk menulis kabar ancaman. |
 | **TAXII** | Trusted Automated Exchange of Intelligence Information | Cara standar mengirim kabar ancaman antarsistem. |
 | **TNI AD** | Tentara Nasional Indonesia Angkatan Darat | Matra darat dari angkatan bersenjata Indonesia. |

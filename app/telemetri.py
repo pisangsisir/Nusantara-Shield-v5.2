@@ -36,7 +36,7 @@ Fase 4 (rantai bukti forensik — analogi olah TKP: foto & kantongi barang bukti
 garis polisi; TKP baru boleh dibersihkan setelah segel bukti dicocokkan):
 - Setiap playbook diawali langkah AMANKAN BUKTI (jenis="bukti"): salinan simulasi + SHA-256 +
   berita acara di buku rantai bukti (app/bukti.py, berantai HMAC).
-- Peladen MENOLAK (409) setiap pemutusan — tombol, aksi tunggal, centang manual, maupun antrean —
+- Server MENOLAK (409) setiap pemutusan — tombol, aksi tunggal, centang manual, maupun antrean —
   selama bukti belum diamankan. Satu-satunya pengecualian: ISOLASI DARURAT dengan alasan tertulis
   yang langsung masuk buku rantai bukti, log audit HMAC, dan laporan ke manajemen.
 - Pemulihan (tombol, centang manual, tutup insiden) WAJIB lolos pencocokan ulang SHA-256 seluruh
@@ -99,7 +99,7 @@ INDEKS_SIMPUL = {s["id"]: s for s in SIMPUL}
 # pemiliknya adalah layanan yang insidennya membuat titik itu berubah status.
 PEMILIK_SIMPUL = {"portal": "perizinan", "api": "imigrasi", "dns": "imigrasi", "db": "pajak",
                   "smb": "kesehatan", "rdp": "listrik", "ssh": "logistik", "backup": "pajak",
-                  "genset": "listrik"}   # Fase 6: aset OT milik layanan Kendali Fasilitas
+                  "genset": "listrik"}   # Fase 6: aset OT milik layanan Genset & Catu Daya RS Kesdam
 PORT_INVENTARIS = {s["port"] for s in SIMPUL if s["port"]}
 ASET_BERPORT = [s["id"] for s in SIMPUL if s["port"]]
 

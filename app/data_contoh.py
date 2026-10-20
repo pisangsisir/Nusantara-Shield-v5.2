@@ -18,29 +18,29 @@ import copy
 from .istilah import ISTILAH, kepada_manajemen
 
 # --------------------------------------------------------------------------
-# 1. ASET SISTEM PERUSAHAAN CONTOH — PT Contoh Nusantara (fiktif)
+# 1. ASET SISTEM SATUAN CONTOH — RS dan markas TNI AD (fiktif)
 # --------------------------------------------------------------------------
 # v5.1: ID lama sengaja dipertahankan agar loket API & uji tetap stabil;
 # yang berubah nama aset, cabang pemilik, dan PIC. "sektor" tetap dipakai korelasi CTI.
 # "jam sejak backup" & "backup teruji" terinspirasi kasus PDNS 2024 (hanya ~2% data ber-backup).
 LAYANAN_AWAL: list[dict] = [
-    {"id": "imigrasi", "nama": "Portal Pelanggan (contoh)", "singkat": "Portal Pelanggan",
-     "cabang": "Kantor Pusat Jakarta", "sektor": "Administrasi pemerintahan",
+    {"id": "imigrasi", "nama": "Portal Layanan Pasien RSPAD Gatot Soebroto (contoh)", "singkat": "Portal RSPAD",
+     "cabang": "RSPAD Gatot Soebroto, Jakarta", "sektor": "Administrasi pemerintahan",
      "jam_sejak_backup": 6, "backup_teruji": True},
-    {"id": "perizinan", "nama": "Portal Mitra & Vendor (contoh)", "singkat": "Portal Mitra",
-     "cabang": "Cabang Bandung", "sektor": "Administrasi pemerintahan",
+    {"id": "perizinan", "nama": "Portal Pemasok Alat Kesehatan Kesdam (contoh)", "singkat": "Portal Alkes Kesdam",
+     "cabang": "Kesdam Bandung", "sektor": "Administrasi pemerintahan",
      "jam_sejak_backup": 52, "backup_teruji": True},          # sengaja terlambat → kuning
-    {"id": "pajak", "nama": "Sistem Keuangan ERP (contoh)", "singkat": "ERP Keuangan",
-     "cabang": "Cabang Surabaya", "sektor": "Keuangan",
+    {"id": "pajak", "nama": "Sistem Keuangan & Anggaran Markas (contoh)", "singkat": "Keuangan Markas",
+     "cabang": "Markas Utama Surabaya", "sektor": "Keuangan",
      "jam_sejak_backup": 12, "backup_teruji": True},
-    {"id": "kesehatan", "nama": "Rumah Sakit Pemerintah · SIMRS (contoh)", "singkat": "RS Pemerintah",
-     "cabang": "Cabang Makassar", "sektor": "Kesehatan",
+    {"id": "kesehatan", "nama": "RS Kesdam · SIMRS (contoh)", "singkat": "RS Kesdam",
+     "cabang": "RS Kesdam Makassar", "sektor": "Kesehatan",
      "jam_sejak_backup": 20, "backup_teruji": False},         # backup belum diuji → kuning
-    {"id": "listrik", "nama": "Kendali Fasilitas RS · genset & catu daya (contoh)", "singkat": "Fasilitas RS",
-     "cabang": "Cabang Makassar", "sektor": "Energi",
+    {"id": "listrik", "nama": "Genset & Catu Daya RS Kesdam (contoh)", "singkat": "Genset RS Kesdam",
+     "cabang": "RS Kesdam Makassar", "sektor": "Energi",
      "jam_sejak_backup": 8, "backup_teruji": True},
-    {"id": "logistik", "nama": "Sistem Gudang & Logistik (contoh)", "singkat": "Gudang",
-     "cabang": "Cabang Pontianak", "sektor": "Logistik",
+    {"id": "logistik", "nama": "Gudang Logistik Kesehatan Kesdam (contoh)", "singkat": "Gudang Kesdam",
+     "cabang": "Gudang Kesdam Pontianak", "sektor": "Logistik",
      "jam_sejak_backup": 10, "backup_teruji": True},
 ]
 
@@ -298,15 +298,15 @@ KEPARAHAN_IR = {"ransomware": "SEV-1", "ddos": "SEV-1", "backup_dimatikan": "SEV
 #         diisolasi, jangan di-restart"), BUKAN untuk meminta izin.
 PROFIL_LAYANAN: dict[str, dict] = {
     "imigrasi": {"pic": {"nama": "Bayu Pratama", "jabatan": ISTILAH["pic_cabang_utama"],
-                         "cabang": "Kantor Pusat Jakarta", "kanal": "Jalur Internal SIM-01"}},
+                         "cabang": "RSPAD Gatot Soebroto, Jakarta", "kanal": "Jalur Internal SIM-01"}},
     "perizinan": {"pic": {"nama": "Sri Wahyuni", "jabatan": ISTILAH["pic_cabang"],
-                          "cabang": "Cabang Bandung", "kanal": "Jalur Internal SIM-11"}},
+                          "cabang": "Kesdam Bandung", "kanal": "Jalur Internal SIM-11"}},
     "pajak": {"pic": {"nama": "Dewi Lestari", "jabatan": ISTILAH["pic_basis_data"],
-                      "cabang": "Cabang Surabaya", "kanal": "Jalur Internal SIM-21"}},
+                      "cabang": "Markas Utama Surabaya", "kanal": "Jalur Internal SIM-21"}},
     "kesehatan": {"pic": {"nama": "Fajar Nugroho", "jabatan": ISTILAH["pic_cabang"],
-                          "cabang": "Cabang Makassar", "kanal": "Jalur Internal SIM-31"}},
+                          "cabang": "RS Kesdam Makassar", "kanal": "Jalur Internal SIM-31"}},
     "listrik": {"pic": {"nama": "Rizky Ramadhan", "jabatan": ISTILAH["pic_cabang"],
-                        "cabang": "Cabang Makassar", "kanal": "Jalur Internal SIM-41"}},
+                        "cabang": "RS Kesdam Makassar", "kanal": "Jalur Internal SIM-41"}},
     "logistik": {"pic": {"nama": "Lestari Handayani", "jabatan": ISTILAH["pic_basis_data"],
-                         "cabang": "Cabang Pontianak", "kanal": "Jalur Internal SIM-51"}},
+                         "cabang": "Gudang Kesdam Pontianak", "kanal": "Jalur Internal SIM-51"}},
 }

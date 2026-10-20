@@ -3,7 +3,7 @@ Uji Fase 6 — sinergi IT/OT: aset teknologi operasional (pengendali genset, Mod
 
 Prinsip yang dikunci:
 - Aset OT terdaftar di inventaris yang sama dengan aset IT: tampil di topologi (zona kendali),
-  di radar (zona internal), dan bisa dibuka ke profil layanan Kendali Fasilitas.
+  di radar (zona internal), dan bisa dibuka ke profil layanan Genset & Catu Daya RS Kesdam.
 - Kabar ancaman protokol industri Modbus di Radio CTI MENAIKKAN genset ke WASPADA sebelum serangan
   (0,80 keyakinan × 0,75 paparan × 1,1 bonus sektor energi ≈ 66 %).
 - Tombol Perketat menurunkan peluang genset di bawah ambang, sama seperti aset IT.
@@ -68,7 +68,7 @@ def test_genset_terdaftar_sebagai_aset_ot_di_topologi_dan_radar(klien, h):
     k = potret(klien, h)
     g = simpul(k)["genset"]
     assert (g["ip"], g["port"], g["status"]) == ("192.0.2.120", 502, "normal")
-    assert g["layanan"] == "listrik"                           # klik → profil Kendali Fasilitas
+    assert g["layanan"] == "listrik"                           # klik → profil Genset RS Kesdam
     kabel = {(c["dari"], c["ke"]) for c in k["topologi"]["kabel"]}
     assert ("core", "genset") in kabel
     titik = {t["ip"]: t for t in k["radar"]["titik"]}

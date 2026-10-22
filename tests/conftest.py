@@ -21,6 +21,7 @@ KELOMPOK = {
     "test_istilah.py": "Kamus istilah: tidak ada label yang tertanam di luar app/istilah.py",
     "test_ot.py": "Sinergi IT/OT: kabar Modbus menaikkan pengendali genset ke WASPADA",
     "test_ai.py": "AI lokal: deteksi anomali Isolation Forest, luring, dengan alasan yang bisa dibaca",
+    "test_paket_luring.py": "Paket pasang luring: sidik jari SHA-256, pemasangan tanpa internet",
 }
 _berkas_terakhir = {"nama": None}
 _CONFIG = {"config": None}

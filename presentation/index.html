@@ -285,7 +285,7 @@ h2 em { font-style: normal; color: var(--neon); }
 .darurat b { color: var(--merah); font-family: var(--huruf-mono); letter-spacing: .1em; font-size: 14px; white-space: nowrap; }
 
 /* =====================================================================
-   SLIDE 3 · Server: grafik CPU menurun (−74%) + 196 uji
+   SLIDE 3 · Server: grafik CPU menurun (−74%) + 204 uji
    ===================================================================== */
 .dua-kolom { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .grafik { padding: 22px 26px 18px; }
@@ -614,7 +614,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <div class="angka"><b>66%→20%</b><span>genset WASPADA sebelum diserang; Perketat menurunkannya</span></div>
         <div class="angka"><b>±1,2 dtk</b><span>keputusan → jaringan terputus, bukti sudah aman</span></div>
         <div class="angka"><b>2,8%</b><span>CPU (prosesor) <i class="asing">server</i> untuk 300 layar (dari 10,8%)</span></div>
-                <div class="angka"><b>196</b><span>uji otomatis, termasuk 10 uji AI lokal</span></div>
+                <div class="angka"><b>204</b><span>uji otomatis, termasuk 10 uji AI lokal</span></div>
       </div>
     </div>
 
@@ -767,7 +767,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="penanda"><b>04</b>Keunggulan <i class="asing">Server</i> · Skalabilitas dan Uji</div>
     <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
   </div>
-  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 196 uji.</em></h2>
+  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 204 uji.</em></h2>
 
   <div class="dua-kolom">
     <div>
@@ -805,7 +805,8 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
           <div class="t-baris t-ot" style="--i:6"><span>▶ Sinergi IT/OT<small>Modbus → WASPADA · isolasi OT</small></span><em>6 PASSED</em></div>
           <div class="t-baris" style="--i:7"><span>▶ Rantai bukti forensik<small>bukti sebelum isolasi</small></span><em>36 PASSED</em></div>
           <div class="t-baris" style="--i:8"><span>▶ Telemetri dan siaran<small>dapur tunggal, delta</small></span><em>19 PASSED</em></div>
-          <div class="t-akhir" style="--i:9">═══ 196 passed in 42.97s ═══</div>
+          <div class="t-baris" style="--i:9"><span>▶ Paket pasang luring<small>SHA-256 · tanpa internet</small></span><em>8 PASSED</em></div>
+          <div class="t-akhir" style="--i:10">═══ 204 passed in 45.28s ═══</div>
         </div>
       </div>
       <p class="terminal-ket">Uji mengunci <b>aturan doktrin</b>, bukan sekadar fungsi: isolasi tanpa bukti ditolak 409 · pemulihan terkunci bila <i class="asing">hash</i> berbeda · sabotase OT diputus ±1,2 dtk tanpa mematikan genset · sandi tidak pernah tercatat di log · AI menilai tanpa satu pun koneksi jaringan · data layar hasil rakitan delta identik dengan <i class="asing">server</i>.</p>
@@ -819,7 +820,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Komponen: Loket Application Programming Interface (API) <code>app/main.py</code> · Gerbang keamanan <code>app/keamanan.py</code> · Dapur situasi <code>app/telemetri.py</code> · Engine Deteksi Anomali <code>app/ai_anomali.py</code> · Brankas bukti <code>app/bukti.py</code> · Buku berantai <code>app/audit.py</code> · Hub siaran <code>app/siaran.py</code> + <code>app/delta.py</code> · Dasbor <code>static/</code>.</li>
       <li>Gerbang ASGI memeriksa ukuran kiriman sebelum menyentuh logika aplikasi; lebih dari 16 KB diputus dengan kode 413.</li>
       <li>Batas yang sebaiknya disebut sendiri: sistem berjalan sebagai <b>satu proses <i class="asing">server</i></b>. Operasi multiproses adalah langkah lanjutan.</li>
-      <li>Uji bisa dijalankan ulang juri dalam ±45 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli: 196 passed in 42.97s (174 uji asal + 12 uji IT/OT dan istilah + 10 uji AI lokal).</li>
+      <li>Uji bisa dijalankan ulang juri dalam ±45 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli: 204 passed in 45.28s (174 uji asal + 12 uji IT/OT dan istilah + 10 uji AI lokal + 8 uji paket luring).</li>
       <li>Kebutuhan minimum: Python 3.10+, 2 inti, 512 MB memori bebas, 50 MB penyimpanan (paket rilis 187 KB). Memori terukur ±71 MB sebelum AI; pustaka scikit-learn dan numpy menambah ±130 MB.</li>
     </ul>
   </aside>
@@ -859,7 +860,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <text x="550" y="118" text-anchor="middle" font-size="10" fill="#ff5c74">tidak dipakai</text>
       </svg>
       <div class="cek">
-        <div><i>✓</i><span><b><i class="asing">On-premise</i> penuh di 1 satuan/RS:</b> tanpa awan, CDN, atau skrip daring; internet hanya sekali saat <span class="mono">pip install</span>.</span></div>
+        <div><i>✓</i><span><b><i class="asing">On-premise</i> penuh di 1 satuan/RS:</b> tanpa awan, CDN, atau skrip daring; dipasang dari paket luring bersidik jari SHA-256, <b>tanpa internet sama sekali</b>.</span></div>
         <div><i>✓</i><span><b>Peran Pengamat dan Operator;</b> isolasi dengan tombol ditahan 0,6 dtk; LAPSIT dan ekspor PDF.</span></div>
         <div><i>✓</i><span><b>Rantai bukti HMAC-SHA256,</b> korelasi CTI, dan simulasi OT genset (Modbus 502).</span></div>
         <div><i>✓</i><span><b>Engine Deteksi Anomali (berfungsi penuh):</b> <i class="asing">Isolation Forest</i> (scikit-learn), 100% luring di <i class="asing">backend</i>; skor anomali lalu lintas IT/OT tiap detik.</span></div>
@@ -912,7 +913,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="besar kartu-dasar" style="--i:0"><b>66→20%</b><strong>Peringatan dini</strong><span>genset naik WASPADA sebelum diserang; satu klik Perketat menurunkan peluangnya.</span></div>
     <div class="besar kartu-dasar" style="--i:1"><b>±1,2 dtk</b><strong>Penahanan ancaman</strong><span>dari keputusan operator sampai jaringan terputus, bukti sudah aman.</span></div>
     <div class="besar kartu-dasar" style="--i:2"><b class="biru">2,8%</b><strong>CPU <i class="asing">server</i></strong><span>untuk 300 layar komando, turun dari 10,8% (−74%).</span></div>
-    <div class="besar kartu-dasar" style="--i:3"><b class="biru">196</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin dan AI lokal; lulus semua.</span></div>
+    <div class="besar kartu-dasar" style="--i:3"><b class="biru">204</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin dan AI lokal; lulus semua.</span></div>
   </div>
 
   <div class="jaminan">

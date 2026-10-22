@@ -7,7 +7,7 @@
 | **Kompetisi** | Kartika Cyber Hackathon 2026 · Pusat Siber Angkatan Darat (Pussiberad) × CODEPOLITAN |
 | **Kategori** | 02 · **Penangkalan (_Defensive Shield_)** — *Threat Intelligence Platform* dan *Automated Incident Response* |
 | **Tim** | [Nama tim] · Muhammad Isa Ananta · [Nama anggota 2] · [Nama anggota 3] |
-| **Status purwarupa** | **Berfungsi penuh** · 196 uji otomatis lulus · AI deteksi anomali berjalan lokal · luring tanpa internet |
+| **Status purwarupa** | **Berfungsi penuh** · 204 uji otomatis lulus · AI deteksi anomali berjalan lokal · luring tanpa internet |
 | **Tanggal** | 20 Oktober 2026 |
 
 ---
@@ -45,7 +45,7 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 | Beban Central Processing Unit (CPU) _server_ untuk **300 layar** pemantau serentak | **2,8%** (sebelumnya 10,8%) |
 | Lalu lintas jaringan ke 300 layar saat serangan intensif | **−80%** (8,4 → 1,7 MB/s) |
 | Waktu AI lokal menilai lalu lintas 9 aset (_Isolation Forest_, tanpa internet) | **±10 milidetik** |
-| Perilaku sistem yang dikunci uji otomatis | **196 uji** |
+| Perilaku sistem yang dikunci uji otomatis | **204 uji** |
 
 ---
 
@@ -357,7 +357,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 
 - **Tidak membutuhkan awan atau _server_ luar untuk beroperasi.** Seluruh pemrosesan berjalan di _server_ atau laptop milik satuan (*on-premise*): layanan web, penyimpanan akun dan data (berkas lokal), sidik jari SHA-256 barang bukti, log audit HMAC, tombol isolasi, LAPSIT, dan AI deteksi anomali. Kode _server_ tidak memuat satu pun pemanggilan ke alamat luar.
 - **Tanpa ketergantungan eksternal di layar.** Antarmuka tidak memanggil skrip CDN, Google Fonts, atau sumber daring apa pun. Bila internet diputus, dasbor dan _playbook_ respons insiden tetap berjalan penuh. Bahkan bila kabel LAN dicabut, _server_ dan dasbor di laptop yang sama tetap bekerja.
-- **Internet hanya sekali, saat pemasangan** (`pip install`, empat perintah). Untuk jaringan *air-gapped*, paket dependensi dapat dibawa lewat media yang sudah diperiksa.
+- **Pemasangan tanpa internet sama sekali.** Paket pasang luring berisi kode dan seluruh pustaka, dilengkapi daftar sidik jari SHA-256. Di posko, sidik jari dicocokkan dengan berita acara serah terima paket; satu berkas saja berbeda, pemasangan dihentikan. Paket dibawa lewat media yang sudah diperiksa, sehingga siap untuk jaringan *air-gapped*.
 - **Mode Hybrid (rancangan lanjutan, belum ada di purwarupa).** Satu-satunya data yang direncanakan melintasi batas jaringan adalah **umpan indikator ancaman resmi** (BSSN/MISP). Umpan masuk satu arah lewat gerbang yang dikendalikan satuan, atau diimpor sebagai berkas lewat media yang diperiksa. Aplikasi inti tetap luring. Pada purwarupa, umpan CTI memakai data latihan sintetis.
 - **Batas purwarupa.** Pengambilan bukti dan pemutusan jaringan **disimulasikan** atas aset latihan. Yang berjalan nyata: penguncian urutan di _server_, perhitungan sidik jari SHA-256, buku berantai HMAC, LAPSIT, korelasi CTI, dan penilaian AI lokal (atas ciri lalu lintas sintetis).
 - **Dua jenis AI, dengan status yang berbeda:**
@@ -369,7 +369,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 ### 5.2 Kesiapan Penerapan
 
 - **Ringan:** satu laptop atau _server_ kecil; satu proses Python. Memori ±71 MB untuk 300 layar sebelum AI; pustaka AI (scikit-learn dan numpy) menambah ±130 MB, sehingga totalnya tetap jauh di bawah 512 MB. AI menambah kerja _server_ hanya ±0,05 milidetik per detik karena model baru dijalankan saat keadaan lalu lintas berubah.
-- **Teruji:** 196 uji otomatis mengunci setiap aturan, dan dapat dijalankan ulang oleh siapa pun dalam ±45 detik.
+- **Teruji:** 204 uji otomatis mengunci setiap aturan, dan dapat dijalankan ulang oleh siapa pun dalam ±45 detik.
 - **Cakupan OT saat ini:** purwarupa memantau **pengendali genset rumah sakit** (Modbus/TCP, _port_ 502) di **zona kendali** topologi. Kabar ancaman Modbus menaikkannya ke **WASPADA (±66%)** sebelum ada serangan. Pada skenario **Sabotase OT**, bukti diamankan, lalu jalur kantor → zona kendali diputus lewat _webhook_ (simulasi) ke sakelar terkelola ±1,2 detik kemudian; genset tetap menyala dengan kendali lokal. Pemulihan jalur kendali terkunci sampai sidik jari bukti cocok.
 - **Langkah lanjutan** (semuanya sumber terbuka dan dapat berjalan _air-gapped_ atau _on-premise_):
     - telemetri nyata dari sensor dan SIEM satuan (Wazuh, Suricata, Zeek) serta sensor protokol industri Modbus/DNP3;
@@ -404,6 +404,7 @@ Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar 
 | Korelasi CTI dan Engine Deteksi Anomali (_Isolation Forest_, luring) | Sensor nyata (Wazuh, Suricata, Zeek) dan sakelar terkelola sungguhan |
 | Simulasi OT genset (Modbus, _port_ 502) | |
 | Pembuatan LAPSIT dan ekspor PDF | |
+| Paket pasang luring bersidik jari SHA-256 (tanpa internet sama sekali) | |
 
 ---
 

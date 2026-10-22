@@ -14,8 +14,8 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          196 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
-tools/          alat bantu: pengemasan rilis, perbaikan .venv (perbaiki_venv.sh)
+tests/          204 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), dan diagram alur
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
 CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (20 Okt 2026)
@@ -96,6 +96,24 @@ python tools/kemas_rilis.py --periksa  # hanya menampilkan daftar berkas
 
 Alat ini membuang `.venv/`, `data/`, `.env`, cache, dan sampah sistem (`.DS_Store`, `__MACOSX`) —
 aturan yang sama dengan `.gitignore`. Hasilnya ±160 KB, bukan ±28 MB.
+
+### Paket pasang luring (jaringan *air-gapped*)
+
+Untuk posko yang sama sekali tidak tersambung internet, kode dan seluruh pustaka (berkas `.whl`) dikemas menjadi satu zip beserta daftar sidik jari SHA-256 (`SHA256SUMS`). Pemasangan berhenti bila satu berkas saja berbeda.
+
+```bash
+# 1) Di komputer yang terhubung internet (sekali saja; pilih platform posko):
+python tools/kemas_luring.py --platform win_amd64 --python 3.12           # posko Windows 64-bit
+python tools/kemas_luring.py --platform macosx_14_0_arm64 --python 3.12   # posko Mac Apple Silicon
+python tools/kemas_luring.py                                              # posko sama dengan komputer ini
+#    → dist/nusantara-shield-v5.1-luring-<platform>.zip + dua sidik jari untuk berita acara
+
+# 2) Di posko tanpa internet: ekstrak zip, masuk ke foldernya, lalu
+python pasang_luring.py --periksa-saja    # cocokkan sidik jari SHA256SUMS dengan berita acara
+python pasang_luring.py                   # buat .venv, pasang dari wheels/ (--no-index), jalankan uji
+```
+
+Batas: versi Python di posko harus sama dengan `--python`, dan ukuran paket ±50–80 MB per platform.
 
 ---
 
@@ -258,7 +276,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 196 uji** dalam 9 kelompok.
+**Total: 204 uji** dalam 10 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -388,7 +406,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                196 uji otomatis (lihat bagian 6)
+tests/                204 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/buat_peta.mjs   pembuat titik peta dunia (sekali pakai)
 run_tests.sh / .bat   menjalankan uji dengan umpan balik per uji
@@ -416,6 +434,7 @@ pytest.ini            pengaturan tampilan pytest
 | Korelasi CTI dan Engine Deteksi Anomali (Isolation Forest, luring) | |
 | Simulasi OT genset (Modbus 502) | |
 | Pembuatan LAPSIT dan ekspor PDF | |
+| Paket pasang luring bersidik jari SHA-256 (tanpa internet sama sekali) | |
 
 **Langkah berikutnya (setelah lomba):**
 1. Ganti data contoh dengan umpan indikator resmi (misalnya dari BSSN atau komunitas MISP).

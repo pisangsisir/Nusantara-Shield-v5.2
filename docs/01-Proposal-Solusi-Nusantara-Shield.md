@@ -1,6 +1,6 @@
 # Proposal Solusi — Nusantara Shield v5.1
 
-**Platform Respons Insiden Siber Otomatis dengan Rantai Bukti Forensik**
+**Posko Pertahanan Siber Luring: Peringatan Dini, Isolasi Cepat, dan Rantai Bukti Forensik**
 
 | | |
 | --- | --- |
@@ -14,9 +14,16 @@
 
 ## 1. Ringkasan Eksekutif
 
+> ### Nusantara Shield: posko pertahanan siber luring yang memperingatkan lebih dulu, memutus dalam 1,2 detik, dan tidak pernah menghapus barang bukti.
+
 > **Serangan siber tidak menunggu rapat staf.** _Ransomware_ mengenkripsi satu _server_ per menit, sementara posko siber masih memilah ratusan peringatan, menunggu izin berjenjang, dan menyusun laporan dengan tangan. Saat jaringan akhirnya diputus atau dipulihkan, jejak penyerang sering sudah terhapus.
 
 **Nusantara Shield** adalah **Perwira Staf Siber Digital** bagi posko satuan: menjaga **jaringan perkantoran (IT)** dan **sistem kendali fasilitas (OT)** dalam satu layar. Ia mengamati tanpa henti, mencocokkan setiap kabar ancaman dengan aset milik satuan sendiri, dan menyajikan langkah penindakan yang sudah dibakukan dalam doktrin. **Keputusan tetap di tangan manusia.** Begitu operator menahan tombol, sistem mengeksekusi dalam urutan baku:
+
+Nusantara Shield bekerja dalam **dua lapis**:
+
+1. **Lapis pertama: tangkal lebih dulu.** Kabar ancaman (CTI) dan AI lokal menaikkan aset IT maupun OT yang berisiko ke **WASPADA** sebelum diserang. Satu klik **Perketat** menurunkan paparannya. Contoh terukur: kabar celah Modbus menaikkan pengendali genset ke peluang ±66%, dan Perketat menurunkannya ke ±20%.
+2. **Lapis kedua: bila ancaman tetap tembus, bukti dulu, baru putus.** Begitu operator memutuskan, _server_ menjalankan alur baku di bawah dalam urutan yang tidak bisa dilompati.
 
 <div class="ilustrasi" id="ilustrasi-alur">
 <svg viewBox="0 0 1000 190" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alur baku Nusantara Shield: amankan bukti, isolasi IT dan OT, laporkan, pulihkan; urutan dikunci server"><rect width="1000" height="190" rx="10" fill="#0d1729"/><text x="24" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" letter-spacing="2" fill="#3ef0a1">ALUR BAKU · DIKUNCI DI SERVER</text><text x="976" y="30" text-anchor="end" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" fill="#8798b1">operator cukup menahan satu tombol 0,6 detik</text><rect x="24" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#7aa2d6" stroke-width="2"/><text x="40" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#7aa2d6">01</text><text x="70" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">AMANKAN BUKTI</text><text x="40" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">Memori, log, trafik</text><text x="40" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">disegel SHA-256</text><path d="M248 98 L270 98" stroke="#8798b1" stroke-width="2"/><path d="M270 92 L276 98 L270 104 Z" fill="#8798b1"/><rect x="274" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#ff5c74" stroke-width="2"/><text x="290" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#ff5c74">02</text><text x="320" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">ISOLASI IT · OT</text><text x="290" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">±1,2 dtk setelah bukti aman</text><text x="290" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">genset tetap menyala</text><path d="M498 98 L520 98" stroke="#8798b1" stroke-width="2"/><path d="M520 92 L526 98 L520 104 Z" fill="#8798b1"/><rect x="524" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#f5c451" stroke-width="2"/><text x="540" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#f5c451">03</text><text x="570" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">LAPORKAN</text><text x="540" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">LAPSIT otomatis</text><text x="540" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">ke pimpinan</text><path d="M748 98 L770 98" stroke="#8798b1" stroke-width="2"/><path d="M770 92 L776 98 L770 104 Z" fill="#8798b1"/><rect x="774" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#3ef0a1" stroke-width="2"/><text x="790" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#3ef0a1">04</text><text x="820" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">PULIHKAN</text><text x="790" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">Terkunci sampai</text><text x="790" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2"><tspan font-style="italic">hash</tspan> cocok ulang</text><rect x="24" y="160" width="952" height="0" /><text x="24" y="172" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12.5" fill="#ff8a9c">✕ Isolasi tanpa bukti atau pemulihan sebelum <tspan font-style="italic">hash</tspan> cocok: ditolak <tspan font-style="italic">server</tspan> (409). Setiap langkah tercatat di buku berantai HMAC.</text></svg>
@@ -33,6 +40,7 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 
 | Indikator (terukur pada purwarupa) | Hasil |
 | --- | --- |
+| Peringatan dini: peluang serangan genset setelah kabar celah Modbus, sebelum dan sesudah Perketat (belum ada serangan) | **±66% → ±20%** |
 | Waktu dari keputusan operator sampai jaringan terputus, bukti sudah aman | **±1,2 detik** |
 | Beban Central Processing Unit (CPU) _server_ untuk **300 layar** pemantau serentak | **2,8%** (sebelumnya 10,8%) |
 | Lalu lintas jaringan ke 300 layar saat serangan intensif | **−80%** (8,4 → 1,7 MB/s) |
@@ -229,11 +237,11 @@ Dalam bahasa _incident response_ militer, tahap Bertindak setara dengan siklus *
 
 ### 3.2 Empat Pilar Kemampuan
 
-1. **Intelijen proaktif**
+1. **Penangkalan dini (lapis pertama)**
     - Kabar ancaman dikorelasikan dengan _port_ dan sektor aset milik satuan, **termasuk aset OT**: kabar celah protokol industri Modbus langsung menaikkan pengendali genset ke WASPADA.
     - **AI lokal (Engine Deteksi Anomali):** model _Isolation Forest_ (scikit-learn) dilatih di _server_ satuan dari profil lalu lintas normal, lalu menilai enam ciri lalu lintas tiap aset dalam milidetik. Lalu lintas tidak wajar menambah peluang serangan dan disertai alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal" (_explainability_).
     - Satu klik **Perketat** menurunkan peluang serangan sebelum ancaman tiba.
-2. **Respons berdoktrin**
+2. **Respons berdoktrin (lapis kedua, bila ancaman tetap tembus)**
     - **Isolasi standar:** bukti diamankan lebih dulu, lalu ±1,2 detik kemudian jaringan diputus.
     - **Isolasi Darurat (*Emergency Override*):** bila alat forensik gagal, operator tetap bisa memutus jaringan, tetapi **wajib menulis alasan** (minimal 15 karakter) dan menahan tombol **1,5 detik**.
     - Setiap jalan pintas ditolak _server_ (kode **409**).

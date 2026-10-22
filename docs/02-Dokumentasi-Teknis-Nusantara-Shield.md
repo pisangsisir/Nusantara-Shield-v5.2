@@ -51,6 +51,9 @@
 | **scikit-learn** | ≥1.3 | AI lokal: model _Isolation Forest_ untuk deteksi anomali (membawa numpy); berjalan luring |
 | **pytest** | ≥8.0 | Menjalankan 204 uji otomatis |
 | **httpx** | ≥0.27 | Klien uji untuk loket API |
+| **hmac**, **hashlib**, **secrets** | bawaan Python | Segel HMAC-SHA256 berantai untuk log audit dan Buku Rantai Bukti, sidik jari SHA-256 barang bukti, dan kunci acak. Tidak memakai pustaka kriptografi pihak ketiga |
+
+**Ringkasnya:** _server_ memakai **FastAPI**, AI lokal memakai **scikit-learn** (_Isolation Forest_), dan segel bukti memakai **HMAC-SHA256 dari pustaka bawaan Python**. Semuanya sumber terbuka dan dapat diperiksa baris per baris.
 
 ### 1.3 Pengaturan Utama (*Environment Variable*)
 
@@ -61,6 +64,15 @@
 | `NS_KODE_OPERATOR` | Kode undangan untuk mendaftar sebagai operator | Pendaftaran operator mandiri **tertutup** |
 | `NS_DAFTAR_PENGAMAT` | `1` = siapa pun boleh mendaftar sebagai pengamat | Terbuka |
 | `NS_HTTPS` | `1` = aktifkan HTTP Strict Transport Security (HSTS) di belakang Hypertext Transfer Protocol Secure (HTTPS) | Nonaktif |
+
+### 1.4 Data Latihan Sintetis
+
+Seluruh data di purwarupa **sengaja** sintetis agar aman didemonstrasikan di depan umum:
+
+- **Alamat IP** memakai tiga blok khusus dokumentasi Request for Comments (RFC) 5737: `192.0.2.0/24`, `198.51.100.0/24`, dan `203.0.113.0/24`. Blok ini tidak pernah dipakai di internet sungguhan, sehingga tidak ada alamat milik pihak mana pun yang tercantum.
+- **Nama domain contoh** memakai akhiran `.example` dan `.test` yang dicadangkan RFC 2606.
+- **Sidik jari berkas berbahaya contoh** memakai berkas uji EICAR, berkas standar yang tidak berbahaya untuk menguji antivirus.
+- **Nama orang, satuan, dan aset** fiktif; ciri lalu lintas yang dinilai AI dibangkitkan dari profil sintetis.
 
 ---
 
@@ -261,6 +273,8 @@ Purwarupa memantau aset OT **Pengendali genset** (`192.0.2.120`, **Modbus/TCP _p
 | **Pengamat** | Melihat seluruh dasbor | Akun bawaan, atau daftar sendiri di halaman masuk |
 | **Operator** | Melihat, memicu latihan, isolasi IT/OT, pemulihan, mengelola akun | Akun bawaan, **kode undangan** (`NS_KODE_OPERATOR`), atau dibuatkan operator lain |
 
+> **Dua kunci konfirmasi sebelum jaringan diputus.** Kunci pertama dipegang mesin: kabar ancaman (CTI) dicocokkan dengan aset satuan dan AI lokal menilai lalu lintasnya, tetapi hasilnya hanya menaikkan status ke WASPADA. Kunci kedua dipegang manusia: hanya akun Operator yang dapat memerintahkan isolasi, dengan menahan tombol 0,6 detik; permintaan dari akun Pengamat ditolak _server_. **Tidak ada satu sinyal pun yang memutus jaringan vital secara otomatis penuh (_autonomous_) tanpa keputusan akhir manusia.** Dikunci uji `test_loket_baru_wajib_login_dan_hanya_operator`: tanpa _login_ 401, akun Pengamat 403.
+
 ---
 
 ## 4. Instruksi Pemasangan (*Deployment*)
@@ -441,7 +455,7 @@ python pasang_luring.py                   # buat .venv, pasang dari wheels/ (--n
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi (AI di dalam aplikasi adalah model lokal scikit-learn di atas) | Layanan komersial |
 | **Blok alamat IP RFC 5737** | Data latihan sintetis | Standar terbuka IETF |
 
-**Rujukan kerangka.** Purbo, O. W., dan Lumy, G. D. (2025). _Cyber Warfare & Pertahanan Siber Indonesia_. Peraturan Presiden Nomor 82 Tahun 2022 tentang Pelindungan Infrastruktur Informasi Vital. National Institute of Standards and Technology (NIST) SP 800-82.
+**Rujukan kerangka.** Purbo, O. W., dan Lumy, G. D. (2025). _Cyber Warfare & Pertahanan Siber Indonesia_. Peraturan Presiden Nomor 82 Tahun 2022 tentang Pelindungan Infrastruktur Informasi Vital. National Institute of Standards and Technology (NIST) SP 800-82. International Organization for Standardization/International Electrotechnical Commission (ISO/IEC) 27037:2012 tentang penanganan bukti digital; alur bukti dan buku berantai HMAC **mengikuti prinsipnya**, belum diaudit terhadap standar ini.
 
 ---
 
@@ -477,6 +491,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **HSTS** | HTTP Strict Transport Security | Aturan agar peramban selalu memakai sambungan terenkripsi. |
 | **HTTPS** | Hypertext Transfer Protocol Secure | Sambungan web yang dienkripsi. |
 | **_Human-in-the-loop_** | Manusia tetap memegang keputusan | Mesin hanya menyarankan; tindakan memutus jaringan harus disetujui operator. |
+| **ISO/IEC 27037** | International Organization for Standardization/International Electrotechnical Commission, standar 27037:2012 | Pedoman internasional mengidentifikasi, mengumpulkan, mengambil, dan melestarikan bukti digital. Nusantara Shield mengikuti prinsipnya; belum diaudit terhadapnya. |
 | **Isolasi** | Pemutusan jaringan | Memutus jalur perangkat yang diserang agar serangan tidak menyebar. |
 | **Isolation Forest** | Nama algoritma _machine learning_ | Cara mesin menemukan data yang aneh: data yang tidak wajar paling cepat "terpisah" dari kelompoknya. |
 | **IT** | _Information Technology_ (teknologi informasi) | Komputer kantor, _server_, dan jaringannya. |

@@ -2,7 +2,14 @@
 
 Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi pasal 5.3 di Proposal. Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
-## v5.1 — 15–20 Oktober 2026
+## v5.1 — 15–22 Oktober 2026
+
+### Paket pasang luring — 22 Oktober 2026
+- `tools/kemas_luring.py` membundel kode dan semua pustaka (`pip download`) beserta daftar sidik jari `SHA256SUMS`; `pasang_luring.py` memeriksa sidik jari lalu memasang dengan `pip install --no-index`, tanpa internet.
+- 8 uji baru; total 204 uji.
+
+### Narasi penangkalan — 22 Oktober 2026
+- Alur cerita dokumen dan dek dibuka dengan peringatan dini (CTI + AI lokal → WASPADA → Perketat), lalu isolasi ±1,2 detik bila ancaman tetap tembus.
 
 ### Finalisasi hackathon — 20 Oktober 2026 (branch `feature/finalisasi-hackathon`)
 - Skrip pembuatan ulang `.venv` setelah folder proyek dipindah (`tools/perbaiki_venv.sh`).

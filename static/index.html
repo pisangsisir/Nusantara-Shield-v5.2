@@ -127,6 +127,17 @@
               <div class="postur-nilai" id="postur-nilai">–</div>
               <p class="postur-ringkas" id="postur-ringkas" aria-live="polite">Menyambung ke server…</p>
             </div>
+            <div id="kesiapan" class="kesiapan" data-huruf="–">
+              <div class="label-kecil" data-istilah="kesiapan"></div>
+              <div class="kesiapan-isi">
+                <div class="kesiapan-huruf" id="kesiapan-huruf" aria-live="polite">–</div>
+                <div class="kesiapan-sub">
+                  <span>Kerawanan <b id="kesiapan-k">–</b></span>
+                  <span>Insiden <b id="kesiapan-i">–</b></span>
+                </div>
+              </div>
+              <div class="kesiapan-layanan" id="kesiapan-layanan" aria-label="Nilai per layanan"></div>
+            </div>
             <div class="kpis">
               <div class="kpi"><div class="k">Aset sehat</div><div class="v" id="kpi-sehat">–</div></div>
               <div class="kpi"><div class="k">Host terpantau</div><div class="v" id="kpi-host">–</div></div>
@@ -233,6 +244,7 @@
           <section class="panel" aria-labelledby="judul-cti">
             <h2 id="judul-cti">Prediksi CTI + AI <small id="cti-berikut">–</small></h2>
             <ul id="daftar-prediksi" class="prediksi"></ul>
+            <p id="ringkas-triase" class="ringkas-triase" hidden></p>
             <p id="status-ai" class="status-ai">AI lokal memuat…</p>
             <button id="tombol-latihan-ai" class="tombol halus kecil penuh jarak-atas" type="button" data-ubah>Latihan AI: suntik lalu lintas Modbus tak wajar (genset)</button>
             <details class="lipat">
@@ -241,7 +253,7 @@
               <button id="tombol-siarkan" class="tombol halus kecil penuh jarak-atas" type="button" data-ubah>Siarkan berita berikutnya</button>
               <button id="tombol-siarkan-ot" class="tombol halus kecil penuh jarak-atas" type="button" data-ubah>Latihan OT: siarkan kabar Modbus (genset)</button>
             </details>
-            <p class="edu"><b>Alarm rumah &amp; radio satpam.</b> Radio menyiarkan kabar ancaman umum. Server mencocokkan port yang disebut berita dengan aset yang <b>benar-benar kita punya</b>. Peluang = keyakinan sumber × paparan aset × kesegaran berita (× 1,1 bila sektor kita disasar). ≥ 50% → aset dinaikkan ke <b>waspada</b> sebelum serangan datang. Tombol <b>Perketat</b> memotong paparan 70%. <b>AI lokal</b> (Isolation Forest, dilatih di server ini, tanpa internet) menilai enam ciri lalu lintas tiap aset; lalu lintas tidak wajar menambah peluang: 1 − (1 − p<sub>CTI</sub>)(1 − p<sub>AI</sub>), lengkap dengan alasannya. AI hanya menaikkan status; memutus jaringan tetap keputusan operator.</p>
+            <p class="edu"><b>Alarm rumah &amp; radio satpam.</b> Radio menyiarkan kabar ancaman umum. Server mencocokkan port yang disebut berita dengan aset yang <b>benar-benar kita punya</b>. Peluang = keyakinan sumber × paparan aset × kesegaran berita (× 1,1 bila sektor kita disasar). ≥ 50% → aset dinaikkan ke <b>waspada</b> sebelum serangan datang. Tombol <b>Perketat</b> memotong paparan 70%. <b>AI lokal</b> (Isolation Forest, dilatih di server ini, tanpa internet) menilai enam ciri lalu lintas tiap aset; lalu lintas tidak wajar menambah peluang: 1 − (1 − p<sub>CTI</sub>)(1 − p<sub>AI</sub>), lengkap dengan alasannya. AI hanya menaikkan status; memutus jaringan tetap keputusan operator. <b>Triase:</b> Operator boleh menutup peringatan sebagai <b data-istilah="tutup_selesai"></b> atau Positif Palsu (<i data-istilah="tutup_fp"></i>) dengan alasan tertulis. Tidak ada yang dihapus: penutupan menjadi halaman baru di <span data-istilah="buku_bukti"></span>, dan bukti baru membuka peringatan lagi.</p>
           </section>
         </div>
 
@@ -467,6 +479,26 @@
       <div class="aksi kanan">
         <button value="batal" class="tombol halus">Batal</button>
         <button value="ya" class="tombol utama" id="dialog-ya">Ya, lanjutkan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Triase: penutupan peringatan WASPADA beralasan -->
+  <dialog id="dialog-tutup" class="dialog">
+    <form method="dialog" id="form-tutup">
+      <h2><span data-istilah="tombol_tutup_peringatan"></span>: <span id="tutup-aset">–</span></h2>
+      <p id="tutup-info" class="redup"></p>
+      <fieldset class="pilihan-tutup">
+        <legend class="label-kecil">Status penutupan</legend>
+        <label><input type="radio" name="status-tutup" value="selesai" required> <b data-istilah="tutup_selesai"></b><small>ancaman sudah ditindak</small></label>
+        <label><input type="radio" name="status-tutup" value="false_positive"> <b><i data-istilah="tutup_fp"></i></b><small>alarm ternyata bukan ancaman</small></label>
+      </fieldset>
+      <label class="label-alasan" for="tutup-alasan">Alasan (wajib, tercatat permanen di <span data-istilah="buku_bukti"></span>)</label>
+      <textarea id="tutup-alasan" rows="3" maxlength="500"></textarea>
+      <small id="tutup-hitung" class="hitung-alasan" aria-live="polite"></small>
+      <div class="aksi kanan">
+        <button value="batal" class="tombol halus" formnovalidate>Batal</button>
+        <button value="ya" class="tombol utama" id="tutup-ya">Tutup dan catat</button>
       </div>
     </form>
   </dialog>

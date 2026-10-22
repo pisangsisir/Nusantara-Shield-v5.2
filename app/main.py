@@ -55,7 +55,8 @@ from .delta import beda
 from .siaran import HUB
 from .lapsit import buat_pdf
 from .istilah import ISTILAH
-from .telemetri import AKSI_GABUNGAN, ASET_BERPORT, MENARA, MIN_ALASAN_DARURAT, SEMUA_AKSI_SOAR
+from .telemetri import (AKSI_GABUNGAN, ASET_BERPORT, MENARA, MIN_ALASAN_DARURAT, MIN_ALASAN_TUTUP, SEMUA_AKSI_SOAR,
+                        STATUS_TUTUP)
 from .ai_anomali import POLA
 
 FOLDER_STATIS = Path(__file__).resolve().parent.parent / "static"
@@ -598,6 +599,12 @@ class PerketatMasuk(Formulir):
     aset_id: IdAset
 
 
+class TutupPeringatanMasuk(Formulir):
+    aset_id: IdAset
+    status: Literal[tuple(STATUS_TUTUP)]
+    alasan: str = Field(min_length=MIN_ALASAN_TUTUP, max_length=500)
+
+
 IdPolaAI = Literal[tuple(POLA)]
 
 
@@ -665,6 +672,17 @@ def perketat_aset(f: PerketatMasuk, akun: Akun = Depends(butuh_izin("ubah"))) ->
             raise HTTPException(409, str(e)) from None
     LOG.catat(akun.nama, "SOAR_PERKETAT", {"aset": f.aset_id})
     return {"ok": True, "aset_id": f.aset_id}
+
+
+@app.post("/api/peringatan/tutup", dependencies=[Depends(batasi("ubah"))])
+def tutup_peringatan(f: TutupPeringatanMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
+    """Triase: Operator menutup peringatan WASPADA (selesai ditangani / alarm keliru) dengan alasan tertulis.
+    Tidak ada yang dihapus: penutupan dicatat di buku rantai bukti dan log audit (kait saat_bukti)."""
+    with _kunci_state:
+        try:
+            return MENARA.tutup_peringatan(LAYANAN, f.aset_id, f.status, f.alasan, akun.nama)
+        except ValueError as e:
+            raise HTTPException(409, str(e)) from None
 
 
 @app.post("/api/ai/latihan", dependencies=[Depends(batasi("ubah"))])

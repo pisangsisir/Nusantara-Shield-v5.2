@@ -64,8 +64,8 @@ from typing import Callable
 from .data_contoh import (BATAS_JAM_BACKUP, BERITA_ANCAMAN, INDEKS_BERITA, KEBIJAKAN, KEPARAHAN_IR, LANGKAH_IR,
                           MANAJEMEN, PLAYBOOK, PLAYBOOK_RINGKAS, PROFIL_LAYANAN)
 from .istilah import ISTILAH, nama_manajemen, pesan_jangan_restart
-from .bukti import (BUKTI_DIAMANKAN, BUKTI_DIVERIFIKASI, BUKTI_GAGAL, ISOLASI_DARURAT, RANTAI, VERIFIKASI_GAGAL,
-                    RantaiBukti)
+from .bukti import (BUKTI_DIAMANKAN, BUKTI_DIVERIFIKASI, BUKTI_GAGAL, ISOLASI_DARURAT, PERINGATAN_DITUTUP, RANTAI,
+                    VERIFIKASI_GAGAL, RantaiBukti)
 from .penomoran import PENCACAH, PencacahIR
 from .ai_anomali import DETEKTOR, POLA, POLA_SKENARIO, ciri_normal, ciri_pola
 
@@ -317,6 +317,34 @@ TAHAP_PENAHANAN = {"ransomware": 1, "ddos": 1, "backup_dimatikan": 3, "sabotase_
 JEDA_RUNBOOK = 1.2  # detik antar-tindakan pemutus saat isolasi berurutan (juga: bukti → pemutus pertama)
 MIN_ALASAN_DARURAT = 15   # karakter; alasan isolasi darurat tidak boleh asal "ok"
 
+# --------------------------------------------------------------------------
+# TRIASE PERINGATAN dan NILAI KESIAPAN SIBER
+# --------------------------------------------------------------------------
+# Peringatan terbuka = aset yang dinaikkan ke WASPADA oleh CTI dan/atau AI lokal (peluang ≥ 50%).
+# Operator boleh MENUTUPNYA dengan alasan tertulis: "selesai" (ancaman sudah ditangani) atau
+# "false_positive" (alarm ternyata bukan ancaman). Penutupan TIDAK menghapus apa pun: berita CTI dan
+# penilaian AI tetap tercatat; yang berubah hanya bahwa SUMBER-SUMBER saat itu tidak lagi menaikkan aset
+# tersebut. Bukti baru (berita lain, atau episode anomali AI berikutnya) membuka peringatan lagi.
+# Setiap penutupan menjadi halaman baru di buku rantai bukti (HMAC berantai) + log audit.
+MIN_ALASAN_TUTUP = 15
+STATUS_TUTUP = {"selesai": "tutup_selesai", "false_positive": "tutup_fp"}   # status → kunci label di ISTILAH
+# Nilai kesiapan siber per layanan (kelompok aset), 0–100, makin tinggi makin siap. Rumus sengaja sederhana
+# dan terbuka agar bisa diperiksa juri (lihat Dokumentasi Teknis §2.5):
+#   Kerawanan = 100 − 50 × rata-rata peluang serangan aset − 30 × porsi aset bertemuan konfigurasi
+#               − 20 × (backup terlambat atau belum diuji)
+#   Insiden   = 100 − 70 (insiden belum ditahan) atau − 40 (sudah ditahan, belum pulih)
+#               − 15 per peringatan WASPADA terbuka (maks. 30)
+#   Nilai     = yang LEBIH RENDAH dari keduanya (rantai sekuat mata rantai terlemah).
+# Nilai posko = rata-rata tertimbang jumlah aset; selama ada insiden belum ditahan, paling tinggi D.
+BOBOT_KERAWANAN = {"peluang": 50, "temuan": 30, "backup": 20}
+POTONG_INSIDEN = {"aktif": 70, "ditahan": 40, "peringatan": 15, "maks_peringatan": 30}
+BATAS_HURUF = ((90, "A"), (75, "B"), (60, "C"), (40, "D"), (0, "E"))
+PLAFON_INSIDEN_AKTIF = 59   # nilai posko tertinggi selama ada insiden yang belum ditahan (= D)
+
+
+def huruf_nilai(nilai: float) -> str:
+    return next(h for batas, h in BATAS_HURUF if nilai >= batas)
+
 INFO_RUTIN = [
     "Pemindaian rutin selesai: tidak ada port baru yang terbuka",
     "Sinkronisasi waktu server berhasil",
@@ -439,6 +467,9 @@ class Menara:
         self._injeksi_ai: dict[str, tuple[str, float]] = {}   # AI: aset → (pola latihan, berakhir)
         self._tanda_ai: frozenset[str] = frozenset()        # AI: aset yang sedang dinilai tidak wajar
         self._ai_sejak: dict[str, float] = {}               # AI: kapan anomali aset pertama terlihat
+        self._ditutup: dict[str, dict] = {}                 # triase: aset → sumber yang sudah ditutup Operator
+        self._hitung_tutup = {s: 0 for s in STATUS_TUTUP}   # triase: jumlah penutupan per status (sesi demo)
+        self._riwayat_tutup: deque[dict] = deque(maxlen=5)  # triase: penutupan terakhir (terbaru di depan)
         self.catat("info", "Pemantauan jaringan dimulai. Semua data adalah data sintetis.")
 
     def ubah(self) -> None:
@@ -525,6 +556,8 @@ class Menara:
         if pola not in POLA:
             raise ValueError("Pola latihan tidak dikenal")
         self._injeksi_ai[aset_id] = (pola, self._jam() + DURASI_LATIHAN_AI)
+        if aset_id in self._ditutup:              # latihan baru = episode baru: penutupan AI lama tidak berlaku
+            self._ditutup[aset_id]["ai_sejak"] = None
         self.catat("info", f"Latihan AI: pola \"{POLA[pola]['nama']}\" disuntikkan ke lalu lintas {s['nama']} "
                            f"{s['ip']}:{s['port']} (data sintetis, {DURASI_LATIHAN_AI // 60} menit)", jenis="ai")
         self._periksa_ai(layanan)
@@ -565,14 +598,18 @@ class Menara:
         for aid in ASET_BERPORT:
             s = INDEKS_SIMPUL[aid]
             sisa, sumber = 1.0, []
+            tutup = self._ditutup.get(aid, {})
             for b in self.osint.aktif:
+                if b["id"] in tutup.get("berita", ()):
+                    continue              # triase: berita ini sudah ditutup Operator untuk aset ini
                 w = self._bobot(s, b, sektor_kita)
                 if w > 0:
                     sisa *= 1 - w
                     sumber.append(b["id"])
             info_ai = None
             h = ai.get(aid)
-            if h and h.anomali and aid not in dalam_insiden:
+            ai_ditutup = tutup.get("ai_sejak") is not None and tutup["ai_sejak"] == self._ai_sejak.get(aid)
+            if h and h.anomali and aid not in dalam_insiden and not ai_ditutup:
                 p_ai = h.peluang * (FAKTOR_PERKETAT if aid in self._diperketat else 1)
                 sisa *= 1 - p_ai
                 sumber.append(SUMBER_AI)
@@ -1086,6 +1123,89 @@ class Menara:
         self.ubah()
 
     # ======================================================================
+    # TRIASE PERINGATAN dan NILAI KESIAPAN SIBER
+    # ======================================================================
+    def tutup_peringatan(self, layanan: dict, aset_id: str, status: str, alasan: str, oleh: str) -> dict:
+        """Operator menutup peringatan WASPADA beralasan. Tidak ada yang dihapus: penutupan menjadi halaman
+        baru di buku rantai bukti, dan bukti baru membuka peringatan lagi."""
+        if status not in STATUS_TUTUP:
+            raise ValueError("Status penutupan tidak dikenal")
+        alasan = " ".join(alasan.split())
+        if len(alasan) < MIN_ALASAN_TUTUP:
+            raise ValueError(f"Alasan penutupan wajib diisi (minimal {MIN_ALASAN_TUTUP} karakter)")
+        self._periksa_ai(layanan)                 # pastikan episode anomali AI sudah tercatat waktunya
+        if aset_id in self._status_insiden(layanan):
+            raise ValueError("Aset ini sedang dalam insiden aktif: tangani lewat playbook, bukan ditutup sebagai peringatan")
+        pr = self._prediksi(layanan).get(aset_id)
+        if not pr or not pr["proaktif"]:
+            raise ValueError("Tidak ada peringatan WASPADA terbuka di aset ini")
+        tutup = self._ditutup.setdefault(aset_id, {"berita": set(), "ai_sejak": None})
+        tutup["berita"] |= {x for x in pr["sumber"] if x != SUMBER_AI}
+        if SUMBER_AI in pr["sumber"]:
+            tutup["ai_sejak"] = self._ai_sejak.get(aset_id)
+        s, label = INDEKS_SIMPUL[aset_id], ISTILAH[STATUS_TUTUP[status]]
+        e = self.rantai.catat(oleh, PERINGATAN_DITUTUP, {
+            "aset": aset_id, "nama": s["nama"], "alamat": f"{s['ip']}:{s['port']}", "status": status, "label": label,
+            "sumber": pr["sumber"], "peluang_persen": pr["persen"], "alasan": alasan})
+        self._cermin(oleh, PERINGATAN_DITUTUP, {"aset": aset_id, "status": status, "alasan": alasan, "hash_buku": e["hash"]})
+        self._hitung_tutup[status] += 1
+        catatan = {"aset": aset_id, "nama": s["nama"], "status": status, "label": label, "alasan": alasan,
+                   "oleh": oleh, "waktu": e["waktu"], "peluang_persen": pr["persen"], "sumber": pr["sumber"],
+                   "hash_buku": e["hash"]}
+        self._riwayat_tutup.appendleft(catatan)
+        self.catat("info", f"Triase ▶ peringatan WASPADA {s['nama']} {s['ip']}:{s['port']} ditutup sebagai {label} "
+                           f"oleh {oleh} (peluang {pr['persen']}%, sumber {', '.join(pr['sumber'])}). Alasan: {alasan}. "
+                           f"Tercatat di {ISTILAH['buku_bukti']}; bukti baru akan membuka peringatan lagi.", jenis="bukti")
+        self.ubah()
+        return catatan
+
+    def _rapikan_tutup(self) -> None:
+        """Buang catatan penutupan yang sudah tidak berlaku (berita kedaluwarsa, episode AI berakhir)."""
+        aktif = {b["id"] for b in self.osint.aktif}
+        for aid in list(self._ditutup):
+            t = self._ditutup[aid]
+            t["berita"] &= aktif
+            if t["ai_sejak"] is not None and t["ai_sejak"] != self._ai_sejak.get(aid):
+                t["ai_sejak"] = None
+            if not t["berita"] and t["ai_sejak"] is None:
+                del self._ditutup[aid]
+
+    def _kesiapan(self, layanan: dict, prediksi: dict) -> dict:
+        """Nilai kesiapan siber: dua sub-skor (Kerawanan, Insiden) per layanan, lalu nilai posko."""
+        per, total_k, total_i, total_n, belum_ditahan = [], 0.0, 0.0, 0, False
+        for lid, l in layanan.items():
+            aset = [a for a, pemilik in PEMILIK_SIMPUL.items() if pemilik == lid]
+            n = len(aset) or 1
+            rata = sum(prediksi.get(a, {}).get("prob", 0.0) for a in aset) / n
+            temuan = sum(1 for a in aset if INDEKS_SIMPUL[a].get("status") == "waspada" and a not in self._diperketat)
+            backup = l["jam_sejak_backup"] > BATAS_JAM_BACKUP or not l["backup_teruji"]
+            k = 100 - BOBOT_KERAWANAN["peluang"] * rata - BOBOT_KERAWANAN["temuan"] * temuan / n \
+                - BOBOT_KERAWANAN["backup"] * backup
+            potong, ins = 0, l["insiden"]
+            if ins:
+                ditahan = ins["langkah_selesai"][TAHAP_PENAHANAN[ins["skenario"]]]
+                potong += POTONG_INSIDEN["ditahan" if ditahan else "aktif"]
+                belum_ditahan |= not ditahan
+            terbuka = sum(1 for a in aset if prediksi.get(a, {}).get("proaktif"))
+            potong += min(POTONG_INSIDEN["maks_peringatan"], POTONG_INSIDEN["peringatan"] * terbuka)
+            i = 100 - potong
+            nilai = min(k, i)
+            per.append({"id": lid, "singkat": l.get("singkat", l["nama"]), "aset": len(aset),
+                        "kerawanan": round(k), "insiden": round(i), "nilai": round(nilai), "huruf": huruf_nilai(nilai),
+                        "rincian": {"peluang_rata": round(rata * 100), "temuan": temuan, "backup_bermasalah": backup,
+                                    "peringatan_terbuka": terbuka, "insiden": bool(ins)}})
+            total_k += k * len(aset); total_i += i * len(aset); total_n += len(aset)
+        k_pos, i_pos = total_k / total_n, total_i / total_n
+        nilai = min(k_pos, i_pos)
+        batas = None
+        if belum_ditahan and nilai > PLAFON_INSIDEN_AKTIF:
+            nilai, batas = PLAFON_INSIDEN_AKTIF, "Ada insiden yang belum ditahan: nilai posko paling tinggi D"
+        return {"nilai": round(nilai), "huruf": huruf_nilai(nilai), "kerawanan": round(k_pos), "insiden": round(i_pos),
+                "batas": batas, "per_layanan": per,
+                "triase": {"jumlah": dict(self._hitung_tutup), "riwayat": list(self._riwayat_tutup),
+                           "min_alasan": MIN_ALASAN_TUTUP}}
+
+    # ======================================================================
     # MESIN WAKTU
     # ======================================================================
     def maju(self, layanan: dict) -> None:
@@ -1114,6 +1234,7 @@ class Menara:
             self._umumkan(b, layanan)
         if baru or habis:
             self.ubah()
+        self._rapikan_tutup()                         # triase: buang penutupan yang sudah tidak berlaku
         # Bila daftar aset "waspada proaktif" berubah (berita memudar), minta gambar ulang peta
         tanda = tuple(sorted(k for k, v in self._prediksi(layanan).items() if v["proaktif"]))
         if tanda != self._tanda_cti:
@@ -1323,6 +1444,7 @@ class Menara:
             "radar": {"putaran_ms": PUTARAN_MS[postur["tingkat"]], "titik": titik},
             "lalu_lintas": lalu_lintas,
             "cti": self._cti(prediksi, lengkap=True), "soar": self._soar(layanan), "forensik": self._forensik(layanan),
+            "kesiapan": self._kesiapan(layanan, prediksi),
             "peta": self._peta(status, ancaman, kerumunan, asal_kerumunan),
             "komando": self._komando(layanan), "manajemen": MANAJEMEN, "kebijakan": KEBIJAKAN,
             "ir": self._ir[::-1], "playbook_ringkas": PLAYBOOK_RINGKAS,

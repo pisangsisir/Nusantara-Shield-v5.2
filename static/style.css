@@ -706,7 +706,7 @@ input[aria-invalid="true"] { border-color: var(--merah); box-shadow: 0 0 0 3px v
    ========================================================================== */
 /* Executive Overview dominan: KPI jadi satu baris tipis, topologi selebar panel */
 .exec-grid.tunggal { grid-template-columns: 1fr; gap: 12px; }
-.exec-grid.tunggal > div:first-child { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 12px; }
+.exec-grid.tunggal > div:first-child { display: grid; grid-template-columns: minmax(220px, 300px) minmax(210px, 250px) 1fr; gap: 12px; }
 .exec-grid.tunggal .postur { padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; }
 .exec-grid.tunggal .postur-nilai { font-size: 26px; margin: 0; }
 .exec-grid.tunggal .postur-ringkas { font: .74rem var(--huruf-mono); color: var(--teks-redup); }
@@ -940,3 +940,29 @@ body.edu-on .edu-sebaris { display: inline; }
 .status-ai.waspada { color: var(--kuning); }
 .prediksi .alasan-ai { display: block; color: var(--kuning); margin-top: 2px; }
 .chip.ai { background: rgba(122, 162, 214, .12); color: var(--biru); box-shadow: inset 0 0 0 1px rgba(122, 162, 214, .35); }
+
+/* ---------- Nilai Kesiapan Siber & triase peringatan ---------- */
+.kesiapan { --warna-huruf: var(--neon); border-radius: 12px; padding: 10px 14px; border: 1px solid var(--garis-lembut);
+  background: rgba(10, 17, 32, .55); display: flex; flex-direction: column; justify-content: center; gap: 6px; cursor: help; }
+.kesiapan[data-huruf="B"] { --warna-huruf: #8fe3b4; }
+.kesiapan[data-huruf="C"], .chip-huruf[data-huruf="C"] { --warna-huruf: var(--kuning); }
+.kesiapan[data-huruf="D"], .chip-huruf[data-huruf="D"] { --warna-huruf: #ff9f5a; }
+.kesiapan[data-huruf="E"], .chip-huruf[data-huruf="E"] { --warna-huruf: var(--merah); }
+.kesiapan-isi { display: flex; align-items: center; gap: 12px; }
+.kesiapan-huruf { font: 700 30px/1 var(--huruf-mono); color: var(--warna-huruf); min-width: 1.2ch; }
+.kesiapan-sub { display: grid; gap: 1px; font: .72rem var(--huruf-mono); color: var(--teks-redup); }
+.kesiapan-sub b { color: var(--teks); font-weight: 650; }
+.kesiapan-layanan { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip-huruf { --warna-huruf: var(--neon); font: 700 .68rem/1 var(--huruf-mono); padding: 3px 6px; border-radius: 6px;
+  color: var(--warna-huruf); border: 1px solid color-mix(in srgb, var(--warna-huruf) 45%, transparent); }
+.chip-huruf[data-huruf="B"] { --warna-huruf: #8fe3b4; }
+.prediksi .tombol-baris { display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.ringkas-triase { margin: 8px 0 0; font: .72rem var(--huruf-mono); color: var(--teks-redup); }
+.ringkas-triase small { display: block; color: var(--teks-samar); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pilihan-tutup { border: 0; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+.pilihan-tutup label { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; padding: 8px 10px;
+  border: 1px solid var(--garis-lembut); border-radius: 9px; cursor: pointer; }
+.pilihan-tutup label small { grid-column: 2; color: var(--teks-redup); font-size: .74rem; }
+.pilihan-tutup label:has(input:checked) { border-color: var(--neon-garis); background: var(--neon-lembut); }
+.label-alasan { display: block; font-size: .8rem; margin-bottom: 4px; }
+#tutup-alasan { width: 100%; resize: vertical; }

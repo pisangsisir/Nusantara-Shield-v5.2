@@ -285,7 +285,7 @@ h2 em { font-style: normal; color: var(--neon); }
 .darurat b { color: var(--merah); font-family: var(--huruf-mono); letter-spacing: .1em; font-size: 14px; white-space: nowrap; }
 
 /* =====================================================================
-   SLIDE 3 · Server: grafik CPU menurun (−74%) + 204 uji
+   SLIDE 3 · Server: grafik CPU menurun (−74%) + 224 uji
    ===================================================================== */
 .dua-kolom { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .grafik { padding: 22px 26px 18px; }
@@ -614,7 +614,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <div class="angka"><b>66%→20%</b><span>genset WASPADA sebelum diserang; Perketat menurunkannya</span></div>
         <div class="angka"><b>±1,2 dtk</b><span>keputusan → jaringan terputus, bukti sudah aman</span></div>
         <div class="angka"><b>2,8%</b><span>CPU (prosesor) <i class="asing">server</i> untuk 300 layar (dari 10,8%)</span></div>
-                <div class="angka"><b>204</b><span>uji otomatis, termasuk 10 uji AI lokal</span></div>
+                <div class="angka"><b>224</b><span>uji otomatis, termasuk 10 uji AI lokal</span></div>
       </div>
     </div>
 
@@ -768,7 +768,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="penanda"><b>04</b>Keunggulan <i class="asing">Server</i> · Skalabilitas dan Uji</div>
     <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
   </div>
-  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 204 uji.</em></h2>
+  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 224 uji.</em></h2>
 
   <div class="dua-kolom">
     <div>
@@ -800,14 +800,15 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
           <div class="t-baris t-ai" style="--i:0"><span>▶ AI lokal<small>Isolation Forest · luring · alasan</small></span><em>10 PASSED</em></div>
           <div class="t-baris" style="--i:1"><span>▶ Manajemen akun<small>pendaftaran, dasbor akun</small></span><em>18 PASSED</em></div>
           <div class="t-baris" style="--i:2"><span>▶ Intelijen ancaman dan SOAR<small>prediksi, isolasi</small></span><em>18 PASSED</em></div>
-          <div class="t-baris" style="--i:3"><span>▶ Kamus istilah<small>istilah satuan</small></span><em>29 PASSED</em></div>
+          <div class="t-baris" style="--i:3"><span>▶ Kamus istilah<small>istilah satuan</small></span><em>33 PASSED</em></div>
           <div class="t-baris" style="--i:4"><span>▶ Keamanan dan akses<small><i class="asing">login</i>, peran, batas laju</small></span><em>38 PASSED</em></div>
           <div class="t-baris" style="--i:5"><span>▶ Rantai komando dan LAPSIT<small><i class="asing">pre-authorized</i></small></span><em>22 PASSED</em></div>
           <div class="t-baris t-ot" style="--i:6"><span>▶ Sinergi IT/OT<small>Modbus → WASPADA · isolasi OT</small></span><em>6 PASSED</em></div>
           <div class="t-baris" style="--i:7"><span>▶ Rantai bukti forensik<small>bukti sebelum isolasi</small></span><em>36 PASSED</em></div>
           <div class="t-baris" style="--i:8"><span>▶ Telemetri dan siaran<small>dapur tunggal, delta</small></span><em>19 PASSED</em></div>
           <div class="t-baris" style="--i:9"><span>▶ Paket pasang luring<small>SHA-256 · tanpa internet</small></span><em>8 PASSED</em></div>
-          <div class="t-akhir" style="--i:10">═══ 204 passed in 45.28s ═══</div>
+          <div class="t-baris" style="--i:10"><span>▶ Triase dan Kesiapan Siber<small>alasan wajib · A–E terbuka</small></span><em>16 PASSED</em></div>
+          <div class="t-akhir" style="--i:11">═══ 224 passed in 47.41s ═══</div>
         </div>
       </div>
       <p class="terminal-ket">Uji mengunci <b>aturan doktrin</b>, bukan sekadar fungsi: isolasi tanpa bukti ditolak 409 · pemulihan terkunci bila <i class="asing">hash</i> berbeda · sabotase OT diputus ±1,2 dtk tanpa mematikan genset · sandi tidak pernah tercatat di log · AI menilai tanpa satu pun koneksi jaringan · data layar hasil rakitan delta identik dengan <i class="asing">server</i>.</p>
@@ -821,7 +822,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Komponen: Loket Application Programming Interface (API) <code>app/main.py</code> · Gerbang keamanan <code>app/keamanan.py</code> · Dapur situasi <code>app/telemetri.py</code> · Engine Deteksi Anomali <code>app/ai_anomali.py</code> · Brankas bukti <code>app/bukti.py</code> · Buku berantai <code>app/audit.py</code> · Hub siaran <code>app/siaran.py</code> + <code>app/delta.py</code> · Dasbor <code>static/</code>.</li>
       <li>Gerbang ASGI memeriksa ukuran kiriman sebelum menyentuh logika aplikasi; lebih dari 16 KB diputus dengan kode 413.</li>
       <li>Batas yang sebaiknya disebut sendiri: sistem berjalan sebagai <b>satu proses <i class="asing">server</i></b>. Operasi multiproses adalah langkah lanjutan.</li>
-      <li>Uji bisa dijalankan ulang juri dalam ±45 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli: 204 passed in 45.28s (174 uji asal + 12 uji IT/OT dan istilah + 10 uji AI lokal + 8 uji paket luring).</li>
+      <li>Uji bisa dijalankan ulang juri dalam ±50 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli: 224 passed in 47.41s (174 uji asal + 12 uji IT/OT dan istilah + 10 uji AI lokal + 8 uji paket luring + 20 uji triase dan istilah barunya).</li>
       <li>Kebutuhan minimum: Python 3.10+, 2 inti, 512 MB memori bebas, 50 MB penyimpanan (paket rilis 187 KB). Memori terukur ±71 MB sebelum AI; pustaka scikit-learn dan numpy menambah ±130 MB.</li>
     </ul>
   </aside>
@@ -895,6 +896,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li><b>Bukti langsung:</b> cabut internet saat demo. Dasbor, <i class="asing">playbook</i>, dan tombol isolasi tetap berjalan. Bila kabel LAN dicabut, <i class="asing">server</i> dan dasbor di laptop yang sama tetap bekerja.</li>
       <li>"Apakah AI sudah dipakai di sistem?" <b>Ya, untuk deteksi anomali.</b> Isolation Forest (scikit-learn) dilatih dan dijalankan di <i class="asing">server</i> satuan; lalu lintas tidak wajar menaikkan aset ke WASPADA dengan alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal". Ini <i class="asing">local inference</i>: tanpa API luar, sehingga siap dipasang <i class="asing">air-gapped</i>. AI hanya menaikkan status; memutus tetap keputusan operator. Model bahasa (Llama 3 8B lewat Ollama) untuk draf LAPSIT masih peta jalan, sengaja tidak dimasukkan ke <i class="asing">server</i> inti agar CPU hemat. Asisten AI juga dipakai pengembang saat menulis kode, sebagaimana diizinkan panitia.</li>
       <li><b>Kaitan dengan Slide 1:</b> "Saat PDNS lumpuh, layanan banyak instansi yang dititipkan di sana ikut berhenti. Karena itu inti pertahanan satuan kami jalankan di posko sendiri, bukan di pusat data atau awan di luar kendali satuan."</li>
+      <li><b>Triase dan Kesiapan Siber (bila ditanya "bagaimana dengan alarm palsu?"):</b> Operator menutup peringatan sebagai Selesai ditangani atau Positif Palsu (<i class="asing">False Positive</i>) dengan alasan tertulis; penutupan tercatat di Buku Rantai Bukti, tidak ada yang dihapus, dan bukti baru membuka peringatan lagi. Kartu Kesiapan Siber di samping Postur memberi rapor A–E dari dua sub-skor, Kerawanan dan Insiden.</li>
       <li>Kenapa dua jalur? Hybrid cocok untuk markas yang punya gerbang internet terkendali; AI Lokal (Asisten Narasi) untuk satuan yang wajib <i class="asing">air-gapped</i>. Keduanya opsional dan bisa dimatikan tanpa mengganggu inti.</li>
       <li>Pemasangan (Dokumentasi §4.1): <code>python3 -m venv .venv</code> → aktifkan → <code>pip install -r requirements.txt</code> → <code>python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</code>. Buka 127.0.0.1:8000.</li>
       <li>Variabel penting: <code>NS_OPERATOR_PASSWORD</code>/<code>NS_VIEWER_PASSWORD</code> (sandi bawaan, min. 12), <code>NS_AUDIT_KEY</code> (kunci HMAC, mengaktifkan penyimpanan permanen), <code>NS_KODE_OPERATOR</code> (kode undangan operator).</li>
@@ -915,7 +917,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="besar kartu-dasar" style="--i:0"><b>66→20%</b><strong>Peringatan dini</strong><span>genset naik WASPADA sebelum diserang; satu klik Perketat menurunkan peluangnya.</span></div>
     <div class="besar kartu-dasar" style="--i:1"><b>±1,2 dtk</b><strong>Penahanan ancaman</strong><span>dari keputusan operator sampai jaringan terputus, bukti sudah aman.</span></div>
     <div class="besar kartu-dasar" style="--i:2"><b class="biru">2,8%</b><strong>CPU <i class="asing">server</i></strong><span>untuk 300 layar komando, turun dari 10,8% (−74%).</span></div>
-    <div class="besar kartu-dasar" style="--i:3"><b class="biru">204</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin dan AI lokal; lulus semua.</span></div>
+    <div class="besar kartu-dasar" style="--i:3"><b class="biru">224</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin dan AI lokal; lulus semua.</span></div>
   </div>
 
   <div class="jaminan">

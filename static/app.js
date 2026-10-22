@@ -371,6 +371,7 @@ function gambarBagian(kena) {
   const k = S.keadaan, ada = (...x) => x.some((b) => kena.has(b));
   S.versi = k.versi; S.layanan = k.layanan; S.batasJam = k.batas_jam_backup;
   if (ada("postur", "kpi", "waktu", "versi")) gambarPostur(k.postur, k.kpi, k.waktu);
+  if (ada("kesiapan") && k.kesiapan) gambarKesiapan(k.kesiapan);
   if (ada("topologi")) gambarTopologi(k.topologi);
   if (ada("radar")) {
     Radar.aturTitik(k.radar.titik);
@@ -440,6 +441,32 @@ function gambarPostur(postur, kpi, waktu) {
   $("#kpi-backup").replaceChildren(...pecahan(kpi.backup_patuh, kpi.layanan_total));
   $("#cap-waktu").textContent = `server ${jamLokal(waktu)} · versi ${S.versi}`;
   document.title = kpi.insiden_aktif ? `(${kpi.insiden_aktif}) Insiden · ${T("produk")}` : `Nusantara Shield v5.1 — ${T("produk")}`;
+}
+
+/** Nilai kesiapan siber: huruf posko + dua sub-skor + huruf per layanan. Rumus di server (telemetri.py). */
+function gambarKesiapan(k) {
+  $("#kesiapan").dataset.huruf = k.huruf;
+  $("#kesiapan-huruf").textContent = k.huruf;
+  $("#kesiapan-k").textContent = k.kerawanan;
+  $("#kesiapan-i").textContent = k.insiden;
+  $("#kesiapan").title = `${T("kesiapan")} ${k.huruf} (${k.nilai}/100) = nilai terendah dari Kerawanan ${k.kerawanan} dan Insiden ${k.insiden}.`
+    + (k.batas ? `\n${k.batas}.` : "") + "\nA ≥ 90 · B ≥ 75 · C ≥ 60 · D ≥ 40 · E < 40";
+  $("#kesiapan-layanan").replaceChildren(...k.per_layanan.map((l) => el("span", {
+    kelas: "chip-huruf", "data-huruf": l.huruf,
+    title: `${l.singkat}: ${l.huruf} (${l.nilai}) · Kerawanan ${l.kerawanan} · Insiden ${l.insiden}`
+      + (l.rincian.peringatan_terbuka ? ` · ${l.rincian.peringatan_terbuka} peringatan terbuka` : "")
+      + (l.rincian.backup_bermasalah ? " · backup bermasalah" : "") + (l.rincian.temuan ? " · temuan konfigurasi" : ""),
+    teks: l.huruf })));
+  const t = k.triase, p = $("#ringkas-triase");
+  S.minAlasanTutup = t.min_alasan;
+  const total = t.jumlah.selesai + t.jumlah.false_positive;
+  p.hidden = !total;
+  if (total) {
+    const r = t.riwayat[0];
+    p.replaceChildren("Triase: ", el("b", { teks: t.jumlah.selesai }), ` ${T("tutup_selesai")} · `,
+      el("b", { teks: t.jumlah.false_positive }), " ", el("i", { teks: T("tutup_fp") }),
+      el("small", { teks: ` · terakhir ${r.nama} oleh ${r.oleh}: "${r.alasan}"` }));
+  }
 }
 
 // Tata letak peta = urusan tampilan (frontend). Daftar perangkat, kabel & status = data (backend).
@@ -976,8 +1003,11 @@ function gambarCTI(cti) {
           el("div", { kelas: "baris-bawah" },
             el("span", { kelas: p.diperketat ? "diperketat" : "",
               teks: p.diperketat ? "✓ diperketat (paparan −70%)" : p.proaktif ? `peluang ${p.tingkat} → dinaikkan ke WASPADA` : `peluang ${p.tingkat} → dipantau` }),
-            p.diperketat ? null : el("button", { type: "button", kelas: "tombol kecil", "data-ubah": "", "data-kunci": `perketat-${p.id}`,
-              title: "SOAR proaktif: tutup akses dari luar & pasang pembaruan sebelum diserang", onclick: (e) => perketatAset(p.id, e.currentTarget) }, ikon("kunci"), "Perketat")));
+            el("span", { kelas: "tombol-baris" },
+              p.diperketat ? null : el("button", { type: "button", kelas: "tombol kecil", "data-ubah": "", "data-kunci": `perketat-${p.id}`,
+                title: "SOAR proaktif: tutup akses dari luar & pasang pembaruan sebelum diserang", onclick: (e) => perketatAset(p.id, e.currentTarget) }, ikon("kunci"), "Perketat"),
+              p.proaktif ? el("button", { type: "button", kelas: "tombol kecil halus", "data-ubah": "", "data-kunci": `tutup-${p.id}`,
+                title: "Triase: tutup peringatan ini dengan alasan tertulis (tercatat permanen)", onclick: () => bukaTutup(p) }, T("tombol_tutup_peringatan")) : null)));
       }));
     });
     terapkanPeran();
@@ -1035,6 +1065,37 @@ async function siarkanBerita(tombol, beritaId) {
 async function perketatAset(aset_id, tombol) {
   const j = await coba(() => sibuk(tombol, () => api("/api/soar/perketat", { metode: "POST", data: { aset_id } })));
   if (j) { toast("Pengerasan diterapkan. Peluang serangan aset ini turun."); setelahAksi(); }
+}
+
+// ==========================================================================
+// TRIASE: penutupan peringatan WASPADA beralasan (hanya Operator; server tetap memeriksa ulang)
+// ==========================================================================
+function bukaTutup(p) {
+  S.tutupAset = p.id;
+  $("#tutup-aset").textContent = p.nama;
+  $("#tutup-info").textContent = `${p.ip}:${p.port} · peluang ${p.persen}% · sumber ${p.sumber.join(", ")}. `
+    + "Sumber-sumber ini tidak lagi menaikkan aset ke WASPADA; berita dan penilaian AI tetap tercatat. Bukti baru membuka peringatan lagi.";
+  $("#form-tutup").reset();
+  hitungAlasanTutup();
+  $("#dialog-tutup").showModal();
+}
+function hitungAlasanTutup() {
+  const n = $("#tutup-alasan").value.trim().length, min = S.minAlasanTutup || 15;
+  $("#tutup-hitung").textContent = n < min ? `${n}/${min} karakter minimum` : "✓ alasan cukup · tercatat permanen";
+  return n >= min;
+}
+async function kirimTutup(e) {
+  if (e.submitter?.value !== "ya") return;               // Batal: biarkan dialog menutup
+  e.preventDefault();
+  const status = $("#form-tutup").querySelector("input[name=status-tutup]:checked")?.value;
+  if (!status) { toast("Pilih status penutupan lebih dulu.", "galat"); return; }
+  if (!hitungAlasanTutup()) { toast("Alasan terlalu pendek.", "galat"); $("#tutup-alasan").focus(); return; }
+  const alasan = $("#tutup-alasan").value.trim();
+  const j = await coba(() => sibuk($("#tutup-ya"), () => api("/api/peringatan/tutup", { metode: "POST", data: { aset_id: S.tutupAset, status, alasan } })));
+  if (!j) return;
+  $("#dialog-tutup").close();
+  toast(`Peringatan ${j.nama} ditutup sebagai ${j.label}. Tercatat di ${T("buku_bukti")}.`, "sukses");
+  setelahAksi();
 }
 
 // ==========================================================================
@@ -1423,6 +1484,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fase 6: latihan IT/OT yang bisa diulang — siarkan kabar ancaman Modbus (aset OT genset)
   $("#tombol-siarkan-ot").addEventListener("click", (e) => siarkanBerita(e.currentTarget, "CTI-109"));
   $("#tombol-latihan-ai").addEventListener("click", (e) => latihanAI(e.currentTarget, "genset"));
+  $("#form-tutup").addEventListener("submit", kirimTutup);
+  $("#tutup-alasan").addEventListener("input", hitungAlasanTutup);
 
   $("#form-login").addEventListener("submit", masuk);
   $("#form-daftar").addEventListener("submit", daftarAkun);

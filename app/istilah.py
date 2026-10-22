@@ -54,6 +54,13 @@ ISTILAH: dict = {
     "tombol_darurat": "⚠ ISOLASI DARURAT",
     "tombol_darurat_tahan": "tahan 1,5 detik · tanpa bukti · alasan dicatat permanen",
     "pesan_jangan_restart": "sistem sedang diisolasi {tim}, jangan di-restart",
+
+    # --- triase peringatan: penutupan oleh Operator (tercatat di Buku Rantai Bukti) ----------
+    # Penyebutan pertama di dokumen: "Positif Palsu (False Positive)"; label UI dan log: istilah asingnya saja.
+    "tutup_selesai": "Selesai ditangani",
+    "tutup_fp": "False Positive",
+    "tombol_tutup_peringatan": "Tutup peringatan",
+    "kesiapan": "Kesiapan Siber",
 }
 
 

@@ -14,7 +14,7 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          204 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tests/          224 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), dan diagram alur
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
@@ -235,10 +235,10 @@ sequenceDiagram
 
 | Bagian | Fungsinya | Analogi |
 | --- | --- | --- |
-| Executive Overview | Postur AMAN/WASPADA/KRITIS, KPI, sakelar **Peta Global (Makro)** ⇄ **Topologi Internal (Mikro)** | Satelit pemantau & denah markas |
+| Executive Overview | Postur AMAN/WASPADA/KRITIS, kartu **Kesiapan Siber** A–E (Kerawanan dan Insiden, per layanan), KPI, sakelar **Peta Global (Makro)** ⇄ **Topologi Internal (Mikro)** | Satelit pemantau & denah markas |
 | Peta Ancaman Global | Peta dunia titik-titik; trayektori dari wilayah asal (fiktif) ke markas | Satelit pemantau |
 | Radar Anomali | Jarak dari pusat = **zona jaringan**, warna/bentuk = **keparahan**, arah = penanda tetap per alamat IP (**bukan** geografis). Legenda "Cara membaca radar" + tooltip pada titik & cincin | Penjaga malam bersenter |
-| Prediksi CTI + AI | Berita ancaman sintetis → korelasi port ke inventaris aset (IT **dan OT**) → peluang serangan; ≥ 50% = waspada proaktif. **AI lokal** (Isolation Forest) menilai lalu lintas tiap aset dan menambah peluang bila tidak wajar, lengkap dengan alasan. Tombol **Latihan OT** menyiarkan kabar Modbus; tombol **Latihan AI** menyuntikkan lalu lintas Modbus tak wajar ke genset | Alarm rumah, radio satpam, & satpam yang hafal suasana normal |
+| Prediksi CTI + AI | Berita ancaman sintetis → korelasi port ke inventaris aset (IT **dan OT**) → peluang serangan; ≥ 50% = waspada proaktif. **AI lokal** (Isolation Forest) menilai lalu lintas tiap aset dan menambah peluang bila tidak wajar, lengkap dengan alasan. Tombol **Latihan OT** menyiarkan kabar Modbus; tombol **Latihan AI** menyuntikkan lalu lintas Modbus tak wajar ke genset. **Tutup peringatan** (Operator): *False Positive* atau Selesai ditangani, wajib beralasan | Alarm rumah, radio satpam, & satpam yang hafal suasana normal |
 | Action Center | Satu kartu per insiden: status bukti, ⚡ isolasi, isolasi darurat, langkah playbook, ♻ pemulihan | Panel komando |
 | Beban Jaringan | Gauge + riwayat 48 detik | Meteran air |
 | Aset (triase) | Status 6 layanan contoh; klik untuk laci PIC & Quick Call | Papan triase IGD |
@@ -276,7 +276,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 204 uji** dalam 10 kelompok.
+**Total: 224 uji** dalam 11 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -332,8 +332,14 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - Isolasi darurat menolak alasan kosong; alasannya terikat ke buku bukti, log audit, dan LAPSIT
 - Bukti atau berita acara yang dirusak → pemulihan dikunci di semua pintu
 
-**Kamus istilah** — `tests/test_istilah.py` (29 uji)
+**Kamus istilah** — `tests/test_istilah.py` (33 uji)
 - Tidak ada label yang tertanam di luar `app/istilah.py`; playbook dirakit dari kamus
+
+**Triase & Kesiapan Siber** — `tests/test_triase_kesiapan.py` (16 uji)
+- Nilai Kesiapan Siber mengikuti rumus terbuka: dua sub-skor (Kerawanan, Insiden), nilai = yang lebih rendah, huruf A–E
+- Kabar ancaman menurunkan nilai; Perketat memulihkannya; insiden yang belum ditahan membatasi nilai posko paling tinggi D
+- Penutupan peringatan (Selesai ditangani atau Positif Palsu (*False Positive*)) wajib beralasan dan hanya untuk Operator
+- Tidak ada yang dihapus: penutupan = halaman baru di Buku Rantai Bukti + log audit; bukti baru membuka peringatan lagi
 
 ---
 
@@ -353,6 +359,7 @@ dibatasi lajunya dan dicatat di log audit.
 | `POST /api/soar/jalankan` | operator | `aksi` = `isolasi` · `pulihkan` · `amankan_bukti` · id tindakan |
 | `POST /api/soar/darurat` | operator | Isolasi darurat `{layanan_id, alasan}` |
 | `POST /api/soar/perketat` | operator | Pengerasan proaktif aset `{aset_id}` |
+| `POST /api/peringatan/tutup` | operator | Triase: tutup peringatan WASPADA `{aset_id, status: selesai \| false_positive, alasan}`; dicatat di Buku Rantai Bukti |
 | `POST /api/ai/latihan` | operator | Latihan AI lokal: suntik pola lalu lintas tak wajar `{aset_id, pola?}` (data sintetis) |
 | `POST /api/playbook/langkah` · `POST /api/pulihkan` | operator | Centang langkah · tutup insiden |
 | `POST /api/cti/siarkan` | operator | Siarkan berita CTI sekarang (`NS_CTI_JEDA`, bawaan 30 dtk) |
@@ -406,7 +413,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                204 uji otomatis (lihat bagian 6)
+tests/                224 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/buat_peta.mjs   pembuat titik peta dunia (sekali pakai)
 run_tests.sh / .bat   menjalankan uji dengan umpan balik per uji

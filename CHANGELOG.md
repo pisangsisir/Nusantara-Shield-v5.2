@@ -4,6 +4,11 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–22 Oktober 2026
 
+### Kesiapan Siber dan triase — 22 Oktober 2026 (branch `feature/kesiapan-dan-triase`)
+- Kartu **Nilai Kesiapan Siber** A–E di Executive Overview: dua sub-skor (Kerawanan, Insiden) per layanan, nilai posko tertimbang jumlah aset; rumus terbuka di `app/telemetri.py` dan Dokumentasi Teknis §2.5.
+- **Triase peringatan**: Operator menutup peringatan WASPADA sebagai Selesai ditangani atau Positif Palsu (*False Positive*) dengan alasan tertulis (`POST /api/peringatan/tutup`). Penutupan menjadi halaman `PERINGATAN_DITUTUP` di Buku Rantai Bukti; tidak ada yang dihapus, dan bukti baru membuka peringatan lagi.
+- 16 uji baru (+4 uji kamus untuk label baru); total 224 uji dalam 11 kelompok.
+
 ### Penajaman narasi — 22 Oktober 2026 (branch `docs/penajaman-narasi`)
 - "Dua kunci konfirmasi" ditulis eksplisit di Proposal, Dokumentasi Teknis, dan dek: CTI dan AI lokal hanya menaikkan WASPADA; isolasi hanya bisa diperintahkan Operator (Pengamat ditolak 403, dikunci uji yang sudah ada).
 - Pelajaran PDNS 2024 dikaitkan ke Mode Berdaulat: inti pertahanan berjalan di posko sendiri, tidak bergantung pada pusat data atau awan.

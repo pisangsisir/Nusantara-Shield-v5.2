@@ -22,6 +22,7 @@ KELOMPOK = {
     "test_ot.py": "Sinergi IT/OT: kabar Modbus menaikkan pengendali genset ke WASPADA",
     "test_ai.py": "AI lokal: deteksi anomali Isolation Forest, luring, dengan alasan yang bisa dibaca",
     "test_paket_luring.py": "Paket pasang luring: sidik jari SHA-256, pemasangan tanpa internet",
+    "test_triase_kesiapan.py": "Triase & Kesiapan Siber: penutupan peringatan beralasan, nilai A–E terbuka",
 }
 _berkas_terakhir = {"nama": None}
 _CONFIG = {"config": None}

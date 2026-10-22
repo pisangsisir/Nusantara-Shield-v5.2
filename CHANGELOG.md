@@ -4,6 +4,13 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–22 Oktober 2026
 
+### Penajaman narasi — 22 Oktober 2026 (branch `docs/penajaman-narasi`)
+- "Dua kunci konfirmasi" ditulis eksplisit di Proposal, Dokumentasi Teknis, dan dek: CTI dan AI lokal hanya menaikkan WASPADA; isolasi hanya bisa diperintahkan Operator (Pengamat ditolak 403, dikunci uji yang sudah ada).
+- Pelajaran PDNS 2024 dikaitkan ke Mode Berdaulat: inti pertahanan berjalan di posko sendiri, tidak bergantung pada pusat data atau awan.
+- Dokumentasi Teknis: daftar komponen (FastAPI, scikit-learn, HMAC-SHA256 bawaan Python) dan subbab 1.4 Data Latihan Sintetis (RFC 5737, RFC 2606, EICAR).
+- Rujukan ISO/IEC 27037:2012 ("mengikuti prinsip", belum diaudit) di Proposal, Dokumentasi Teknis, dan Panduan; kotak Batasan Penggunaan (UU ITE, UU PDP) di Panduan.
+- Tanpa perubahan kode; 204 uji tetap lulus.
+
 ### Paket pasang luring — 22 Oktober 2026
 - `tools/kemas_luring.py` membundel kode dan semua pustaka (`pip download`) beserta daftar sidik jari `SHA256SUMS`; `pasang_luring.py` memeriksa sidik jari lalu memasang dengan `pip install --no-index`, tanpa internet.
 - 8 uji baru; total 204 uji.

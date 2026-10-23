@@ -2,7 +2,16 @@
 
 Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi pasal 5.3 di Proposal. Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
-## v5.1 — 15–22 Oktober 2026
+## v5.1 — 15–23 Oktober 2026
+
+### Tata posko 24 jam — 23 Oktober 2026 (branch `feature/ui-posko-24jam`)
+- **Rel keputusan** di kanan layar (≥ 1280 px), lengket saat digulir: Action Center → Prediksi CTI + AI → Log. Di monitor 1920×1080, tombol Eksekusi Isolasi kini terlihat tanpa menggulir (sebelumnya di bawah lipatan layar, y ≈ 1.076 px). Insiden baru mengembalikan rel ke Action Center.
+- Layar sempit: satu kolom; selama ada insiden yang belum diisolasi, Action Center naik ke paling atas.
+- Gerak hanya untuk yang tidak normal: arus topologi normal diam (redup), hanya arus waspada/kritis yang bergerak; kedip keras 1 Hz diganti denyut lembut 2,4 dtk; tombol Isolasi tidak lagi berdenyut tanpa henti. Animasi tak henti saat tenang: 13 → 2.
+- Satu skala warna keparahan: warna yang ditulis langsung (#ff9a6b, #ff9f5a, #c9d36b, #8fe3b4) menjadi token; peluang "sedang" (di bawah ambang) netral, kuning disimpan untuk WASPADA; kartu prediksi WASPADA disorot.
+- Kontras: `--teks-samar` 3,0–3,5:1 → ≥ 4,6:1 (WCAG AA); pendar dekoratif (latar, logo, judul panel, panel kritis, meteran) dihapus; huruf label minimum ±10,5 px.
+- Panduan radar dilipat bawaan; Action Center saat SIAGA cukup satu baris.
+- Hanya `static/` (HTML, CSS, 3 baris JS); backend tidak berubah; 224 uji tetap lulus.
 
 ### Kesiapan Siber dan triase — 22 Oktober 2026 (branch `feature/kesiapan-dan-triase`)
 - Kartu **Nilai Kesiapan Siber** A–E di Executive Overview: dua sub-skor (Kerawanan, Insiden) per layanan, nilai posko tertimbang jumlah aset; rumus terbuka di `app/telemetri.py` dan Dokumentasi Teknis §2.5.

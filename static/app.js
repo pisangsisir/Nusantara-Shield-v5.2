@@ -417,6 +417,7 @@ function beritahuInsidenBaru() {
       if (!S.insidenSebelumnya.has(id)) {
         const l = S.layanan.find((x) => x.id === id);
         toast(`Insiden latihan dimulai: ${l.insiden.judul} di ${l.nama}.`, "peringatan");
+        $(".rel-keputusan")?.scrollTo({ top: 0 });     // posko 24 jam: insiden baru → rel kembali ke Action Center
       }
     }
   }
@@ -995,7 +996,7 @@ function gambarCTI(cti) {
         const bar = el("div", { kelas: "bar-peluang", "data-tingkat": p.tingkat, title: `garis tegak = ambang waspada ${ambang}%` }, el("i"));
         bar.style.setProperty("--p", p.persen);
         bar.style.setProperty("--ambang", ambang);
-        return el("li", {},
+        return el("li", { kelas: p.proaktif ? "waspada" : null },
           el("div", { kelas: "aset" }, p.nama, el("small", { teks: `${p.ip}:${p.port} · sumber ${p.sumber.join(", ")}` }),
             p.ai ? el("small", { kelas: "alasan-ai", teks: `AI lokal · skor ${koma(p.ai.skor, 2)} · ${p.ai.alasan}` }) : null),
           el("div", { kelas: `persen ${p.tingkat.replace(" ", "-")}`, teks: `${p.persen}%` }),

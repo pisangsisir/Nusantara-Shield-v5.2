@@ -1,8 +1,10 @@
 # Nusantara Shield v5.1
 
-> **Posko pertahanan siber luring yang memperingatkan lebih dulu, memutus dalam 1,2 detik, dan tidak pernah menghapus barang bukti.**
+> **Perisai pertahanan (_Defensive Shield_) luring yang mendeteksi, mencegah, dan membantu merespons serangan siber: memperingatkan lebih dulu, memutus dalam 1,2 detik, dan tidak pernah menghapus barang bukti.**
 
-Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hackathon 2026.
+Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hackathon 2026, kategori 02 Penangkalan (*Defensive Shield*).
+**Mendeteksi** (aturan deteksi, AI lokal, kabar ancaman) · **mencegah** (WASPADA dan Perketat) · **membantu merespons**
+(bukti → isolasi → LAPSIT, otomatis setelah satu keputusan Operator; perintah ke perangkat masih simulasi).
 *Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
 - Semua data **sintetis**: alamat IP dari blok dokumentasi RFC 5737, nama orang & instansi **fiktif**.
@@ -14,7 +16,7 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          224 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tests/          254 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), dan diagram alur
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
@@ -240,7 +242,7 @@ sequenceDiagram
 | Radar Anomali | Jarak dari pusat = **zona jaringan**, warna/bentuk = **keparahan**, arah = penanda tetap per alamat IP (**bukan** geografis). Legenda "Cara membaca radar" + tooltip pada titik & cincin | Penjaga malam bersenter |
 | Prediksi CTI + AI | Berita ancaman sintetis → korelasi port ke inventaris aset (IT **dan OT**) → peluang serangan; ≥ 50% = waspada proaktif. **AI lokal** (Isolation Forest) menilai lalu lintas tiap aset dan menambah peluang bila tidak wajar, lengkap dengan alasan. Tombol **Latihan OT** menyiarkan kabar Modbus; tombol **Latihan AI** menyuntikkan lalu lintas Modbus tak wajar ke genset. **Tutup peringatan** (Operator): *False Positive* atau Selesai ditangani, wajib beralasan | Alarm rumah, radio satpam, & satpam yang hafal suasana normal |
 | Action Center | Satu kartu per insiden: status bukti, ⚡ isolasi, isolasi darurat, langkah playbook, ♻ pemulihan | Panel komando |
-| Beban Jaringan | Gauge + riwayat 48 detik | Meteran air |
+| Beban Jaringan | Gauge, **linimasa 60 menit** (berlabel data latihan), **pita anomali AI per aset** (klik → sorot di topologi), dan **Peringatan terbaru** (label dari data nyata: Operator dan nomor bukti) | Meteran air |
 | Aset (triase) | Status 6 layanan contoh; klik untuk laci PIC & Quick Call | Papan triase IGD |
 | Log | Peristiwa dari *server* (ringkas 2 baris ⇄ semua) | Rekam gejala pasien |
 | Alat operator | Cek indikator, kepatuhan backup, Audit & LAPSIT PDF, **Akun** (khusus operator) | Pos satpam & buku piket |
@@ -276,7 +278,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 224 uji** dalam 11 kelompok.
+**Total: 254 uji** dalam 13 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -335,6 +337,15 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 **Kamus istilah** — `tests/test_istilah.py` (33 uji)
 - Tidak ada label yang tertanam di luar `app/istilah.py`; playbook dirakit dari kamus
 
+**Engine Deteksi Aturan** — `tests/test_deteksi.py` (24 uji)
+- Ambang terbuka dikunci: 8 _login_ gagal dalam 60 dtk (ke-7 belum, ke-8 terdeteksi), _login_ tembus ≤ 120 dtk, 15 kombinasi aset:port dalam 10 dtk
+- Di bawah ambang, di luar jendela, atau port yang sama berulang: tidak ada temuan; rentetan berlanjut tidak menggandakan temuan
+- Temuan hanya menaikkan WASPADA (tanpa isolasi/SOAR); Perketat, triase, kedaluwarsa 300 dtk; label isolasi = Operator + nomor bukti sebenarnya
+
+**Linimasa & KPI** — `tests/test_linimasa.py` (6 uji)
+- 60 menit data latihan berbenih tetap tanpa kejadian karangan; tiap 60 dtk satu titik posko; menit insiden ditandai
+- Pita anomali AI menyebut aset dan alasan, lalu berakhir; KPI MTTC dan insiden dihitung dari kejadian nyata
+
 **Triase & Kesiapan Siber** — `tests/test_triase_kesiapan.py` (16 uji)
 - Nilai Kesiapan Siber mengikuti rumus terbuka: dua sub-skor (Kerawanan, Insiden), nilai = yang lebih rendah, huruf A–E
 - Kabar ancaman menurunkan nilai; Perketat memulihkannya; insiden yang belum ditahan membatasi nilai posko paling tinggi D
@@ -361,6 +372,7 @@ dibatasi lajunya dan dicatat di log audit.
 | `POST /api/soar/perketat` | operator | Pengerasan proaktif aset `{aset_id}` |
 | `POST /api/peringatan/tutup` | operator | Triase: tutup peringatan WASPADA `{aset_id, status: selesai \| false_positive, alasan}`; dicatat di Buku Rantai Bukti |
 | `POST /api/ai/latihan` | operator | Latihan AI lokal: suntik pola lalu lintas tak wajar `{aset_id, pola?}` (data sintetis) |
+| `POST /api/deteksi/latihan` | operator | Latihan deteksi: putar peristiwa mentah sintetis `{jenis: login_gagal \| login_tembus \| pindai_port, aset_id?}` |
 | `POST /api/playbook/langkah` · `POST /api/pulihkan` | operator | Centang langkah · tutup insiden |
 | `POST /api/cti/siarkan` | operator | Siarkan berita CTI sekarang (`NS_CTI_JEDA`, bawaan 30 dtk) |
 | `POST /api/komando/panggil` | operator | Quick Call ke PIC cabang (simulasi) |
@@ -415,7 +427,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                224 uji otomatis (lihat bagian 6)
+tests/                254 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/buat_peta.mjs   pembuat titik peta dunia (sekali pakai)
 run_tests.sh / .bat   menjalankan uji dengan umpan balik per uji
@@ -440,7 +452,9 @@ pytest.ini            pengaturan tampilan pytest
 | Peran Pengamat dan Operator | Akses dan tampilan lintas satuan untuk pemantauan serentak di Mabes |
 | Isolasi dengan tombol ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal (Llama 3 8B lewat Ollama) untuk draf LAPSIT |
 | Rantai bukti HMAC-SHA256 | |
-| Korelasi CTI dan Engine Deteksi Anomali (Isolation Forest, luring) | |
+| Korelasi CTI dan Engine Deteksi Anomali (Isolation Forest, luring) | **Respons bertingkat menurut kritikalitas aset:** aset vital tetap dua kunci; endpoint kantor berisiko rendah diisolasi otomatis dengan praotorisasi |
+| Engine Deteksi Aturan: login gagal berulang, login tembus, pemindaian port (atas peristiwa sintetis) | Peristiwa identitas nyata dari Active Directory |
+| Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI MTTC dan insiden | |
 | Simulasi OT genset (Modbus 502) | |
 | Pembuatan LAPSIT dan ekspor PDF | |
 | Paket pasang luring bersidik jari SHA-256 (tanpa internet sama sekali) | |

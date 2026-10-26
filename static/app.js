@@ -380,6 +380,7 @@ function gambarBagian(kena) {
     $("#radar-putaran").textContent = `1 putaran / ${(ms / 1000).toFixed(1)} dtk · ${k.radar.titik.length} titik`;
   }
   if (ada("lalu_lintas")) gambarLaluLintas(k.lalu_lintas);
+  if (ada("linimasa") && k.linimasa) gambarLinimasa(k.linimasa);
   if (ada("peta")) gambarPeta(k.peta);
   if (ada("cti")) gambarCTI(k.cti);
   if (ada("peringatan") && k.peringatan) gambarPeringatan(k.peringatan);
@@ -442,6 +443,10 @@ function gambarPostur(postur, kpi, waktu) {
   $("#kpi-host").textContent = kpi.host_terpantau;
   $("#kpi-anomali").textContent = kpi.anomali;
   $("#kpi-backup").replaceChildren(...pecahan(kpi.backup_patuh, kpi.layanan_total));
+  $("#kpi-mttc").replaceChildren(...(kpi.mttc_rata == null ? [document.createTextNode("–")] : [
+    document.createTextNode(lamaDetik(kpi.mttc_rata)), el("small", { teks: ` · ${kpi.mttc_n} insiden` })]));
+  $("#kpi-insiden").replaceChildren(document.createTextNode(kpi.insiden_sejak),
+    el("small", { teks: ` sejak ${jamMenit(kpi.posko_sejak)}` }));
   $("#cap-waktu").textContent = `server ${jamLokal(waktu)} · versi ${S.versi}`;
   document.title = kpi.insiden_aktif ? `(${kpi.insiden_aktif}) Insiden · ${T("produk")}` : `Nusantara Shield v5.1 — ${T("produk")}`;
 }
@@ -575,7 +580,6 @@ function gambarTopologi(topologi) {
 }
 
 // ---------------------------------------------------------------- CSS Gauge
-const SPARK = [];
 function gambarLaluLintas(ll) {
   const g = $("#gauge");
   g.style.setProperty("--load", ll.beban);                    // ← satu-satunya "tuas" untuk CSS
@@ -592,14 +596,53 @@ function gambarLaluLintas(ll) {
   // Kabel di peta ikut: makin padat → titik arus makin cepat
   $("#topo").style.setProperty("--flow-dur", `${Math.max(0.45, 2.6 - ll.beban / 45).toFixed(2)}s`);
 
-  const wadah = $("#spark"), n = 48;
-  while (SPARK.length < n) { const b = el("span"); wadah.append(b); SPARK.push(b); }
-  const awal = n - ll.riwayat.length;
-  SPARK.forEach((b, i) => {
-    const v = ll.riwayat[i - awal];
-    b.style.setProperty("--h", v == null ? 0 : v);
-    b.className = v == null ? "kosong" : v >= ll.ambang.kritis ? "kritis" : v >= ll.ambang.waspada ? "waspada" : "";
+  // Batang paling kanan linimasa = menit yang sedang berjalan (ikut bergerak tiap detik)
+  const b = LINI.batang[60];
+  if (b && ll.berjalan) {
+    b.style.setProperty("--h", ll.berjalan.rata);
+    b.className = `berjalan ${zonaBeban(ll.berjalan.rata, ll.ambang)}`;
+    b.title = `Menit berjalan (${ll.berjalan.detik} dtk) · rata-rata ${Math.round(ll.berjalan.rata)}%`;
+  }
+}
+
+// ---------------------------------------------------------------- Linimasa 60 menit + pita anomali AI
+const LINI = { batang: [] };
+const zonaBeban = (v, a) => (v >= a.kritis ? "kritis" : v >= a.waspada ? "waspada" : "");
+const jamMenit = (iso) => new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false });
+function lamaDetik(d) {
+  if (d < 60) return `${d} dtk`;
+  return `${Math.floor(d / 60)} mnt ${String(d % 60).padStart(2, "0")} dtk`;
+}
+function gambarLinimasa(lm) {
+  const wadah = $("#linimasa-batang"), n = lm.menit.length + 1;     // 60 menit + menit berjalan
+  while (LINI.batang.length < n) { const b = el("span"); wadah.append(b); LINI.batang.push(b); }
+  lm.menit.forEach((m, i) => {
+    const b = LINI.batang[i];
+    b.style.setProperty("--h", m.rata);
+    b.className = [m.asal, zonaBeban(m.rata, lm.ambang), m.insiden ? "insiden" : ""].filter(Boolean).join(" ");
+    b.title = `${jamMenit(m.akhir)} · rata-rata ${Math.round(m.rata)}% · puncak ${Math.round(m.puncak)}%`
+      + (m.asal === "latihan" ? " · data latihan sebelum posko dibuka" : "")
+      + (m.insiden ? " · ada insiden" : "") + (Object.keys(m.ai).length ? ` · AI: ${Object.keys(m.ai).length} aset tidak wajar` : "");
   });
+  const latihan = lm.menit.filter((m) => m.asal === "latihan").length;
+  const ket = $("#linimasa-ket");
+  ket.hidden = !latihan;
+  ket.textContent = latihan ? `${latihan} menit pertama (batang redup) adalah data latihan bangkitan sebelum posko dibuka pukul ${jamMenit(lm.posko_sejak)}; batang terang adalah beban posko per menit.` : "";
+
+  const ul = $("#pita-ai");
+  if (!lm.pita.length) { ul.replaceChildren(el("li", { kelas: "kosong-kecil", teks: "Belum ada anomali AI dalam 60 menit terakhir." })); return; }
+  ul.replaceChildren(...lm.pita.slice(-5).map((p) => {
+    const jalur = el("span", { kelas: "pita-jalur", "aria-hidden": "true" }, el("i"));
+    jalur.style.setProperty("--a", (p.dari / n) * 100);
+    jalur.style.setProperty("--b", ((p.sampai + 1) / n) * 100);
+    const menit = p.sampai - p.dari + 1;
+    return el("li", {}, el("button", {
+      type: "button", kelas: `pita${p.berlangsung ? " berlangsung" : ""}`,
+      title: `${p.nama}: ${p.alasan}. Klik untuk melihat di topologi.`, onclick: () => lihatDiTopologi([p.aset]),
+    }, el("span", { kelas: "pita-nama" }, el("b", { teks: p.nama }),
+          el("small", { teks: p.berlangsung ? "berlangsung" : `${menit} mnt` })),
+       jalur, el("span", { kelas: "pita-alasan", teks: p.alasan })));
+  }));
 }
 
 // ---------------------------------------------------------------- Log peringatan jaringan

@@ -23,6 +23,7 @@ KELOMPOK = {
     "test_ai.py": "AI lokal: deteksi anomali Isolation Forest, luring, dengan alasan yang bisa dibaca",
     "test_paket_luring.py": "Paket pasang luring: sidik jari SHA-256, pemasangan tanpa internet",
     "test_triase_kesiapan.py": "Triase & Kesiapan Siber: penutupan peringatan beralasan, nilai A–E terbuka",
+    "test_deteksi.py": "Engine Deteksi Aturan: login gagal berulang, login tembus, pemindaian port (ambang terbuka)",
 }
 _berkas_terakhir = {"nama": None}
 _CONFIG = {"config": None}

@@ -615,6 +615,8 @@ function lamaDetik(d) {
 }
 function gambarLinimasa(lm) {
   const wadah = $("#linimasa-batang"), n = lm.menit.length + 1;     // 60 menit + menit berjalan
+  wadah.style.setProperty("--ambang-w", lm.ambang.waspada);         // garis ambang di latar = ambang server
+  wadah.style.setProperty("--ambang-k", lm.ambang.kritis);
   while (LINI.batang.length < n) { const b = el("span"); wadah.append(b); LINI.batang.push(b); }
   lm.menit.forEach((m, i) => {
     const b = LINI.batang[i];
@@ -629,9 +631,17 @@ function gambarLinimasa(lm) {
   ket.hidden = !latihan;
   ket.textContent = latihan ? `${latihan} menit pertama (batang redup) adalah data latihan bangkitan sebelum posko dibuka pukul ${jamMenit(lm.posko_sejak)}; batang terang adalah beban posko per menit.` : "";
 
+  LINI.data = lm;
   const ul = $("#pita-ai");
   if (!lm.pita.length) { ul.replaceChildren(el("li", { kelas: "kosong-kecil", teks: "Belum ada anomali AI dalam 60 menit terakhir." })); return; }
-  ul.replaceChildren(...lm.pita.slice(-5).map((p) => {
+  // Yang masih berlangsung lebih dulu, lalu yang paling baru. Ringkas = 3 pita, agar tinggi panel tidak melonjak.
+  const urut = [...lm.pita].sort((a, b) => (b.berlangsung - a.berlangsung) || (b.sampai - a.sampai) || (b.dari - a.dari));
+  const tampil = LINI.semua ? urut : urut.slice(0, 3), sisa = urut.length - tampil.length;
+  const tombolSisa = urut.length > 3 ? [el("li", {}, el("button", {
+    type: "button", kelas: "tautan kecil pita-lagi", "aria-expanded": String(!!LINI.semua),
+    teks: LINI.semua ? "Ringkas" : `+${sisa} aset lainnya`, onclick: () => { LINI.semua = !LINI.semua; gambarLinimasa(LINI.data); },
+  }))] : [];
+  ul.replaceChildren(...tampil.map((p) => {
     const jalur = el("span", { kelas: "pita-jalur", "aria-hidden": "true" }, el("i"));
     jalur.style.setProperty("--a", (p.dari / n) * 100);
     jalur.style.setProperty("--b", ((p.sampai + 1) / n) * 100);
@@ -642,7 +652,7 @@ function gambarLinimasa(lm) {
     }, el("span", { kelas: "pita-nama" }, el("b", { teks: p.nama }),
           el("small", { teks: p.berlangsung ? "berlangsung" : `${menit} mnt` })),
        jalur, el("span", { kelas: "pita-alasan", teks: p.alasan })));
-  }));
+  }), ...tombolSisa);
 }
 
 // ---------------------------------------------------------------- Log peringatan jaringan
@@ -1108,18 +1118,26 @@ async function latihanDeteksi(tombol, jenis) {
 // Daftar peringatan terbaru: label status disusun SERVER dari data sebenarnya (Operator, nomor bukti, aturan).
 const IKON_PERINGATAN = { deteksi: "masuk", ai: "petir", insiden: "merah", pulih: "pulih" };
 const LABEL_KEPARAHAN = { kritis: "Kritis", tinggi: "Tinggi", sedang: "Sedang", info: "Info" };
+/** Peringatan terbaru = tabel lebar penuh. Judul server berpola "<peringatan> · <aset>", dipecah jadi dua kolom. */
 function gambarPeringatan(daftar) {
-  const ul = $("#daftar-peringatan");
-  if (!daftar.length) { ul.replaceChildren(el("li", { kelas: "kosong-kecil", teks: "Belum ada peringatan." })); return; }
-  ul.replaceChildren(...daftar.map((x) => el("li", { kelas: `peringatan ${x.kelas}` },
-    ikon(x.aturan === "pindai_port" ? "periksa" : IKON_PERINGATAN[x.jenis] || "kuning"),
-    el("div", { kelas: "isi-peringatan" },
-      el("b", { teks: x.judul }),
-      x.rincian ? el("small", { teks: x.rincian }) : null,
-      el("span", { kelas: "status-peringatan", teks: x.status })),
-    el("div", { kelas: "sisi-peringatan" },
-      el("span", { kelas: `chip ${x.keparahan}`, teks: LABEL_KEPARAHAN[x.keparahan] || x.keparahan }),
-      el("time", { datetime: x.waktu, teks: jamLokal(x.waktu) })))));
+  const tb = $("#daftar-peringatan");
+  const terbuka = daftar.filter((x) => x.kelas === "terbuka").length;
+  $("#hitung-peringatan").textContent = daftar.length ? `${daftar.length} terbaru · ${terbuka} perlu tindakan` : "–";
+  if (!daftar.length) { tb.replaceChildren(el("tr", { kelas: "kosong" }, el("td", { colspan: 5, teks: "Belum ada peringatan." }))); return; }
+  tb.replaceChildren(...daftar.map((x) => {
+    const i = x.judul.lastIndexOf(" · ");
+    const nama = i > 0 ? x.judul.slice(0, i) : x.judul, aset = i > 0 ? x.judul.slice(i + 3) : "–";
+    return el("tr", { kelas: `peringatan ${x.kelas}` },
+      el("td", { kelas: "kol-keparahan", "data-label": "Keparahan" },
+        el("span", { kelas: `chip ${x.keparahan}`, teks: LABEL_KEPARAHAN[x.keparahan] || x.keparahan })),
+      el("td", { kelas: "kol-peringatan", "data-label": "Peringatan" },
+        ikon(x.aturan === "pindai_port" ? "periksa" : IKON_PERINGATAN[x.jenis] || "kuning"),
+        el("div", { kelas: "isi-peringatan" }, el("b", { teks: nama }),
+          x.rincian ? el("small", { teks: x.rincian, title: x.rincian }) : null)),
+      el("td", { kelas: "kol-aset", "data-label": "Aset", teks: aset }),
+      el("td", { kelas: "kol-status status-peringatan", "data-label": "Status", teks: x.status }),
+      el("td", { kelas: "kol-waktu", "data-label": "Waktu" }, el("time", { datetime: x.waktu, teks: jamLokal(x.waktu) })));
+  }));
 }
 
 async function siarkanBerita(tombol, beritaId) {

@@ -4,6 +4,18 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–26 Oktober 2026
 
+### Tata letak penuh: tanpa ruang kosong di monitor posko — 26 Oktober 2026 (branch `feature/tata-letak-penuh`)
+- **Baris Radar | Aset | Beban disamakan tingginya.** Ruang kosong di dalam panel turun dari ±300–580 px menjadi 1 px (diukur di 1440, 1920, dan 2880 px). Ruang lebih dipakai isi: kartu aset merata, dan linimasa 60 menit membesar dengan garis ambang waspada/kritis yang diambil dari *server*.
+- **Peringatan terbaru menjadi tabel lebar penuh**: keparahan, peringatan, aset, status, waktu, satu baris per peringatan. Di ponsel, tabel berubah menjadi kartu bertumpuk.
+- **Latihan menjadi satu bilah alat mendatar** (target, 4 skenario, latihan deteksi).
+- **Pita anomali AI** dibatasi 3 (yang berlangsung lebih dulu), dengan tombol "+N aset lainnya".
+- **Rel keputusan setinggi layar.** Log mengisi sisa ruang dan digulir di dalam, sehingga ±880 px kosong di bawah rel (1920 px) hilang. Mode ringkas Log kini memotong tiap entri menjadi 2 baris, bukan menyembunyikannya.
+- **Executive Overview:** Postur dan Kesiapan ditumpuk di kiri, 6 KPI (3 × 2) di kanan, sehingga tidak ada kartu setengah kosong.
+- **Monitor 1280–1679 px:** Radar dan Aset berdampingan, Beban Jaringan selebar baris (meteran di kiri, linimasa di kanan).
+- **Layar sangat lebar atau di-*zoom out*:** isi melebar sampai 2.400 px, dan bilah judul berbagi tepi yang sama dengan isi.
+- Hanya HTML, CSS, dan JavaScript tampilan; logika *server* tidak berubah. 254 uji lulus. Tanpa galat konsol. Ponsel 390 px tanpa gulir samping. Tombol latihan tetap nonaktif untuk Pengamat.
+- README dan Panduan (PDF serta Claude Docs) diperbarui untuk letak Peringatan terbaru yang baru.
+
 ### Dokumentasi akhir: tiga kata kerja, deteksi, linimasa, angka terukur ulang — 26 Oktober 2026 (branch `docs/deteksi-linimasa-tiga-kata-kerja`)
 - Paragraf pembuka Proposal, Dokumentasi Teknis, README, dek, poster, dan Panduan kini menempatkan Nusantara Shield sebagai perisai pertahanan (*Defensive Shield*) dengan tiga kata kerja: **mendeteksi**, **mencegah**, dan **membantu merespons**. Respons ditulis "otomatis setelah satu keputusan Operator", dengan catatan bahwa perintah ke perangkat masih simulasi.
 - Engine Deteksi Aturan didokumentasikan dengan ambang yang dikunci uji (8 gagal/60 dtk, tembus ≤ 120 dtk, 15 kombinasi/10 dtk, aktif 300 dtk), di Dokumentasi Teknis §2.8 yang baru dan Panduan Bab 7. Ikut didokumentasikan: linimasa 60 menit berlabel data latihan, pita anomali AI, serta KPI MTTC dan insiden.

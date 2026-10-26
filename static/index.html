@@ -246,7 +246,7 @@
         </aside>
       </div>
 
-      <!-- ========== BARIS SEKUNDER: radar | aset | beban + latihan ========== -->
+      <!-- ========== BARIS SEKUNDER: radar | aset | beban (tinggi disamakan) ========== -->
       <div class="grid-utama">
         <div class="kolom">
           <section class="panel" aria-labelledby="judul-radar">
@@ -316,15 +316,28 @@
                 <div>Puncak 48 dtk<b id="g-puncak">–</b></div>
               </div>
             </div>
-            <div class="peringatan-terbaru">
-              <p class="label-kecil">Peringatan terbaru</p>
-              <ul id="daftar-peringatan" class="daftar-peringatan" aria-live="polite"><li class="kosong-kecil">Belum ada peringatan.</li></ul>
-            </div>
             <p class="edu"><b>Meteran air.</b> Angka beban dihitung server sekali per detik. JavaScript hanya menyetel satu variabel CSS <code>--load</code>; CSS yang menggambar lebar, warna, dan animasinya.</p>
           </section>
 
-          <section class="panel latihan-ringkas" aria-labelledby="judul-latihan">
-            <h2 id="judul-latihan">Latihan</h2>
+        </div>
+      </div>
+
+      <!-- ========== BARIS TINDAK LANJUT ==========
+           Peringatan terbaru = tabel lebar penuh (satu baris per peringatan: keparahan, aset, status, waktu),
+           lalu Latihan = satu bilah alat mendatar. Daftar panjang tidak lagi menumpuk di satu kolom sempit. -->
+      <div class="baris-tindak">
+        <section class="panel peringatan-panel" aria-labelledby="judul-peringatan">
+          <h2 id="judul-peringatan">Peringatan terbaru <small id="hitung-peringatan">–</small></h2>
+          <div class="tabel-gulir">
+            <table class="tabel-peringatan">
+              <thead><tr><th scope="col">Keparahan</th><th scope="col">Peringatan</th><th scope="col">Aset</th><th scope="col">Status</th><th scope="col">Waktu</th></tr></thead>
+              <tbody id="daftar-peringatan" aria-live="polite"><tr class="kosong"><td colspan="5">Belum ada peringatan.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel latihan-ringkas latihan-bilah" aria-labelledby="judul-latihan">
+          <h2 id="judul-latihan">Latihan <small>data sintetis · hanya Operator</small></h2>
+          <div class="bilah-latihan">
             <div class="baris-latihan">
               <label class="bidang"><span class="sr">Target aset</span><select id="sim-layanan" aria-label="Target aset"></select></label>
               <div class="skenario" id="daftar-skenario">
@@ -339,11 +352,11 @@
               <button type="button" class="opsi-deteksi" data-deteksi="login_gagal" data-ubah title="12 login gagal dari 203.0.113.77 ke Akses admin SSH dalam ±24 dtk (peristiwa sintetis; aturan: 8 dalam 60 dtk)"><b>Login gagal berulang</b></button>
               <button type="button" class="opsi-deteksi" data-deteksi="pindai_port" data-ubah title="48 percobaan koneksi ke 24 port dua aset DMZ dalam ±6 dtk (peristiwa sintetis; aturan: 15 kombinasi dalam 10 dtk)"><b>Pemindaian port</b></button>
             </div>
-            <label class="opsi-gangguan kecil"><input type="checkbox" id="sim-gangguan-bukti" data-ubah>
-              Latih kegagalan agen forensik (bukti tidak bisa diamankan sebelum isolasi)</label>
-            <p class="catatan-peran redup kecil" hidden>Akun pengamat hanya dapat melihat.</p>
-          </section>
-        </div>
+          </div>
+          <label class="opsi-gangguan kecil"><input type="checkbox" id="sim-gangguan-bukti" data-ubah>
+            Latih kegagalan agen forensik (bukti tidak bisa diamankan sebelum isolasi)</label>
+          <p class="catatan-peran redup kecil" hidden>Akun pengamat hanya dapat melihat.</p>
+        </section>
       </div>
 
       <!-- ========== ALAT OPERATOR (fitur lama tetap ada) ========== -->

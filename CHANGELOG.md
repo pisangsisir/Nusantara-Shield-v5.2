@@ -4,6 +4,13 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–26 Oktober 2026
 
+### Engine deteksi aturan: login gagal berulang dan pemindaian port — 26 Oktober 2026 (branch `feature/deteksi-login-portscan`)
+- `app/deteksi.py` (baru): aturan deteksi **sungguhan** yang membaca peristiwa mentah sintetis (percobaan login, koneksi masuk), bukan baris log yang disuntikkan. Ambang terbuka di kode: **≥ 8 login gagal dari satu IP dalam 60 dtk** (sedang); **login berhasil ≤ 120 dtk setelah rentetan itu** (tinggi); **≥ 15 kombinasi aset:port berbeda dari satu IP dalam 10 dtk** (tinggi). Temuan aktif 300 dtk sejak peristiwa terakhir; rentetan yang berlanjut tidak menggandakan temuan.
+- Temuan menjadi sumber ketiga prediksi (`DET-…`) di samping CTI dan AI, digabung dengan noisy-OR yang sama. Dua kunci tidak berubah: deteksi hanya menaikkan aset ke WASPADA; isolasi tetap keputusan Operator. Perketat memotong sumbangannya; triase dapat menutupnya. Aset yang sedang ditangani *playbook* insiden tidak dinilai ulang dan diberi label jujur "Aset ditangani lewat playbook insiden".
+- Panel **Peringatan terbaru**: label status diambil dari data sebenarnya, misalnya "Diisolasi oleh operator · bukti BB-2026-001" (nama Operator dan nomor berita acara bukti yang tercatat), bukan teks tetap.
+- Latihan deteksi (Operator saja): `POST /api/deteksi/latihan` memutar rangkaian peristiwa sintetis berlabel (IP dokumentasi RFC 5737); tercatat di log audit.
+- 24 uji baru (`tests/test_deteksi.py`), termasuk uji yang mengunci ambang terdokumentasi dan uji waktu (gagal ke-7 belum, ke-8 terdeteksi). Uji mutasi: mengubah ambang kini menggagalkan 3 uji. 248 uji lulus.
+
 ### Sistem pendukung keputusan, NIST CSF 2.0, dan keamanan posko — 26 Oktober 2026 (branch `docs/spk-nist-keamanan-posko`)
 - Pembingkaian **sistem pendukung keputusan (SPK)** di Proposal, Dokumentasi Teknis, dek, dan Panduan: mesin mempercepat, manusia memutuskan. Alasan sengaja **tidak** otonom penuh dituliskan: peringatan keliru yang memutus layanan sendiri, respons yang dapat dipancing pihak luar, dan pemutusan tanpa pejabat yang bertanggung jawab.
 - Dokumentasi Teknis §2.6: pemetaan fitur ke **NIST CSF 2.0** (CSWP 29) per kategori, dengan status (berjalan, simulasi, peta jalan) dan berkas uji yang membuktikannya. Pemetaan mandiri, bukan sertifikasi.

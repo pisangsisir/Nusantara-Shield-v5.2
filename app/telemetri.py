@@ -58,7 +58,7 @@ import os
 import random
 import time
 from collections import deque
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Callable
 
 from .data_contoh import (BATAS_JAM_BACKUP, BERITA_ANCAMAN, INDEKS_BERITA, KEBIJAKAN, KEPARAHAN_IR, LANGKAH_IR,
@@ -68,6 +68,7 @@ from .bukti import (BUKTI_DIAMANKAN, BUKTI_DIVERIFIKASI, BUKTI_GAGAL, ISOLASI_DA
                     VERIFIKASI_GAGAL, RantaiBukti)
 from .penomoran import PENCACAH, PencacahIR
 from .ai_anomali import DETEKTOR, POLA, POLA_SKENARIO, ciri_normal, ciri_pola
+from .deteksi import ATURAN as ATURAN_DETEKSI, AWALAN as AWALAN_DET, JENIS_LATIHAN, MesinDeteksi, rangkaian_latihan
 
 # --------------------------------------------------------------------------
 # 1. TOPOLOGI JARINGAN CONTOH (data, bukan tata letak)
@@ -130,6 +131,7 @@ BONUS_SEKTOR = 1.1         # berita menyasar sektor yang KITA layani → sedikit
 FAKTOR_PERKETAT = 0.3      # setelah pengerasan (SOAR), paparan tinggal 30%
 SUMBER_AI = "AI-ANOMALI"   # penanda sumber peluang dari Engine Deteksi Anomali lokal (app/ai_anomali.py)
 DURASI_LATIHAN_AI = 300    # detik: lamanya pola lalu lintas latihan disuntikkan ke satu aset
+MAKS_PERINGATAN = 6        # daftar peringatan terbaru di dasbor
 
 # -- Peta Ancaman Global (makro) ---------------------------------------------
 # Titik koordinat KASAR per wilayah (lintang, bujur). Asal serangan di demo ini FIKTIF:
@@ -440,6 +442,7 @@ class Menara:
         self.rantai: RantaiBukti = RANTAI                    # Fase 4: TIDAK ikut reset() (tambah-saja)
         self.saat_bukti: Callable[[str, str, dict], None] | None = None   # kait: cermin ke log audit
         self.osint = GeneratorOSINT(lambda: self._jam(), self._acak)
+        self.deteksi = MesinDeteksi()                        # Engine Deteksi Aturan (app/deteksi.py)
         self.reset()
 
     # -- siklus hidup -------------------------------------------------------
@@ -470,6 +473,10 @@ class Menara:
         self._ditutup: dict[str, dict] = {}                 # triase: aset → sumber yang sudah ditutup Operator
         self._hitung_tutup = {s: 0 for s in STATUS_TUTUP}   # triase: jumlah penutupan per status (sesi demo)
         self._riwayat_tutup: deque[dict] = deque(maxlen=5)  # triase: penutupan terakhir (terbaru di depan)
+        self.deteksi.reset()
+        self._antre_det: list[tuple[float, dict]] = []     # deteksi: peristiwa mentah latihan yang menunggu waktunya
+        self._meta_insiden: dict[str, dict] = {}            # peringatan: judul & waktu mulai insiden aktif
+        self._riwayat_insiden: deque[dict] = deque(maxlen=5)  # peringatan: insiden yang sudah dipulihkan
         self.catat("info", "Pemantauan jaringan dimulai. Semua data adalah data sintetis.")
 
     def ubah(self) -> None:
@@ -606,6 +613,16 @@ class Menara:
                 if w > 0:
                     sisa *= 1 - w
                     sumber.append(b["id"])
+            info_det = []
+            if aid not in dalam_insiden:
+                for tm in self.deteksi.aktif(self._jam()):
+                    if aid not in tm.aset or tm.id in tutup.get("deteksi", ()):
+                        continue
+                    p_det = tm.peluang * (FAKTOR_PERKETAT if aid in self._diperketat else 1)
+                    sisa *= 1 - p_det
+                    sumber.append(tm.id)
+                    info_det.append({"id": tm.id, "nama": tm.nama, "persen": round(p_det * 100),
+                                     "alasan": tm.alasan(), "keparahan": tm.keparahan})
             info_ai = None
             h = ai.get(aid)
             ai_ditutup = tutup.get("ai_sejak") is not None and tutup["ai_sejak"] == self._ai_sejak.get(aid)
@@ -619,7 +636,7 @@ class Menara:
                 hasil[aid] = {"id": aid, "nama": s["nama"], "ip": s["ip"], "port": s["port"],
                               "prob": round(p, 3), "persen": round(p * 100), "tingkat": label_peluang(p),
                               "sumber": sumber, "diperketat": aid in self._diperketat,
-                              "proaktif": p >= AMBANG_PROAKTIF, "ai": info_ai}
+                              "proaktif": p >= AMBANG_PROAKTIF, "ai": info_ai, "deteksi": info_det}
         return hasil
 
     def _korelasi_berita(self, berita: dict, layanan: dict) -> list[dict]:
@@ -666,6 +683,7 @@ class Menara:
                    layanan=layanan_id)
         mulai = self._jam()
         self._mulai_insiden[layanan_id] = mulai
+        self._meta_insiden[layanan_id] = {"judul": judul, "nama": nama, "skenario": skenario, "mulai": _iso()}
         self._mttc.pop(layanan_id, None)
         self._ir_insiden.pop(layanan_id, None)        # insiden baru = laporan baru
         self._jejak.pop(layanan_id, None)
@@ -683,6 +701,7 @@ class Menara:
                 umur_cti = [mulai - a["terbit_mono"] for a in self.osint.aktif if a["id"] in pr["sumber"]]
                 if SUMBER_AI in pr["sumber"] and pid in self._ai_sejak:
                     umur_cti.append(mulai - self._ai_sejak[pid])
+                umur_cti += [mulai - tm.mulai for tm in self.deteksi.temuan if tm.id in pr["sumber"]]
                 umur = min(umur_cti, default=0)
                 self.catat("info", f"Peringatan dini terbukti: {', '.join(pr['sumber'])} memprediksi risiko "
                                    f"{pr['nama']} ({pr['persen']}%) {round(umur)} detik sebelum serangan",
@@ -1097,6 +1116,11 @@ class Menara:
         return {"insiden": hasil, "buku": self.rantai.status_buku(), "min_alasan": MIN_ALASAN_DARURAT}
 
     def insiden_ditutup(self, layanan_id: str) -> None:
+        meta, b = self._meta_insiden.pop(layanan_id, None), self._bukti.get(layanan_id)
+        if meta:
+            self._riwayat_insiden.appendleft({**meta, "layanan_id": layanan_id, "selesai": _iso(),
+                                              "petugas": b["petugas"] if b else None,
+                                              "bukti": b["nomor"] if b else None})
         self._ir_insiden.pop(layanan_id, None)
         self._jejak.pop(layanan_id, None)
         self._bukti.pop(layanan_id, None)       # berita acara tetap abadi di buku rantai bukti
@@ -1123,6 +1147,116 @@ class Menara:
         self.ubah()
 
     # ======================================================================
+    # ENGINE DETEKSI ATURAN: peristiwa mentah sintetis → temuan (app/deteksi.py)
+    # ======================================================================
+    def latihan_deteksi(self, layanan: dict, jenis: str, aset_id: str | None = None) -> dict:
+        """Latihan: putar rangkaian PERISTIWA MENTAH sintetis (upaya login / koneksi). Temuan lahir dari aturan
+        di app/deteksi.py saat peristiwa itu tiba, bukan dari baris log yang disuntikkan."""
+        if jenis not in JENIS_LATIHAN:
+            raise ValueError("Jenis latihan deteksi tidak dikenal")
+        aset_id = aset_id or "ssh"
+        if aset_id not in INDEKS_SIMPUL or not INDEKS_SIMPUL[aset_id]["port"]:
+            raise ValueError("Aset tidak dikenal")
+        dmz = [s for s in SIMPUL if s["zona"] == "dmz"]
+        rangkaian = rangkaian_latihan(jenis, INDEKS_SIMPUL[aset_id], dmz)
+        t0 = self._jam()
+        self._antre_det += [(t0 + dt, ev) for dt, ev in rangkaian]
+        self._antre_det.sort(key=lambda x: x[0])
+        s = INDEKS_SIMPUL[aset_id]
+        sasaran = (f"{s['nama']} {s['ip']}:{s['port']}" if jenis != "pindai_port"
+                   else "aset DMZ " + ", ".join(f"{d['ip']}" for d in dmz))
+        self.catat("info", f"Latihan deteksi: {len(rangkaian)} peristiwa mentah ({ATURAN_DETEKSI[jenis]['nama'].lower()}) "
+                           f"diputar ke {sasaran} selama ±{round(rangkaian[-1][0])} dtk (data sintetis)", jenis="deteksi")
+        self._proses_deteksi()
+        self.ubah()
+        return {"jenis": jenis, "aset_id": aset_id, "peristiwa": len(rangkaian),
+                "durasi_detik": round(rangkaian[-1][0], 1)}
+
+    def _proses_deteksi(self) -> None:
+        sekarang = self._jam()
+        siap = [x for x in self._antre_det if x[0] <= sekarang]
+        if not siap:
+            return
+        self._antre_det = [x for x in self._antre_det if x[0] > sekarang]
+        for t, ev in siap:
+            for tm in self.deteksi.proses(ev, t):
+                aset = ", ".join(f"{INDEKS_SIMPUL[a]['nama']} {INDEKS_SIMPUL[a]['ip']}:{INDEKS_SIMPUL[a]['port']}"
+                                 for a in tm.aset) or "tidak ada port terbuka"
+                self.catat(tm.keparahan, f"Deteksi ▶ {tm.nama} ({tm.id}) ke {aset} dari {tm.sumber} — {tm.alasan()}",
+                           jenis="deteksi")
+        self.ubah()
+
+    def _deteksi_tampil(self, prediksi: dict) -> dict:
+        sekarang = self._jam()
+        temuan = [{"id": tm.id, "aturan": tm.aturan, "nama": tm.nama, "keparahan": tm.keparahan, "sumber": tm.sumber,
+                   "aset": tm.aset, "jumlah": tm.jumlah, "alasan": tm.alasan(), "aktif": tm.aktif(sekarang),
+                   "waktu": self._iso_mono(tm.mulai)} for tm in self.deteksi.temuan[-10:]]
+        return {"aturan": {k: {x: v[x] for x in ("nama", "ambang", "jendela", "keparahan", "peluang") if x in v}
+                           for k, v in ATURAN_DETEKSI.items()},
+                "temuan": temuan[::-1], "menunggu": len(self._antre_det)}
+
+    def _iso_mono(self, t: float) -> str:
+        """Waktu monotonic (jam internal) → ISO-8601 UTC, untuk ditampilkan."""
+        return (datetime.now(timezone.utc) - timedelta(seconds=max(0.0, self._jam() - t))).isoformat(timespec="seconds")
+
+    def _peringatan(self, layanan: dict, prediksi: dict) -> list[dict]:
+        """Daftar peringatan terbaru untuk dasbor. Setiap label diambil dari data yang sebenarnya:
+        siapa Operator yang mengisolasi, nomor berita acara bukti, aturan deteksi yang terpenuhi."""
+        sekarang, hasil = self._jam(), []
+        ditutup = {x for t in self._ditutup.values() for x in t.get("deteksi", ())}
+        dalam_insiden = set(self._status_insiden(layanan))
+        for tm in self.deteksi.temuan[-10:]:
+            terangkat = [a for a in tm.aset if prediksi.get(a, {}).get("proaktif") and tm.id in prediksi[a]["sumber"]]
+            if not tm.aktif(sekarang):
+                status, kelas = "Berakhir", "selesai"
+            elif tm.id in ditutup:
+                status, kelas = "Ditutup lewat triase", "selesai"
+            elif tm.aset and all(a in dalam_insiden for a in tm.aset):
+                status, kelas = "Aset ditangani lewat playbook insiden", "ditahan"
+            elif terangkat:
+                status, kelas = "Aset dinaikkan ke WASPADA", "terbuka"
+            else:
+                status, kelas = "Dipantau", "pantau"
+            sasaran = ", ".join(INDEKS_SIMPUL[a]["nama"] for a in tm.aset) or "tanpa port terbuka"
+            hasil.append({"id": tm.id, "jenis": "deteksi", "aturan": tm.aturan, "judul": f"{tm.nama} · {sasaran}",
+                          "rincian": tm.alasan(), "keparahan": tm.keparahan, "waktu": self._iso_mono(tm.mulai),
+                          "status": status, "kelas": kelas})
+        for aid in sorted(self._tanda_ai):
+            if aid in self._ai_sejak and aid in prediksi and prediksi[aid].get("ai"):
+                s = INDEKS_SIMPUL[aid]
+                hasil.append({"id": f"ai-{aid}", "jenis": "ai", "judul": f"Lalu lintas tidak wajar (AI lokal) · {s['nama']}",
+                              "rincian": prediksi[aid]["ai"]["alasan"], "keparahan": "sedang",
+                              "waktu": self._iso_mono(self._ai_sejak[aid]),
+                              "status": "Aset dinaikkan ke WASPADA" if prediksi[aid]["proaktif"] else "Dipantau",
+                              "kelas": "terbuka" if prediksi[aid]["proaktif"] else "pantau"})
+        for lid, meta in self._meta_insiden.items():
+            if not layanan.get(lid, {}).get("insiden"):
+                continue
+            b, dr = self._bukti.get(lid), self._darurat.get(lid)
+            if lid in self._ir_insiden:
+                if dr:
+                    status = (f"Diisolasi darurat oleh {dr['petugas']} · "
+                              + (f"bukti susulan {b['nomor']}" if b else "bukti belum diamankan"))
+                else:
+                    status = f"Diisolasi oleh {b['petugas']} · bukti {b['nomor']}" if b else "Terisolasi"
+                kelas = "ditahan"
+            elif b:
+                status, kelas = f"Bukti {b['nomor']} aman · isolasi berjalan", "terbuka"
+            else:
+                status, kelas = "Menunggu keputusan Operator", "terbuka"
+            hasil.append({"id": f"ins-{lid}", "jenis": "insiden", "judul": f"{meta['judul']} · {meta['nama']}",
+                          "rincian": None, "keparahan": "kritis", "waktu": meta["mulai"], "status": status,
+                          "kelas": kelas, "layanan_id": lid})
+        for r in self._riwayat_insiden:
+            status = (f"Diisolasi oleh {r['petugas']} · bukti {r['bukti']} · dipulihkan" if r["bukti"]
+                      else "Dipulihkan")
+            hasil.append({"id": f"pulih-{r['layanan_id']}-{r['selesai']}", "jenis": "pulih",
+                          "judul": f"{r['judul']} · {r['nama']}", "rincian": None, "keparahan": "info",
+                          "waktu": r["selesai"], "status": status, "kelas": "selesai"})
+        hasil.sort(key=lambda x: x["waktu"], reverse=True)
+        return hasil[:MAKS_PERINGATAN]
+
+    # ======================================================================
     # TRIASE PERINGATAN dan NILAI KESIAPAN SIBER
     # ======================================================================
     def tutup_peringatan(self, layanan: dict, aset_id: str, status: str, alasan: str, oleh: str) -> dict:
@@ -1139,8 +1273,10 @@ class Menara:
         pr = self._prediksi(layanan).get(aset_id)
         if not pr or not pr["proaktif"]:
             raise ValueError("Tidak ada peringatan WASPADA terbuka di aset ini")
-        tutup = self._ditutup.setdefault(aset_id, {"berita": set(), "ai_sejak": None})
-        tutup["berita"] |= {x for x in pr["sumber"] if x != SUMBER_AI}
+        tutup = self._ditutup.setdefault(aset_id, {"berita": set(), "ai_sejak": None, "deteksi": set()})
+        tutup.setdefault("deteksi", set())
+        tutup["berita"] |= {x for x in pr["sumber"] if x != SUMBER_AI and not x.startswith(AWALAN_DET)}
+        tutup["deteksi"] |= {x for x in pr["sumber"] if x.startswith(AWALAN_DET)}
         if SUMBER_AI in pr["sumber"]:
             tutup["ai_sejak"] = self._ai_sejak.get(aset_id)
         s, label = INDEKS_SIMPUL[aset_id], ISTILAH[STATUS_TUTUP[status]]
@@ -1162,12 +1298,14 @@ class Menara:
     def _rapikan_tutup(self) -> None:
         """Buang catatan penutupan yang sudah tidak berlaku (berita kedaluwarsa, episode AI berakhir)."""
         aktif = {b["id"] for b in self.osint.aktif}
+        temuan_aktif = {tm.id for tm in self.deteksi.aktif(self._jam())}
         for aid in list(self._ditutup):
             t = self._ditutup[aid]
             t["berita"] &= aktif
+            t["deteksi"] = t.get("deteksi", set()) & temuan_aktif
             if t["ai_sejak"] is not None and t["ai_sejak"] != self._ai_sejak.get(aid):
                 t["ai_sejak"] = None
-            if not t["berita"] and t["ai_sejak"] is None:
+            if not t["berita"] and t["ai_sejak"] is None and not t["deteksi"]:
                 del self._ditutup[aid]
 
     def _kesiapan(self, layanan: dict, prediksi: dict) -> dict:
@@ -1226,6 +1364,7 @@ class Menara:
             self._peristiwa.append(self._entri(e["tingkat"], e["pesan"], e["rel_menit"], e["layanan"]))
         self._proses_antre_soar(layanan)
         self._periksa_ai(layanan)                     # AI lokal: catat perubahan penilaian
+        self._proses_deteksi()                        # Engine Deteksi Aturan: peristiwa mentah → temuan
         # Radio satpam
         baru, habis = self.osint.detak()
         for a in habis:
@@ -1445,6 +1584,8 @@ class Menara:
             "lalu_lintas": lalu_lintas,
             "cti": self._cti(prediksi, lengkap=True), "soar": self._soar(layanan), "forensik": self._forensik(layanan),
             "kesiapan": self._kesiapan(layanan, prediksi),
+            "deteksi": self._deteksi_tampil(prediksi),
+            "peringatan": self._peringatan(layanan, prediksi),
             "peta": self._peta(status, ancaman, kerumunan, asal_kerumunan),
             "komando": self._komando(layanan), "manajemen": MANAJEMEN, "kebijakan": KEBIJAKAN,
             "ir": self._ir[::-1], "playbook_ringkas": PLAYBOOK_RINGKAS,

@@ -112,6 +112,7 @@ const IKON = {
   rantai: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   server: "M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01",
   radio: "M5 19a10 10 0 0 1 0-14M19 5a10 10 0 0 1 0 14M8.5 15.5a5 5 0 0 1 0-7M15.5 8.5a5 5 0 0 1 0 7M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
+  masuk: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3",   // Engine Deteksi Aturan: upaya login
 };
 function ikon(nama) {
   const s = sv("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "ikon" });
@@ -381,6 +382,7 @@ function gambarBagian(kena) {
   if (ada("lalu_lintas")) gambarLaluLintas(k.lalu_lintas);
   if (ada("peta")) gambarPeta(k.peta);
   if (ada("cti")) gambarCTI(k.cti);
+  if (ada("peringatan") && k.peringatan) gambarPeringatan(k.peringatan);
   if (ada("ir")) umumkanLaporanBaru(k.ir || []);
   if (ada("layanan")) beritahuInsidenBaru();
   if (ada("topologi", "peta")) perbaruiNotifSakelar();
@@ -609,7 +611,7 @@ function tambahPeristiwa(daftar) {
     S.seqTampil = p.seq;
     ul.prepend(el("li", {},
       el("time", { datetime: p.waktu, teks: jamLokal(p.waktu) }),
-      el("span", { kelas: `chip ${p.tingkat} ${p.jenis || ""}`, teks: p.rel_menit != null ? relatif(p.rel_menit) : p.jenis === "cti" ? "CTI" : p.jenis === "ai" ? "AI" : p.jenis === "soar" ? "SOAR" : p.jenis === "ir" ? T("laporan_singkat") : p.jenis === "bukti" ? "BUKTI" : p.jenis === "komando" ? "CALL" : LABEL_TINGKAT[p.tingkat] || p.tingkat }),
+      el("span", { kelas: `chip ${p.tingkat} ${p.jenis || ""}`, teks: p.rel_menit != null ? relatif(p.rel_menit) : p.jenis === "cti" ? "CTI" : p.jenis === "ai" ? "AI" : p.jenis === "soar" ? "SOAR" : p.jenis === "ir" ? T("laporan_singkat") : p.jenis === "bukti" ? "BUKTI" : p.jenis === "komando" ? "CALL" : p.jenis === "deteksi" ? "DETEKSI" : LABEL_TINGKAT[p.tingkat] || p.tingkat }),
       el("span", { teks: p.pesan })));
   }
   while (ul.children.length > 40) ul.lastChild.remove();
@@ -983,7 +985,7 @@ function gambarCTI(cti) {
     $("#status-ai").classList.toggle("waspada", a.aset_anomali > 0);
   }
   const ambang = Math.round(cti.ambang_proaktif * 100);
-  const kunci = JSON.stringify(cti.prediksi.map((p) => [p.id, p.persen, p.diperketat, p.ai && p.ai.skor])) + S.peran;
+  const kunci = JSON.stringify(cti.prediksi.map((p) => [p.id, p.persen, p.diperketat, p.ai && p.ai.skor, (p.deteksi || []).map((d) => d.alasan)])) + S.peran;
   if (kunci !== kunciPrediksi) {                    // gambar ulang hanya bila angkanya berubah
     kunciPrediksi = kunci;
     denganFokus(() => {
@@ -998,7 +1000,8 @@ function gambarCTI(cti) {
         bar.style.setProperty("--ambang", ambang);
         return el("li", { kelas: p.proaktif ? "waspada" : null },
           el("div", { kelas: "aset" }, p.nama, el("small", { teks: `${p.ip}:${p.port} · sumber ${p.sumber.join(", ")}` }),
-            p.ai ? el("small", { kelas: "alasan-ai", teks: `AI lokal · skor ${koma(p.ai.skor, 2)} · ${p.ai.alasan}` }) : null),
+            p.ai ? el("small", { kelas: "alasan-ai", teks: `AI lokal · skor ${koma(p.ai.skor, 2)} · ${p.ai.alasan}` }) : null,
+            ...(p.deteksi || []).map((d) => el("small", { kelas: `alasan-det ${d.keparahan}`, teks: `${d.nama} · ${d.alasan}` }))),
           el("div", { kelas: `persen ${p.tingkat.replace(" ", "-")}`, teks: `${p.persen}%` }),
           bar,
           el("div", { kelas: "baris-bawah" },
@@ -1049,6 +1052,31 @@ async function latihanAI(tombol, aset_id) {
   toast(j.anomali ? `AI lokal: lalu lintas tidak wajar (skor ${koma(j.skor, 2)}) — ${j.alasan}. Peluang serangan ${j.persen}%.`
     : "AI lokal: pola latihan masih dinilai wajar.", j.anomali ? "peringatan" : "info");
   setelahAksi();
+}
+
+// Engine Deteksi Aturan: putar peristiwa mentah sintetis; temuan lahir dari aturan di server (app/deteksi.py)
+async function latihanDeteksi(tombol, jenis) {
+  const j = await coba(() => sibuk(tombol, () => api("/api/deteksi/latihan", { metode: "POST", data: { jenis } })));
+  if (!j) return;
+  toast(`Latihan deteksi: ${j.peristiwa} peristiwa mentah diputar selama ±${Math.round(j.durasi_detik)} dtk. Perhatikan Peringatan terbaru dan Prediksi CTI + AI.`);
+  setelahAksi();
+}
+
+// Daftar peringatan terbaru: label status disusun SERVER dari data sebenarnya (Operator, nomor bukti, aturan).
+const IKON_PERINGATAN = { deteksi: "masuk", ai: "petir", insiden: "merah", pulih: "pulih" };
+const LABEL_KEPARAHAN = { kritis: "Kritis", tinggi: "Tinggi", sedang: "Sedang", info: "Info" };
+function gambarPeringatan(daftar) {
+  const ul = $("#daftar-peringatan");
+  if (!daftar.length) { ul.replaceChildren(el("li", { kelas: "kosong-kecil", teks: "Belum ada peringatan." })); return; }
+  ul.replaceChildren(...daftar.map((x) => el("li", { kelas: `peringatan ${x.kelas}` },
+    ikon(x.aturan === "pindai_port" ? "periksa" : IKON_PERINGATAN[x.jenis] || "kuning"),
+    el("div", { kelas: "isi-peringatan" },
+      el("b", { teks: x.judul }),
+      x.rincian ? el("small", { teks: x.rincian }) : null,
+      el("span", { kelas: "status-peringatan", teks: x.status })),
+    el("div", { kelas: "sisi-peringatan" },
+      el("span", { kelas: `chip ${x.keparahan}`, teks: LABEL_KEPARAHAN[x.keparahan] || x.keparahan }),
+      el("time", { datetime: x.waktu, teks: jamLokal(x.waktu) })))));
 }
 
 async function siarkanBerita(tombol, beritaId) {
@@ -1485,6 +1513,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fase 6: latihan IT/OT yang bisa diulang — siarkan kabar ancaman Modbus (aset OT genset)
   $("#tombol-siarkan-ot").addEventListener("click", (e) => siarkanBerita(e.currentTarget, "CTI-109"));
   $("#tombol-latihan-ai").addEventListener("click", (e) => latihanAI(e.currentTarget, "genset"));
+  $$("[data-deteksi]").forEach((b) => b.addEventListener("click", (e) => latihanDeteksi(e.currentTarget, e.currentTarget.dataset.deteksi)));
   $("#form-tutup").addEventListener("submit", kirimTutup);
   $("#tutup-alasan").addEventListener("input", hitungAlasanTutup);
 

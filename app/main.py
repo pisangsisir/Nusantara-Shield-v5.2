@@ -58,6 +58,7 @@ from .istilah import ISTILAH
 from .telemetri import (AKSI_GABUNGAN, ASET_BERPORT, MENARA, MIN_ALASAN_DARURAT, MIN_ALASAN_TUTUP, SEMUA_AKSI_SOAR,
                         STATUS_TUTUP)
 from .ai_anomali import POLA
+from .deteksi import JENIS_LATIHAN
 
 FOLDER_STATIS = Path(__file__).resolve().parent.parent / "static"
 
@@ -613,6 +614,11 @@ class LatihanAIMasuk(Formulir):
     pola: IdPolaAI | None = None
 
 
+class LatihanDeteksiMasuk(Formulir):
+    jenis: Literal[tuple(JENIS_LATIHAN)]
+    aset_id: IdAset | None = None
+
+
 @app.post("/api/cti/siarkan", dependencies=[Depends(batasi("ubah"))])
 def siarkan_cti(f: CtiMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
     """Radio satpam: siarkan berita ancaman berikutnya SEKARANG (untuk mengatur tempo demo).
@@ -683,6 +689,19 @@ def tutup_peringatan(f: TutupPeringatanMasuk, akun: Akun = Depends(butuh_izin("u
             return MENARA.tutup_peringatan(LAYANAN, f.aset_id, f.status, f.alasan, akun.nama)
         except ValueError as e:
             raise HTTPException(409, str(e)) from None
+
+
+@app.post("/api/deteksi/latihan", dependencies=[Depends(batasi("ubah"))])
+def latihan_deteksi(f: LatihanDeteksiMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
+    """Engine Deteksi Aturan: putar peristiwa mentah sintetis (login / koneksi). Temuan lahir dari aturan dengan
+    ambang terbuka (app/deteksi.py) dan hanya menaikkan status; memutus jaringan tetap keputusan Operator."""
+    with _kunci_state:
+        try:
+            hasil = MENARA.latihan_deteksi(LAYANAN, f.jenis, f.aset_id)
+        except ValueError as e:
+            raise HTTPException(422, str(e)) from None
+    LOG.catat(akun.nama, "DETEKSI_LATIHAN", {"jenis": f.jenis, "aset": hasil["aset_id"]})
+    return hasil
 
 
 @app.post("/api/ai/latihan", dependencies=[Depends(batasi("ubah"))])

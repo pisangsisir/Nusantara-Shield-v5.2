@@ -242,7 +242,9 @@ sequenceDiagram
 | Radar Anomali | Jarak dari pusat = **zona jaringan**, warna/bentuk = **keparahan**, arah = penanda tetap per alamat IP (**bukan** geografis). Legenda "Cara membaca radar" + tooltip pada titik & cincin | Penjaga malam bersenter |
 | Prediksi CTI + AI | Berita ancaman sintetis → korelasi port ke inventaris aset (IT **dan OT**) → peluang serangan; ≥ 50% = waspada proaktif. **AI lokal** (Isolation Forest) menilai lalu lintas tiap aset dan menambah peluang bila tidak wajar, lengkap dengan alasan. Tombol **Latihan OT** menyiarkan kabar Modbus; tombol **Latihan AI** menyuntikkan lalu lintas Modbus tak wajar ke genset. **Tutup peringatan** (Operator): *False Positive* atau Selesai ditangani, wajib beralasan | Alarm rumah, radio satpam, & satpam yang hafal suasana normal |
 | Action Center | Satu kartu per insiden: status bukti, ⚡ isolasi, isolasi darurat, langkah playbook, ♻ pemulihan | Panel komando |
-| Beban Jaringan | Gauge, **linimasa 60 menit** (berlabel data latihan), **pita anomali AI per aset** (klik → sorot di topologi), dan **Peringatan terbaru** (label dari data nyata: Operator dan nomor bukti) | Meteran air |
+| Beban Jaringan | Gauge, **linimasa 60 menit** (berlabel data latihan, garis ambang waspada/kritis) dan **pita anomali AI per aset** (klik → sorot di topologi) | Meteran air |
+| Peringatan terbaru | **Tabel lebar penuh**: keparahan, peringatan, aset, status, waktu. Label dari data nyata (Operator dan nomor bukti) | Papan pengumuman piket |
+| Latihan | Satu bilah alat: target, 4 skenario, latihan deteksi (*login* gagal, pindai *port*), latih kegagalan forensik | Simulator latihan |
 | Aset (triase) | Status 6 layanan contoh; klik untuk laci PIC & Quick Call | Papan triase IGD |
 | Log | Peristiwa dari *server* (ringkas 2 baris ⇄ semua) | Rekam gejala pasien |
 | Alat operator | Cek indikator, kepatuhan backup, Audit & LAPSIT PDF, **Akun** (khusus operator) | Pos satpam & buku piket |

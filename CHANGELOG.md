@@ -2,7 +2,12 @@
 
 Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi pasal 5.3 di Proposal. Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
-## v5.1 — 15–23 Oktober 2026
+## v5.1 — 15–26 Oktober 2026
+
+### Perbaikan uji paket lintas-OS — 26 Oktober 2026 (branch `fix/uji-paket-lintas-os`)
+- `test_kebutuhan_lintas_sistem_operasi_disesuaikan_target` kini memakai `requirements.txt` contohnya sendiri. Sebelumnya uji membaca berkas di folder tempat ia dijalankan, sehingga **gagal di dalam paket luring lintas-OS** (misalnya paket Mac yang dibuat di Linux), karena di sana `uvicorn[standard]` memang sengaja diganti `uvicorn` polos. Ditemukan saat paket Mac dipasang langsung di Mac.
+- Zip dibangun dari salinan kerja yang izin berkasnya sudah dinormalkan (644/755). Sebelumnya 9 berkas berizin baca-saja (444) ikut terbawa ke zip; di Mac (`ditto`/Finder) izin itu dipertahankan dan membuat satu uji gagal menulis `requirements.txt`.
+- Tanpa perubahan kode aplikasi; 224 uji lulus.
 
 ### Tata posko 24 jam — 23 Oktober 2026 (branch `feature/ui-posko-24jam`)
 - **Rel keputusan** di kanan layar (≥ 1280 px), lengket saat digulir: Action Center → Prediksi CTI + AI → Log. Di monitor 1920×1080, tombol Eksekusi Isolasi kini terlihat tanpa menggulir (sebelumnya di bawah lipatan layar, y ≈ 1.076 px). Insiden baru mengembalikan rel ke Action Center.

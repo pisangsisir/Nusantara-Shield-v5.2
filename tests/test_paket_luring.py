@@ -89,7 +89,12 @@ def test_paket_lengkap_tanpa_rahasia_dan_lolos_pemeriksaan(tmp_path):
     assert periksa(akar) == []
 
 
-def test_kebutuhan_lintas_sistem_operasi_disesuaikan_target():
+def test_kebutuhan_lintas_sistem_operasi_disesuaikan_target(tmp_path, monkeypatch):
+    # Pakai requirements contoh sendiri, bukan berkas di folder tempat uji dijalankan: di dalam paket luring
+    # lintas-OS, requirements.txt sudah disesuaikan target (uvicorn polos), sehingga uji akan salah membaca.
+    (tmp_path / "requirements.txt").write_text(
+        "fastapi>=0.115\nuvicorn[standard]>=0.30\nscikit-learn>=1.3\n", encoding="utf-8")
+    monkeypatch.setattr(kemas_luring, "AKAR", tmp_path)
     assert "uvicorn[standard]" in kemas_luring.kebutuhan_untuk(None)
     win = kemas_luring.kebutuhan_untuk("win_amd64")
     assert "uvicorn[standard]" not in win and "uvicorn" in win and "colorama" in win

@@ -148,6 +148,8 @@
                 <div class="kpi"><div class="k">Host terpantau</div><div class="v" id="kpi-host">–</div></div>
                 <div class="kpi"><div class="k">Anomali aktif</div><div class="v" id="kpi-anomali">–</div></div>
                 <div class="kpi"><div class="k">Kepatuhan backup</div><div class="v" id="kpi-backup">–</div></div>
+                <div class="kpi" title="Rata-rata waktu dari insiden dimulai sampai langkah penahanan playbook selesai, untuk semua insiden sejak posko aktif"><div class="k">Waktu respons (MTTC)</div><div class="v" id="kpi-mttc">–</div></div>
+                <div class="kpi" title="Jumlah insiden latihan yang dimulai sejak posko dibuka (atau sejak demo diatur ulang)"><div class="k">Insiden sejak posko aktif</div><div class="v" id="kpi-insiden">–</div></div>
               </div>
             </div>
             <div>
@@ -297,7 +299,17 @@
               </div>
               <div class="g-skala"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
               <div class="g-zona-ket" id="g-zona-ket"></div>
-              <div class="spark" id="spark" aria-hidden="true"></div>
+              <figure class="linimasa" aria-labelledby="judul-linimasa">
+                <figcaption class="linimasa-kepala">
+                  <span id="judul-linimasa">Beban 60 menit <small>rata-rata per menit</small></span>
+                  <span class="lencana-latihan" title="Seluruh lalu lintas di purwarupa ini sintetis">data latihan</span>
+                </figcaption>
+                <div class="linimasa-batang" id="linimasa-batang" role="img" aria-label="Grafik beban jaringan 60 menit terakhir"></div>
+                <div class="linimasa-skala" aria-hidden="true"><span>−60 mnt</span><span>−30 mnt</span><span>sekarang</span></div>
+                <p class="label-kecil pita-judul">Anomali AI per aset <small>klik untuk melihat di topologi</small></p>
+                <ul class="pita-ai" id="pita-ai"><li class="kosong-kecil">Belum ada anomali AI dalam 60 menit terakhir.</li></ul>
+                <p class="linimasa-ket" id="linimasa-ket" hidden></p>
+              </figure>
               <div class="g-statistik">
                 <div>Throughput<b id="g-mbps">–</b></div>
                 <div>Paket/detik<b id="g-pps">–</b></div>

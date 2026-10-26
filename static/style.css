@@ -265,11 +265,37 @@ input[aria-invalid="true"] { border-color: var(--merah); box-shadow: 0 0 0 3px v
 #g-tanda-kritis { left: calc(var(--batas-kritis) * 1%); }
 .g-skala { display: flex; justify-content: space-between; font: 11px var(--huruf-mono); color: var(--teks-samar); margin-top: 6px; }
 .g-zona-ket { font-size: .74rem; color: var(--teks-redup); margin-top: 6px; }
-.spark { display: flex; align-items: flex-end; gap: 2px; height: 46px; margin-top: 12px; padding-top: 4px; border-top: 1px solid var(--garis-lembut); }
-.spark span { flex: 1; height: calc(var(--h, 0) * 1%); min-height: 2px; border-radius: 2px 2px 0 0; background: var(--neon); opacity: .55; transition: height .4s; }
-.spark span.kosong { opacity: .12; }
-.spark span.waspada { background: var(--kuning); }
-.spark span.kritis { background: var(--merah); opacity: .8; }
+/* Linimasa 60 menit (data latihan) + pita anomali AI per aset */
+.linimasa { margin: 12px 0 0; padding-top: 8px; border-top: 1px solid var(--garis-lembut); }
+.linimasa-kepala { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: .78rem; color: var(--teks-redup); }
+.linimasa-kepala small { color: var(--teks-samar); }
+.lencana-latihan { font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px;
+  border: 1px dashed var(--teks-samar); color: var(--teks-redup); white-space: nowrap; }
+.linimasa-batang { display: flex; align-items: flex-end; gap: 1px; height: 56px; margin-top: 6px; }
+.linimasa-batang span { position: relative; flex: 1; height: calc(var(--h, 0) * 1%); min-height: 2px; border-radius: 1px 1px 0 0;
+  background: var(--neon); opacity: .7; transition: height .4s; }
+.linimasa-batang span.latihan { background: var(--teks-samar); opacity: .35; }
+.linimasa-batang span.waspada { background: var(--kuning); }
+.linimasa-batang span.kritis { background: var(--merah); opacity: .85; }
+.linimasa-batang span.insiden::before { content: ""; position: absolute; left: 0; right: 0; top: -5px; height: 3px; border-radius: 1px; background: var(--merah); }
+.linimasa-batang span.berjalan { opacity: 1; outline: 1px solid var(--teks-redup); outline-offset: 1px; }
+.linimasa-skala { display: flex; justify-content: space-between; font-size: .68rem; color: var(--teks-samar); margin-top: 3px; }
+.linimasa-ket { margin: 6px 0 0; font-size: .7rem; color: var(--teks-samar); }
+.pita-judul { margin: 10px 0 4px; }
+.pita-judul small { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--teks-samar); }
+.pita-ai { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.pita { display: grid; grid-template-columns: minmax(0, 14em) minmax(0, 1fr); grid-template-areas: "nama jalur" "alasan alasan";
+  gap: 1px 8px; align-items: center; width: 100%; padding: 4px 8px; border-radius: 8px; text-align: left; cursor: pointer;
+  background: rgba(10, 17, 32, .45); border: 1px solid var(--garis-lembut); color: inherit; font: inherit; }
+.pita:hover, .pita:focus-visible { border-color: var(--kuning); }
+.pita-nama { grid-area: nama; display: flex; gap: 6px; align-items: baseline; min-width: 0; font-size: .76rem; }
+.pita-nama b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pita-nama small { font-size: .66rem; color: var(--teks-samar); }
+.pita.berlangsung .pita-nama small { color: var(--kuning); }
+.pita-jalur { grid-area: jalur; position: relative; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .05); }
+.pita-jalur i { position: absolute; top: 0; bottom: 0; left: calc(var(--a) * 1%); width: max(3px, calc((var(--b) - var(--a)) * 1%));
+  border-radius: 4px; background: var(--kuning); opacity: .8; }
+.pita-alasan { grid-area: alasan; font-size: .7rem; color: var(--teks-redup); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g-statistik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
 .g-statistik div { font-size: .74rem; color: var(--teks-redup); }
 .g-statistik b { display: block; font: 600 15px var(--huruf-mono); color: var(--teks); }
@@ -706,7 +732,7 @@ input[aria-invalid="true"] { border-color: var(--merah); box-shadow: 0 0 0 3px v
 .exec-grid.tunggal .postur { padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; }
 .exec-grid.tunggal .postur-nilai { font-size: 26px; margin: 0; }
 .exec-grid.tunggal .postur-ringkas { font: .74rem var(--huruf-mono); color: var(--teks-redup); }
-.exec-grid.tunggal .kpis { grid-template-columns: repeat(4, 1fr); margin: 0; }
+.exec-grid.tunggal .kpis { grid-template-columns: repeat(3, 1fr); margin: 0; }
 .exec-grid.tunggal .kpi { display: flex; flex-direction: column; justify-content: center; }
 .exec-grid.tunggal .topo { min-width: 820px; }
 .edu-sebaris { display: none; }

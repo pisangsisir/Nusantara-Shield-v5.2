@@ -120,6 +120,8 @@ BEBAN_DASAR = {"target": 34.0, "goyang": 5.0, "lonjakan": 0.0}
 AMBANG = {"waspada": 60, "kritis": 85}
 PUTARAN_MS = {"aman": 4000, "waspada": 3200, "kritis": 2200}
 PANJANG_RIWAYAT = 48
+MENIT_LINIMASA = 60          # linimasa beban: 60 keranjang × 1 menit
+BENIH_LINIMASA = 5100        # benih tetap: 60 menit data latihan sebelum posko dibuka, sama di setiap layar
 JEDA_INFO_RUTIN = 12
 
 # -- parameter Threat Intelligence ---------------------------------------------
@@ -451,6 +453,13 @@ class Menara:
         self.beban = BEBAN_DASAR["target"]
         self.riwayat: deque[float] = deque(maxlen=PANJANG_RIWAYAT)
         self._detak_terakhir = self._jam()
+        self._linimasa: deque[dict] = deque(self._benih_linimasa(), maxlen=MENIT_LINIMASA)
+        self._ember: list[float] = []                  # linimasa: beban tiap detik pada menit berjalan
+        self._ember_insiden = False
+        self._ember_ai: dict[str, str] = {}             # linimasa: aset yang dinilai AI tidak wajar pada menit berjalan
+        self._posko_sejak = _iso()                      # KPI: posko aktif sejak (reset terakhir)
+        self._jumlah_insiden = 0                        # KPI: insiden sejak posko aktif
+        self._mttc_semua: list[int] = []                # KPI: semua waktu penahanan sejak posko aktif (detik)
         self._peristiwa: deque[dict] = deque(maxlen=80)
         self._antre: list[tuple[float, dict]] = []
         self._info_berikut = self._jam() + JEDA_INFO_RUTIN
@@ -581,6 +590,8 @@ class Menara:
             del self._injeksi_ai[aid]
         hasil = self._ai(layanan)
         tanda = frozenset(a for a, h in hasil.items() if h.anomali)
+        for aid in tanda:
+            self._ember_ai.setdefault(aid, hasil[aid].alasan)
         if tanda == self._tanda_ai:
             return
         for aid in sorted(tanda - self._tanda_ai):
@@ -683,6 +694,7 @@ class Menara:
                    layanan=layanan_id)
         mulai = self._jam()
         self._mulai_insiden[layanan_id] = mulai
+        self._jumlah_insiden += 1
         self._meta_insiden[layanan_id] = {"judul": judul, "nama": nama, "skenario": skenario, "mulai": _iso()}
         self._mttc.pop(layanan_id, None)
         self._ir_insiden.pop(layanan_id, None)        # insiden baru = laporan baru
@@ -757,6 +769,7 @@ class Menara:
                     and layanan_id in self._mulai_insiden:
                 detik = round(self._jam() - self._mulai_insiden[layanan_id])
                 self._mttc[layanan_id] = {"detik": detik, "metode": metode}
+                self._mttc_semua.append(detik)
                 self.catat("info", f"Waktu penahanan (MTTC) {l['nama']}: {detik} detik "
                                    f"({'otomatis lewat SOAR' if metode == 'soar' else 'manual'})",
                            layanan=layanan_id, jenis="soar")
@@ -1352,12 +1365,14 @@ class Menara:
         if n > 0:
             self._detak_terakhir += n
             p = self._parameter(layanan)
+            ada_insiden = any(l["insiden"] for l in layanan.values())
             for _ in range(min(n, PANJANG_RIWAYAT)):
                 v = self.beban + (p["target"] - self.beban) * 0.3 + self._acak.uniform(-1, 1) * p["goyang"]
                 if p["lonjakan"] and self._acak.random() < p["lonjakan"]:
                     v += 14
                 self.beban = max(2.0, min(100.0, v))
                 self.riwayat.append(round(self.beban, 1))
+                self._tampung(round(self.beban, 1), ada_insiden)
         siap = [e for t, e in self._antre if t <= sekarang]
         self._antre = [(t, e) for t, e in self._antre if t > sekarang]
         for e in siap:
@@ -1426,13 +1441,56 @@ class Menara:
     # ======================================================================
     # HIDANGAN UNTUK BROWSER
     # ======================================================================
+    def _benih_linimasa(self) -> list[dict]:
+        """60 menit DATA LATIHAN sebelum posko dibuka: beban dasar + goyang acak berbenih tetap.
+        Sengaja tanpa insiden dan tanpa anomali AI: pita hanya lahir dari kejadian di sesi ini."""
+        acak, akhir, v = random.Random(BENIH_LINIMASA), datetime.now(timezone.utc), BEBAN_DASAR["target"]
+        hasil = []
+        for i in range(MENIT_LINIMASA, 0, -1):
+            v = max(5.0, min(55.0, v + (BEBAN_DASAR["target"] - v) * 0.3 + acak.uniform(-1, 1) * BEBAN_DASAR["goyang"]))
+            hasil.append({"akhir": (akhir - timedelta(minutes=i - 1)).isoformat(timespec="seconds"),
+                          "rata": round(v, 1), "puncak": round(min(100.0, v + acak.uniform(2, 8)), 1),
+                          "asal": "latihan", "insiden": False, "ai": {}})
+        return hasil
+
+    def _tampung(self, v: float, ada_insiden: bool) -> None:
+        """Satu detik beban masuk keranjang menit berjalan; 60 detik menjadi satu titik linimasa."""
+        self._ember.append(v)
+        self._ember_insiden |= ada_insiden
+        if len(self._ember) < 60:
+            return
+        self._linimasa.append({"akhir": _iso(), "rata": round(sum(self._ember) / len(self._ember), 1),
+                               "puncak": max(self._ember), "asal": "posko",
+                               "insiden": self._ember_insiden, "ai": dict(self._ember_ai)})
+        self._ember, self._ember_insiden = [], False
+        self._ember_ai = {a: r for a, r in self._ember_ai.items() if a in self._tanda_ai}   # yang masih berlangsung
+
+    def _linimasa_tampil(self) -> dict:
+        """Linimasa 60 menit + pita anomali AI per aset. Isinya berubah sekali per menit atau saat penilaian AI
+        berubah, sehingga siaran ralat hanya mengirimnya bila memang ada yang baru."""
+        menit = list(self._linimasa)
+        slot = [m["ai"] for m in menit] + [self._ember_ai]       # indeks terakhir = menit berjalan
+        pita, buka = [], {}
+        for i, ai in enumerate(slot + [{}]):
+            for aid in [a for a in buka if a not in ai]:
+                i0 = buka.pop(aid)
+                pita.append({"aset": aid, "nama": INDEKS_SIMPUL[aid]["nama"], "alasan": slot[i - 1][aid],
+                             "dari": i0, "sampai": i - 1,
+                             "berlangsung": i - 1 == len(slot) - 1 and aid in self._tanda_ai})
+            for aid in ai:
+                buka.setdefault(aid, i)
+        return {"menit": menit, "pita": sorted(pita, key=lambda x: (x["dari"], x["aset"])),
+                "ambang": AMBANG, "posko_sejak": self._posko_sejak}
+
     def _lalu_lintas(self) -> dict:
         v = self.beban
         zona = "kritis" if v >= AMBANG["kritis"] else "waspada" if v >= AMBANG["waspada"] else "aman"
         riwayat = list(self.riwayat)
         return {"beban": round(v, 1), "zona": zona, "mbps": round(v * 10),
                 "pps": round(v * 812), "puncak": round(max(riwayat or [v])),
-                "riwayat": riwayat, "ambang": AMBANG}
+                "riwayat": riwayat, "ambang": AMBANG,
+                "berjalan": {"rata": round(sum(self._ember) / len(self._ember), 1) if self._ember else round(v, 1),
+                             "detik": len(self._ember)}}
 
     def _postur(self, tampil, status, ancaman, lalu_lintas, prediksi) -> tuple[dict, dict]:
         warna = [l["status"] for l in tampil]
@@ -1460,7 +1518,10 @@ class Menara:
                "host_terpantau": len(ASET_BERPORT), "anomali": anomali,
                "backup_patuh": patuh, "insiden_aktif": len(insiden),
                "cti_aktif": len(self.osint.aktif),
-               "risiko_tertinggi": puncak["persen"] if puncak else 0}
+               "risiko_tertinggi": puncak["persen"] if puncak else 0,
+               "insiden_sejak": self._jumlah_insiden, "posko_sejak": self._posko_sejak,
+               "mttc_rata": round(sum(self._mttc_semua) / len(self._mttc_semua)) if self._mttc_semua else None,
+               "mttc_n": len(self._mttc_semua)}
         return {"tingkat": tingkat, "ringkasan": ringkas}, kpi
 
     def _cti(self, prediksi: dict, lengkap: bool) -> dict:
@@ -1586,6 +1647,7 @@ class Menara:
             "kesiapan": self._kesiapan(layanan, prediksi),
             "deteksi": self._deteksi_tampil(prediksi),
             "peringatan": self._peringatan(layanan, prediksi),
+            "linimasa": self._linimasa_tampil(),
             "peta": self._peta(status, ancaman, kerumunan, asal_kerumunan),
             "komando": self._komando(layanan), "manajemen": MANAJEMEN, "kebijakan": KEBIJAKAN,
             "ir": self._ir[::-1], "playbook_ringkas": PLAYBOOK_RINGKAS,

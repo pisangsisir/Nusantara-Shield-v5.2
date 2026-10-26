@@ -24,6 +24,7 @@ KELOMPOK = {
     "test_paket_luring.py": "Paket pasang luring: sidik jari SHA-256, pemasangan tanpa internet",
     "test_triase_kesiapan.py": "Triase & Kesiapan Siber: penutupan peringatan beralasan, nilai A–E terbuka",
     "test_deteksi.py": "Engine Deteksi Aturan: login gagal berulang, login tembus, pemindaian port (ambang terbuka)",
+    "test_linimasa.py": "Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI MTTC dan insiden",
 }
 _berkas_terakhir = {"nama": None}
 _CONFIG = {"config": None}

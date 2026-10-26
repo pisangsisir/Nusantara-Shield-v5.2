@@ -4,6 +4,13 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–26 Oktober 2026
 
+### Linimasa 60 menit, pita anomali AI, dan KPI posko — 26 Oktober 2026 (branch `feature/timeline-ai-kpi`)
+- Panel Beban Jaringan: grafik 48 detik diganti **linimasa 60 menit** (60 titik × 1 menit, ditambah menit berjalan) berlabel **"data latihan"**. Saat posko baru dibuka, 60 menit sebelumnya diisi data latihan bangkitan berbenih tetap (batang redup, tanpa insiden dan tanpa anomali karangan); setiap 60 detik beban posko yang sebenarnya menjadi satu titik baru. Menit yang memuat insiden diberi tanda merah.
+- **Pita anomali AI per aset** di bawah linimasa: nama aset, lama anomali, alasan dari model, dan penanda "berlangsung". Pita hanya lahir dari penilaian AI di sesi ini. Klik pita untuk menyorot aset itu di topologi.
+- KPI baru: **Waktu respons (MTTC)**, yaitu rata-rata dari insiden dimulai sampai langkah penahanan selesai, dan **Insiden sejak posko aktif**. Keduanya dihitung dari kejadian yang tercatat, lalu dimulai ulang saat demo diatur ulang.
+- `tools/ukur_beban.py` (baru): pengukur beban yang dapat diulang. Alat ini menyalakan *server*, membuka N siaran SSE sungguhan, lalu mencatat waktu CPU proses *server*. Hasil untuk 300 layar di Linux 2 inti (Python 3.13), metode dan mesin sama: sebelum PR ini 1,43% (tenang) dan 1,60% (serangan); sesudahnya **1,47%** dan **1,67%**, dengan 300/300 siaran tetap hidup. Lalu lintas siaran naik dari 0,25–0,33 menjadi 0,28–0,40 MB/s karena linimasa ikut dikirim sekali per menit. Angka 2,8% di dokumen lama diukur dengan skrip yang tidak tersimpan di repositori, jadi tidak dibandingkan langsung.
+- 6 uji baru (`tests/test_linimasa.py`); 254 uji lulus.
+
 ### Engine deteksi aturan: login gagal berulang dan pemindaian port — 26 Oktober 2026 (branch `feature/deteksi-login-portscan`)
 - `app/deteksi.py` (baru): aturan deteksi **sungguhan** yang membaca peristiwa mentah sintetis (percobaan login, koneksi masuk), bukan baris log yang disuntikkan. Ambang terbuka di kode: **≥ 8 login gagal dari satu IP dalam 60 dtk** (sedang); **login berhasil ≤ 120 dtk setelah rentetan itu** (tinggi); **≥ 15 kombinasi aset:port berbeda dari satu IP dalam 10 dtk** (tinggi). Temuan aktif 300 dtk sejak peristiwa terakhir; rentetan yang berlanjut tidak menggandakan temuan.
 - Temuan menjadi sumber ketiga prediksi (`DET-…`) di samping CTI dan AI, digabung dengan noisy-OR yang sama. Dua kunci tidak berubah: deteksi hanya menaikkan aset ke WASPADA; isolasi tetap keputusan Operator. Perketat memotong sumbangannya; triase dapat menutupnya. Aset yang sedang ditangani *playbook* insiden tidak dinilai ulang dan diberi label jujur "Aset ditangani lewat playbook insiden".

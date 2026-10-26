@@ -18,7 +18,7 @@
 
 > **Serangan siber tidak menunggu rapat staf.** _Ransomware_ mengenkripsi satu _server_ per menit, sementara posko siber masih memilah ratusan peringatan, menunggu izin berjenjang, dan menyusun laporan dengan tangan. Saat jaringan akhirnya diputus atau dipulihkan, jejak penyerang sering sudah terhapus.
 
-**Nusantara Shield** adalah **Perwira Staf Siber Digital** bagi posko satuan: menjaga **jaringan perkantoran (IT)** dan **sistem kendali fasilitas (OT)** dalam satu layar. Ia mengamati tanpa henti, mencocokkan setiap kabar ancaman dengan aset milik satuan sendiri, dan menyajikan langkah penindakan yang sudah dibakukan dalam doktrin. **Keputusan tetap di tangan manusia.** Begitu operator menahan tombol, sistem mengeksekusi dalam urutan baku:
+**Nusantara Shield** adalah **sistem pendukung keputusan (SPK)** bagi posko satuan, ibarat **Perwira Staf Siber Digital**: menjaga **jaringan perkantoran (IT)** dan **sistem kendali fasilitas (OT)** dalam satu layar. Ia mengamati tanpa henti, mencocokkan setiap kabar ancaman dengan aset milik satuan sendiri, dan menyajikan langkah penindakan yang sudah dibakukan dalam doktrin. **Keputusan tetap di tangan manusia.** Begitu operator menahan tombol, sistem mengeksekusi dalam urutan baku:
 
 Nusantara Shield bekerja dalam **dua lapis**:
 
@@ -268,14 +268,28 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 | Prinsip | Penerapan di Nusantara Shield |
 | --- | --- |
 | **_Human-in-the-loop_** — komandan memegang keputusan | Tidak ada tindakan pemutusan tanpa operator menahan tombol. Pemulihan terkunci sampai syaratnya terpenuhi. Pengecualian darurat wajib beralasan tertulis. |
+| **Sistem pendukung keputusan, bukan pengganti keputusan** | Sengaja **tidak** otonom penuh. Di jaringan vital, respons otomatis penuh membuka tiga risiko: peringatan keliru yang memutus layanan sendiri, respons yang dapat dipancing pihak luar, dan pemutusan tanpa pejabat yang bertanggung jawab. Kecepatan tetap terjaga: isolasi praotorisasi cukup ditahan 0,6 detik, dan pemutusan selesai ±1,2 detik dengan bukti disegel lebih dulu. |
 | **Mode Berdaulat** — tanpa ketergantungan pihak luar | Berjalan **luring penuh**: tanpa Content Delivery Network (CDN), fon, atau layanan awan. Cocok untuk **jaringan tertutup** satuan. Data latihan sintetis (RFC 5737). |
 | **Doktrin forensik** — *chain of custody* | Bukti diamankan **sebelum** isolasi. Berita acara berantai HMAC. Sidik jari SHA-256 **dicocokkan ulang sebelum pemulihan**; bila tidak cocok, pemulihan dikunci. |
 | **Kecepatan OODA** — bertindak lebih cepat dari lawan | Peringatan dini sebelum serangan; bukti + isolasi ±1,2 detik dari keputusan |
 | **AI tepat guna** — deteksi tanpa _signature_ | _Isolation Forest_ lokal menilai lalu lintas dalam milidetik, menjelaskan alasannya, dan hanya menaikkan status; keputusan memutus tetap di tangan operator (_human-in-the-loop_). Dikunci 10 uji khusus AI. |
 | **Pertanggungjawaban komando** | Setiap keputusan (siapa, apa, kapan, alasan) tercatat di dua buku HMAC. LAPSIT terkirim otomatis ke pimpinan. |
 | **Pemisahan wewenang** | Peran **Pengamat** (melihat) dan **Operator** (bertindak). Akun operator hanya lewat kode undangan atau dibuat operator lain. |
+| **Posko yang dijaga berlapis** | Alat yang memegang tombol isolasi harus paling terlindungi. Kata sandi disimpan dengan PBKDF2-SHA256 (200.000 putaran), sesi memakai token acak yang kedaluwarsa, _login_ dibatasi 5 percobaan per menit, kiriman dibatasi 16 KB, dan antarmuka dikunci kebijakan keamanan konten (_Content Security Policy_, CSP). Dikunci uji keamanan; rincian dan batasnya di Dokumentasi Teknis §2.7. |
+| **Selaras NIST CSF 2.0** | Fitur dipetakan ke enam fungsi _Cybersecurity Framework_ (CSF) 2.0 (tabel di bawah). Pemetaan mandiri oleh tim, bukan sertifikasi. |
 | **Sinergi IT/OT** | Aset rumah sakit (SIMRS) dan aset kendali (**pengendali genset**, Modbus/TCP _port_ 502) berada dalam satu inventaris dan satu layar. Kabar ancaman protokol industri langsung dikorelasikan, dan skenario **Sabotase OT** memutus jalur kantor → zona kendali ±1,2 detik setelah bukti aman. Dikunci 6 uji khusus OT. |
 | **Bahasa satuan** | Seluruh label (jabatan penerima laporan, nama satuan) diatur dari **satu kamus istilah**, tanpa mengubah logika |
+
+**Pemetaan ke NIST _Cybersecurity Framework_ (CSF) 2.0.** Kerangka ini lazim dipakai untuk menilai kelengkapan program keamanan siber. Keenam fungsinya sudah diisi fitur yang berjalan; rincian per kategori beserta uji yang membuktikannya ada di Dokumentasi Teknis §2.6.
+
+| Fungsi CSF 2.0 | Sudah berjalan di Nusantara Shield | Masih peta jalan |
+| --- | --- | --- |
+| **_Govern_** (tata kelola) | Dua peran dan dua kunci konfirmasi; Nilai Kesiapan Siber A–E untuk Dansat | — |
+| **_Identify_** (kenali) | Inventaris aset IT dan OT; korelasi kabar ancaman × aset; peluang serangan per aset | Inventaris dari sistem satuan yang sebenarnya |
+| **_Protect_** (lindungi) | Perketat (simulasi pengerasan); kepatuhan backup < 24 jam dan uji pulih; akses posko berlapis | Pengerasan langsung di perangkat nyata |
+| **_Detect_** (deteksi) | AI lokal (_Isolation Forest_); radar anomali; triase peringatan | Sensor nyata; pemantauan peristiwa identitas (_login_, perubahan hak akses) |
+| **_Respond_** (tanggapi) | Bukti dulu → isolasi ±1,2 detik → LAPSIT; isolasi darurat beralasan | Pengiriman LAPSIT berjenjang otomatis ke Sansidam dan Kartika CSIRT |
+| **_Recover_** (pulihkan) | Pemulihan terkunci sampai sidik jari bukti cocok ulang | — |
 
 <div class="ilustrasi" id="ilustrasi-ooda" style="max-width:62%;margin-left:auto;margin-right:auto">
 <svg viewBox="0 0 720 400" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Siklus OODA Nusantara Shield: Amati, Orientasi, Putuskan, Bertindak, berulang terus" style="font-family:Inter,'Segoe UI','DejaVu Sans',Arial,sans-serif">
@@ -378,6 +392,8 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
     - telemetri nyata dari sensor dan SIEM satuan (Wazuh, Suricata, Zeek) serta sensor protokol industri Modbus/DNP3;
     - sambungan _webhook_ terautentikasi ke sakelar terkelola sungguhan;
     - pertukaran CTI dengan Badan Siber dan Sandi Negara (BSSN) dan Kartika Computer Security Incident Response Team (CSIRT) lewat Malware Information Sharing Platform (MISP) atau OpenCTI (STIX/TAXII), menggantikan rancangan Mode Hybrid;
+    - pemantauan peristiwa identitas (_login_, perubahan hak akses, akun baru di luar jam kerja) dari Active Directory atau SIEM satuan, karena purwarupa belum memantau lapisan identitas;
+    - saat tersambung ke perangkat nyata: brankas kredensial, hak minimum per _playbook_, _playbook_ bertanda tangan digital, dan persetujuan dua orang untuk mengubah _playbook_;
     - akuisisi bukti nyata (misalnya Velociraptor), penerusan kasus ke _case management_ (TheHive), dan pemetaan _alert_ ke MITRE ATT&CK;
     - AI: ciri lalu lintas nyata dari sensor satuan untuk Engine Deteksi Anomali, dan Engine Asisten Narasi (Llama 3 8B lewat Ollama) untuk draf LAPSIT, dengan _human-in-the-loop_;
     - paket pemasangan luring siap pakai, SSO instansi dengan verifikasi dua langkah, dan operasi multiproses.
@@ -405,8 +421,8 @@ Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar 
 | Isolasi dengan tombol yang ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal Llama 3 8B lewat Ollama untuk draf LAPSIT |
 | Rantai bukti HMAC-SHA256 | Umpan indikator resmi (BSSN/MISP) lewat gerbang satu arah |
 | Korelasi CTI dan Engine Deteksi Anomali (_Isolation Forest_, luring) | Sensor nyata (Wazuh, Suricata, Zeek) dan sakelar terkelola sungguhan |
-| Simulasi OT genset (Modbus, _port_ 502) | |
-| Pembuatan LAPSIT dan ekspor PDF | |
+| Simulasi OT genset (Modbus, _port_ 502) | Pemantauan peristiwa identitas (_login_, perubahan hak akses di Active Directory) |
+| Pembuatan LAPSIT dan ekspor PDF | Pengamanan integrasi nyata: brankas kredensial, hak minimum per _playbook_, _playbook_ bertanda tangan |
 | Paket pasang luring bersidik jari SHA-256 (tanpa internet sama sekali) | |
 | Nilai Kesiapan Siber A–E (dua sub-skor: Kerawanan dan Insiden) dan triase peringatan: Selesai ditangani atau Positif Palsu (_False Positive_), beralasan dan tercatat di Buku Rantai Bukti | |
 
@@ -430,6 +446,7 @@ Sesuai pasal 5.4, berikut pustaka dan alat pihak ketiga yang digunakan:
 | **pytest** dan **HTTPX** | Uji otomatis | MIT dan BSD-3-Clause |
 | **Mermaid** dan **Playwright (Chromium)** | Hanya untuk menggambar diagram dan mencetak dokumen ini; tidak dipakai aplikasi | MIT, Apache-2.0, dan BSD-3-Clause |
 | **scikit-learn** dan **NumPy** | Engine Deteksi Anomali (_Isolation Forest_), berjalan lokal | BSD-3-Clause |
+| **Lucide** (v0.460.0) | Ikon pada poster, disematkan sebagai SVG sebaris; tidak dipakai aplikasi | ISC |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi | Layanan komersial |
 | **Blok alamat Internet Protocol (IP) Request for Comments (RFC) 5737** | Data latihan sintetis | Standar terbuka IETF |
 
@@ -439,6 +456,7 @@ Sesuai pasal 5.4, berikut pustaka dan alat pihak ketiga yang digunakan:
 - Peraturan Presiden Nomor 82 Tahun 2022 tentang Pelindungan Infrastruktur Informasi Vital.
 - National Institute of Standards and Technology (NIST) SP 800-82, panduan keamanan sistem kendali industri (OT).
 - International Organization for Standardization/International Electrotechnical Commission (ISO/IEC) 27037:2012, pedoman identifikasi, pengumpulan, akuisisi, dan pelestarian bukti digital. Alur "bukti dulu, baru putus" dan buku berantai HMAC disusun **mengikuti prinsipnya**; purwarupa belum diaudit terhadap standar ini.
+- National Institute of Standards and Technology (2024). _The NIST Cybersecurity Framework (CSF) 2.0_ (NIST CSWP 29). Enam fungsi dan kategorinya dipakai untuk **memetakan** fitur (Dokumentasi Teknis §2.6); pemetaan dilakukan tim sendiri, bukan sertifikasi.
 
 ---
 
@@ -460,7 +478,9 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **CDN** | _Content Delivery Network_ | Layanan luar untuk memuat huruf atau skrip situs web. Nusantara Shield tidak memakainya. |
 | **CDOC** | Cyber Defense Operation Center | Pusat operasi pertahanan siber di tingkat satuan. |
 | **CPU** | Central Processing Unit | Otak komputer; persentasenya menunjukkan seberapa sibuk _server_. |
+| **CSF 2.0** | _Cybersecurity Framework_ 2.0 (NIST) | Kerangka keamanan siber dengan enam fungsi: _Govern_, _Identify_, _Protect_, _Detect_, _Respond_, dan _Recover_. |
 | **CSIRT** | _Computer Security Incident Response Team_ | Tim tanggap insiden siber. Kartika CSIRT adalah milik TNI AD. |
+| **CSP** | _Content Security Policy_ (kebijakan keamanan konten) | Aturan yang hanya mengizinkan skrip dan gaya milik aplikasi sendiri berjalan di layar. |
 | **CTI** | _Cyber Threat Intelligence_ (intelijen ancaman siber) | Kabar dari luar tentang ancaman yang sedang beredar, misalnya celah baru pada suatu perangkat. |
 | **Dansat** | Komandan Satuan | Pimpinan unit; di sistem ini berperan sebagai pengamat yang menerima laporan. |
 | **Deteksi anomali** | Pengenalan perilaku tidak wajar | Menandai lalu lintas yang menyimpang dari kebiasaan, tanpa perlu daftar serangan yang sudah dikenal. |
@@ -491,12 +511,13 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **MISP** | Malware Information Sharing Platform | Platform berbagi kabar ancaman antarlembaga. |
 | **ML** | Machine Learning | Cara komputer belajar pola dari contoh data. |
 | **Modbus** | Bahasa komunikasi mesin industri | Protokol untuk memerintah mesin seperti genset; memakai _port_ 502. |
-| **NIST** | National Institute of Standards and Technology | Lembaga standar Amerika Serikat; SP 800-82 adalah panduan keamanan sistem industri. |
+| **NIST** | National Institute of Standards and Technology | Lembaga standar Amerika Serikat; SP 800-82 adalah panduan keamanan sistem industri, dan CSF 2.0 adalah kerangka keamanan siber umumnya. |
 | **_On-premise_** | Terpasang di tempat sendiri | Dipasang di perangkat milik satuan, bukan disewa dari layanan awan. |
 | **OODA** | _Observe–Orient–Decide–Act_ | Siklus keputusan: Amati, Orientasi, Putuskan, Bertindak. Siapa yang lebih cepat, dia unggul. |
 | **Operator** | Petugas jaga sistem | Satu-satunya peran yang boleh menekan tombol tindakan. |
 | **OSINT** | Open Source Intelligence | Intelijen dari sumber terbuka, misalnya berita dan buletin keamanan. |
 | **OT** | _Operational Technology_ (teknologi operasional) | Perangkat yang mengendalikan mesin fisik, seperti genset dan catu daya rumah sakit. |
+| **PBKDF2** | _Password-Based Key Derivation Function 2_ | Cara menyimpan kata sandi dengan hitungan berulang, sehingga sulit ditebak bila berkasnya bocor. |
 | **PDNS** | Pusat Data Nasional Sementara | Pusat data pemerintah yang lumpuh diserang _ransomware_ pada Juni 2024. |
 | **Perketat** | Pengerasan (_hardening_) | Tombol untuk mengurangi celah sebuah aset sebelum diserang. |
 | **_Playbook_** | Buku panduan langkah | Urutan tindakan baku untuk setiap jenis insiden. |
@@ -510,6 +531,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **Satuan** | Unit organisasi militer | Misalnya rumah sakit TNI AD beserta personelnya. |
 | **SOAR** | _Security Orchestration, Automation and Response_ | Otomasi langkah respons keamanan, misalnya pemutusan jalur yang sudah disetujui. |
 | **_Server_** | Komputer pelayan | Komputer yang melayani komputer lain; di sini tempat Nusantara Shield berjalan. |
+| **SPK** | Sistem pendukung keputusan | Sistem yang menyiapkan informasi dan pilihan tindakan; keputusan akhir tetap di tangan manusia. |
 | **SSE** | _Server-Sent Events_ | Cara _server_ mengirim kabar terbaru ke layar secara langsung. |
 | **SEV-1** | _Severity 1_ (tingkat keparahan tertinggi) | Label untuk insiden paling gawat. |
 | **SIMRS** | Sistem Informasi Manajemen Rumah Sakit | Sistem komputer rekam medis dan layanan pasien. |

@@ -4,6 +4,14 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–26 Oktober 2026
 
+### Sistem pendukung keputusan, NIST CSF 2.0, dan keamanan posko — 26 Oktober 2026 (branch `docs/spk-nist-keamanan-posko`)
+- Pembingkaian **sistem pendukung keputusan (SPK)** di Proposal, Dokumentasi Teknis, dek, dan Panduan: mesin mempercepat, manusia memutuskan. Alasan sengaja **tidak** otonom penuh dituliskan: peringatan keliru yang memutus layanan sendiri, respons yang dapat dipancing pihak luar, dan pemutusan tanpa pejabat yang bertanggung jawab.
+- Dokumentasi Teknis §2.6: pemetaan fitur ke **NIST CSF 2.0** (CSWP 29) per kategori, dengan status (berjalan, simulasi, peta jalan) dan berkas uji yang membuktikannya. Pemetaan mandiri, bukan sertifikasi.
+- Dokumentasi Teknis §2.7: **keamanan posko itu sendiri**, berupa tabel ancaman → pengamanan → uji, beserta batasnya (HTTPS lewat *proxy* balik, sesi di memori, belum ada verifikasi dua langkah, belum ada uji penetrasi independen, syarat saat tersambung ke perangkat nyata).
+- Peta jalan: pemantauan peristiwa identitas (Active Directory) dan pengamanan integrasi nyata (brankas kredensial, hak minimum per *playbook*, *playbook* bertanda tangan, persetujuan dua orang).
+- `docs/poster/`: poster satu halaman A4 (HTML, PDF, PNG); setiap butir berlabel BERJALAN, SIMULASI, atau PETA JALAN. Bendera Merah Putih, ikon Lucide (ISC) sebagai SVG sebaris pada metrik, alur, enam fungsi CSF, dan jenis aset, ilustrasi jaringan abstrak, baris format laporan siap lapor (bahan pelaporan ke BSSN dan UU PDP; belum diaudit kepatuhan), dan peta jalan "Integrasi Direktori Aktif (IAM) & Pemantauan Login". Sumber dan pembangkitnya di `docs/poster/sumber/`.
+- Tanpa perubahan kode aplikasi; 224 uji lulus.
+
 ### Perbaikan uji paket lintas-OS — 26 Oktober 2026 (branch `fix/uji-paket-lintas-os`)
 - `test_kebutuhan_lintas_sistem_operasi_disesuaikan_target` kini memakai `requirements.txt` contohnya sendiri. Sebelumnya uji membaca berkas di folder tempat ia dijalankan, sehingga **gagal di dalam paket luring lintas-OS** (misalnya paket Mac yang dibuat di Linux), karena di sana `uvicorn[standard]` memang sengaja diganti `uvicorn` polos. Ditemukan saat paket Mac dipasang langsung di Mac.
 - Zip dibangun dari salinan kerja yang izin berkasnya sudah dinormalkan (644/755). Sebelumnya 9 berkas berizin baca-saja (444) ikut terbawa ke zip; di Mac (`ditto`/Finder) izin itu dipertahankan dan membuat satu uji gagal menulis `requirements.txt`.

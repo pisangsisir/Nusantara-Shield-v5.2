@@ -389,6 +389,8 @@ dibatasi lajunya dan dicatat di log audit.
 
 Batas yang perlu diketahui: *server* berjalan sebagai **satu proses** (Hub siaran ada di memori proses itu).
 
+Model ancaman terhadap posko itu sendiri beserta batasnya ada di Dokumentasi Teknis §2.7, dan pemetaan fitur ke NIST Cybersecurity Framework (CSF) 2.0 di §2.6.
+
 ---
 
 ## 9. Struktur berkas

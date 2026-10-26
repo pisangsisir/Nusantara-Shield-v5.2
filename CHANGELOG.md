@@ -4,6 +4,15 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–26 Oktober 2026
 
+### Dokumentasi akhir: tiga kata kerja, deteksi, linimasa, angka terukur ulang — 26 Oktober 2026 (branch `docs/deteksi-linimasa-tiga-kata-kerja`)
+- Paragraf pembuka Proposal, Dokumentasi Teknis, README, dek, poster, dan Panduan kini menempatkan Nusantara Shield sebagai perisai pertahanan (*Defensive Shield*) dengan tiga kata kerja: **mendeteksi**, **mencegah**, dan **membantu merespons**. Respons ditulis "otomatis setelah satu keputusan Operator", dengan catatan bahwa perintah ke perangkat masih simulasi.
+- Engine Deteksi Aturan didokumentasikan dengan ambang yang dikunci uji (8 gagal/60 dtk, tembus ≤ 120 dtk, 15 kombinasi/10 dtk, aktif 300 dtk), di Dokumentasi Teknis §2.8 yang baru dan Panduan Bab 7. Ikut didokumentasikan: linimasa 60 menit berlabel data latihan, pita anomali AI, serta KPI MTTC dan insiden.
+- Jumlah uji 224 → **254** di semua dokumen; cuplikan terminal dari keluaran asli (`254 passed in 33.82s`).
+- CPU: angka versi akhir **±1,5% siaga, ±1,7% serangan** untuk 300 layar (`tools/ukur_beban.py`, Linux 2 inti). Angka 10,8% → 2,8% tetap dicatat sebagai riwayat optimasi siaran ralat (17 Okt), dengan keterangan bahwa alat dan mesinnya berbeda, sehingga tidak dibandingkan langsung.
+- NIST CSF: DE.CM dan DE.AE kini memuat aturan deteksi; peristiwa identitas nyata dari Active Directory tetap peta jalan.
+- Peta jalan baru: **respons bertingkat menurut kritikalitas aset**. Aset vital tetap dua kunci; *endpoint* kantor berisiko rendah dapat diisolasi otomatis dengan *playbook* praotorisasi.
+- Poster dan PDF Panduan dibangun ulang; tanpa perubahan kode aplikasi.
+
 ### Linimasa 60 menit, pita anomali AI, dan KPI posko — 26 Oktober 2026 (branch `feature/timeline-ai-kpi`)
 - Panel Beban Jaringan: grafik 48 detik diganti **linimasa 60 menit** (60 titik × 1 menit, ditambah menit berjalan) berlabel **"data latihan"**. Saat posko baru dibuka, 60 menit sebelumnya diisi data latihan bangkitan berbenih tetap (batang redup, tanpa insiden dan tanpa anomali karangan); setiap 60 detik beban posko yang sebenarnya menjadi satu titik baru. Menit yang memuat insiden diberi tanda merah.
 - **Pita anomali AI per aset** di bawah linimasa: nama aset, lama anomali, alasan dari model, dan penanda "berlangsung". Pita hanya lahir dari penilaian AI di sesi ini. Klik pita untuk menyorot aset itu di topologi.

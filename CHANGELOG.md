@@ -4,6 +4,9 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–26 Oktober 2026
 
+### Susunan tim di Proposal — 26 Oktober 2026 (branch `docs/nama-tim`)
+- Baris **Tim** di Proposal diisi: Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah (sebelumnya masih *placeholder*).
+
 ### Tata letak penuh: tanpa ruang kosong di monitor posko — 26 Oktober 2026 (branch `feature/tata-letak-penuh`)
 - **Baris Radar | Aset | Beban disamakan tingginya.** Ruang kosong di dalam panel turun dari ±300–580 px menjadi 1 px (diukur di 1440, 1920, dan 2880 px). Ruang lebih dipakai isi: kartu aset merata, dan linimasa 60 menit membesar dengan garis ambang waspada/kritis yang diambil dari *server*.
 - **Peringatan terbaru menjadi tabel lebar penuh**: keparahan, peringatan, aset, status, waktu, satu baris per peringatan. Di ponsel, tabel berubah menjadi kartu bertumpuk.

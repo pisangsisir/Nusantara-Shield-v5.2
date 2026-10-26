@@ -6,7 +6,7 @@
 | --- | --- |
 | **Kompetisi** | Kartika Cyber Hackathon 2026 · Pusat Siber Angkatan Darat (Pussiberad) × CODEPOLITAN |
 | **Kategori** | 02 · **Penangkalan (_Defensive Shield_)** — *Threat Intelligence Platform* dan *Automated Incident Response* |
-| **Tim** | [Nama tim] · Muhammad Isa Ananta · [Nama anggota 2] · [Nama anggota 3] |
+| **Tim** | Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah |
 | **Status purwarupa** | **Berfungsi penuh** · 254 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
 | **Tanggal** | 26 Oktober 2026 |
 

@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Poster Nusantara Shield</title>
-<!-- Poster satu halaman A4. Setiap butir diberi label BERJALAN (sudah ada di purwarupa) atau PETA JALAN (belum dibangun).
-     Tanpa CDN, fon, atau gambar eksternal; cetak ke PDF dari Chrome: Cetak → Simpan sebagai PDF, kertas A4, margin Tidak ada, centang Grafis latar. -->
+<!-- Poster satu halaman A4. Setiap butir berlabel BERJALAN (ada di purwarupa), SIMULASI (alur nyata, perangkat tiruan),
+     atau PETA JALAN (belum dibangun). Semua ikon, bendera, dan ilustrasi berupa SVG sebaris: tanpa CDN, fon, atau gambar luar.
+     Ikon: Lucide v0.460.0 (lisensi ISC). Cetak ke PDF dari Chrome: Cetak → Simpan sebagai PDF, kertas A4, margin Tidak ada,
+     centang Grafis latar. Berkas ini dibangkitkan; ubah templatnya, bukan hasilnya. -->
 <style>
 :root {
   --latar: #0a1120; --permukaan: #101a2d; --permukaan-2: #14213a; --garis: #1f2d47;
@@ -13,7 +15,7 @@
   --neon: #3ef0a1; --neon-lembut: rgba(62, 240, 161, .12); --neon-garis: rgba(62, 240, 161, .4);
   --kuning: #f2c14e; --kuning-lembut: rgba(242, 193, 78, .12);
   --merah: #ff5c74; --merah-lembut: rgba(255, 92, 116, .12);
-  --biru: #7aa2d6; --biru-lembut: rgba(122, 162, 214, .12);
+  --biru: #7aa2d6; --biru-lembut: rgba(122, 162, 214, .14);
   --huruf: Inter, "Segoe UI", "DejaVu Sans", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 }
@@ -21,22 +23,42 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--latar); }
 body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-.halaman { width: 210mm; height: 297mm; margin: 0 auto; padding: 11mm 11mm 9mm; display: flex; flex-direction: column; gap: 6.2mm; overflow: hidden; position: relative; }
-.mono { font-family: var(--mono); }
+.halaman { width: 210mm; height: 297mm; margin: 0 auto; padding: 10mm 11mm 8mm; display: flex; flex-direction: column;
+  justify-content: space-between; overflow: hidden; position: relative; isolation: isolate;
+  background: radial-gradient(120mm 80mm at 100% 0%, rgba(62, 240, 161, .07), transparent 70%), var(--latar); }
+.ik { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.14em; }
+
+/* Ilustrasi jaringan abstrak (latar) */
+.jaringan { position: absolute; z-index: -1; pointer-events: none; }
+.jaringan line { stroke: var(--neon); stroke-opacity: .14; stroke-width: 1; }
+.jaringan line.tebal { stroke-opacity: .22; stroke-dasharray: 3 4; }
+.jaringan circle { fill: var(--neon); fill-opacity: .35; }
+.jaringan circle.hub { fill-opacity: .55; }
+.jaringan circle.kuning { fill: var(--kuning); fill-opacity: .55; }
+.jaringan circle.merah { fill: var(--merah); fill-opacity: .55; }
+.jaringan.atas { right: 0; top: 0; width: 430px; height: 250px; opacity: .5; }
+.jaringan.bawah { left: 7mm; bottom: 11mm; width: 780px; height: 70px; opacity: .55; }
 
 /* Kepala */
 .kepala { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .merek { display: flex; align-items: center; gap: 10px; }
-.merek svg { width: 40px; height: 40px; }
-.merek b { display: block; font: 800 20px/1 var(--huruf); letter-spacing: .5px; }
-.merek span { font: 600 9px var(--mono); letter-spacing: 1.4px; color: var(--samar); text-transform: uppercase; }
-.lomba { text-align: right; font: 600 9px/1.5 var(--mono); letter-spacing: .8px; color: var(--redup); text-transform: uppercase; }
+.merek .logo { width: 42px; height: 42px; }
+.merek b { display: block; font: 800 21px/1 var(--huruf); letter-spacing: .5px; }
+.merek span { font: 600 8.6px var(--mono); letter-spacing: 1.4px; color: var(--samar); text-transform: uppercase; }
+.kanan { display: flex; align-items: center; gap: 10px; text-align: right; }
+.bendera { width: 34px; height: 23px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 2px 8px rgba(0, 0, 0, .4); overflow: hidden; display: block; }
+.lomba { font: 600 8.6px/1.55 var(--mono); letter-spacing: .8px; color: var(--redup); text-transform: uppercase; }
 .lomba b { color: var(--neon); }
+.lomba .bangsa { color: #fff; }
 
-.judul h1 { margin: 0; font: 800 27px/1.12 var(--huruf); letter-spacing: -.3px; }
+.judul h1 { margin: 0; font: 800 24px/1.14 var(--huruf); letter-spacing: -.3px; max-width: 182mm; text-shadow: 0 0 12px var(--latar), 0 0 4px var(--latar); }
 .judul h1 em { font-style: normal; color: var(--neon); }
-.judul p { margin: 5px 0 0; font-size: 12.5px; color: var(--redup); max-width: 175mm; }
+.judul p { margin: 5px 0 0; font-size: 12px; color: var(--redup); max-width: 170mm; }
 .judul p b { color: var(--teks); }
+.aset { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 7px; font: 600 8.4px var(--mono); color: var(--samar); letter-spacing: .5px; }
+.aset span.chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; background: var(--permukaan); border: 1px solid var(--garis); color: var(--teks); font: 600 9px var(--huruf); letter-spacing: 0; }
+.aset span.chip .ik { font-size: 11px; color: var(--biru); }
+.aset span.chip.ot .ik { color: var(--kuning); }
 
 /* Legenda status */
 .legenda { display: flex; gap: 6px; align-items: center; font: 8.6px var(--huruf); color: var(--samar); white-space: nowrap; }
@@ -49,35 +71,46 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
 
 /* Angka */
 .angka { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
-.angka div { background: var(--permukaan); border: 1px solid var(--garis); border-radius: 8px; padding: 7px 10px; }
-.angka b { display: block; font: 800 21px/1.1 var(--mono); color: var(--neon); }
-.angka span { font-size: 9px; color: var(--redup); }
+.angka > div { background: var(--permukaan); border: 1px solid var(--garis); border-radius: 9px; padding: 8px 10px; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; }
+.angka .bulat { grid-row: span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--neon-lembut); border: 1px solid var(--neon-garis); color: var(--neon); font-size: 15px; }
+.angka b { font: 800 20px/1.1 var(--mono); color: var(--neon); white-space: nowrap; }
+.angka span { grid-column: 1 / -1; margin-top: 5px; font-size: 9px; color: var(--redup); }
 
 /* Alur */
-.kotak { background: var(--permukaan); border: 1px solid var(--garis); border-radius: 10px; padding: 9px 11px; }
-.label { font: 700 9px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--neon); margin: 0 0 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.kotak { background: rgba(16, 26, 45, .92); border: 1px solid var(--garis); border-radius: 10px; padding: 9px 11px; }
+.label { font: 700 9px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--neon); margin: 0 0 7px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.label .kiri { display: inline-flex; align-items: center; gap: 6px; }
+.label .kiri .ik { font-size: 12px; }
 .label small { font: 600 8px var(--mono); letter-spacing: .4px; text-transform: none; color: var(--samar); }
 .alur { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; align-items: stretch; }
 .langkah { position: relative; background: var(--permukaan-2); border: 1px solid var(--garis); border-top: 3px solid var(--warna, var(--neon)); border-radius: 6px; padding: 6px 6px 5px; }
+.langkah .ikon-langkah { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; margin-bottom: 4px; color: var(--warna, var(--neon)); background: color-mix(in srgb, var(--warna, var(--neon)) 14%, transparent); font-size: 14px; }
 .langkah b { display: block; font: 800 9.5px/1.2 var(--huruf); letter-spacing: .3px; text-transform: uppercase; color: var(--warna, var(--neon)); }
-.langkah span { display: block; font-size: 8.4px; line-height: 1.35; color: var(--teks); margin-top: 2px; }
-.langkah .panah { position: absolute; right: -6px; top: 50%; transform: translateY(-50%); color: var(--samar); font: 700 10px var(--mono); font-style: normal; z-index: 1; }
+.langkah span { display: block; font-size: 8.3px; line-height: 1.35; color: var(--teks); margin-top: 2px; }
 .langkah span i { font-style: italic; }
+.langkah .panah { position: absolute; right: -6px; top: 18px; color: var(--samar); font: 700 10px var(--mono); font-style: normal; z-index: 1; }
+.lapor { display: flex; align-items: center; gap: 8px; margin-top: 5px; padding: 5px 9px; border-radius: 6px; font-size: 8.8px; background: var(--kuning-lembut); border: 1px solid rgba(242, 193, 78, .35); }
+.lapor .ik { font-size: 13px; color: var(--kuning); }
+.lapor b { color: var(--kuning); }
+.lapor em { color: var(--samar); font-style: normal; }
 .kunci-dua { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 5px; }
-.kunci-dua div { font-size: 8.6px; padding: 5px 8px; border-radius: 6px; background: var(--latar); border: 1px solid var(--garis); }
+.kunci-dua div { display: flex; gap: 7px; align-items: center; font-size: 8.6px; padding: 5px 8px; border-radius: 6px; background: var(--latar); border: 1px solid var(--garis); }
+.kunci-dua .ik { font-size: 15px; }
 .kunci-dua b { font: 700 8.6px var(--mono); }
-.pemisah { grid-column: span 7; display: flex; align-items: center; gap: 6px; font: 700 8px var(--mono); letter-spacing: 1px; color: var(--merah); margin: 1px 0; }
-.pemisah::before, .pemisah::after { content: ""; flex: 1; border-top: 1px dashed rgba(255, 92, 116, .45); }
 
 /* NIST CSF */
 .csf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
-.fungsi { background: var(--permukaan); border: 1px solid var(--garis); border-radius: 9px; padding: 8px 10px; }
-.fungsi h3 { margin: 0 0 1px; font: 800 12.5px/1.2 var(--huruf); display: flex; justify-content: space-between; align-items: baseline; }
-.fungsi h3 small { font: 700 8.5px var(--mono); color: var(--samar); letter-spacing: .5px; }
-.fungsi > p { margin: 0 0 5px; font-size: 8.6px; color: var(--samar); }
+.fungsi { background: rgba(16, 26, 45, .92); border: 1px solid var(--garis); border-radius: 9px; padding: 8px 10px; }
+.fungsi .kepala-fungsi { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; margin-bottom: 5px; }
+.fungsi .ikon-fungsi { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-size: 15px; color: var(--neon); background: var(--neon-lembut); border: 1px solid var(--neon-garis); }
+.fungsi h3 { margin: 0; font: 800 12.5px/1.15 var(--huruf); }
+.fungsi h3 + p { margin: 1px 0 0; font-size: 8.4px; color: var(--samar); }
+.fungsi .kode { font: 700 8.5px var(--mono); color: var(--samar); letter-spacing: .5px; align-self: start; }
 .fungsi ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3.5px; }
 .fungsi li { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: start; font-size: 9px; line-height: 1.32; }
 .fungsi li.rencana { color: var(--samar); }
+.fungsi li.tajam { color: var(--teks); }
+.fungsi li.tajam b { color: #fff; }
 
 /* Bawah */
 .bawah { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3mm; }
@@ -85,16 +118,19 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
 .bawah li::marker { color: var(--neon); }
 .bawah .jujur li::marker { color: var(--samar); }
 .bawah .jujur li { color: var(--redup); }
-.kaki { margin-top: auto; display: flex; justify-content: space-between; gap: 10px; font: 600 7.8px/1.45 var(--mono); color: var(--samar); letter-spacing: .4px; border-top: 1px solid var(--garis); padding-top: 5px; }
+.kaki { display: flex; justify-content: space-between; gap: 10px; font: 600 7.8px/1.45 var(--mono); color: var(--samar); letter-spacing: .4px; border-top: 1px solid var(--garis); padding-top: 5px; background: var(--latar); }
 .kaki b { color: var(--redup); }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><!-- Ikon: Lucide v0.460.0 (lisensi ISC), disematkan agar luring --><symbol id="i-badge-check" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /> <path d="m9 12 2 2 4-4" /></symbol><symbol id="i-code-xml" viewBox="0 0 24 24"><path d="m18 16 4-4-4-4" /> <path d="m6 8-4 4 4 4" /> <path d="m14.5 4-5 16" /></symbol><symbol id="i-cpu" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2" /> <rect width="6" height="6" x="9" y="9" rx="1" /> <path d="M15 2v2" /> <path d="M15 20v2" /> <path d="M2 15h2" /> <path d="M2 9h2" /> <path d="M20 15h2" /> <path d="M20 9h2" /> <path d="M9 2v2" /> <path d="M9 20v2" /></symbol><symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" /> <path d="M3 5V19A9 3 0 0 0 21 19V5" /> <path d="M3 12A9 3 0 0 0 21 12" /></symbol><symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></symbol><symbol id="i-file-check" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="m9 15 2 2 4-4" /></symbol><symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /> <path d="M14 2v4a2 2 0 0 0 2 2h4" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></symbol><symbol id="i-fingerprint" viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" /> <path d="M14 13.12c0 2.38 0 6.38-1 8.88" /> <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" /> <path d="M2 12a10 10 0 0 1 18-6" /> <path d="M2 16h.01" /> <path d="M21.8 16c.2-2 .131-5.354 0-6" /> <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" /> <path d="M8.65 22c.21-.66.45-1.32.57-2" /> <path d="M9 6.8a6 6 0 0 1 9 5.2v2" /></symbol><symbol id="i-flask-conical" viewBox="0 0 24 24"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2" /> <path d="M8.5 2h7" /> <path d="M7 16h10" /></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 16v-4" /> <path d="M12 8h.01" /></symbol><symbol id="i-laptop" viewBox="0 0 24 24"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16" /></symbol><symbol id="i-life-buoy" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="m4.93 4.93 4.24 4.24" /> <path d="m14.83 9.17 4.24-4.24" /> <path d="m14.83 14.83 4.24 4.24" /> <path d="m9.17 14.83-4.24 4.24" /> <circle cx="12" cy="12" r="4" /></symbol><symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol><symbol id="i-lock-keyhole" viewBox="0 0 24 24"><circle cx="12" cy="16" r="1" /> <rect x="3" y="10" width="18" height="12" rx="2" /> <path d="M7 10V7a5 5 0 0 1 10 0v3" /></symbol><symbol id="i-network" viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1" /> <rect x="2" y="16" width="6" height="6" rx="1" /> <rect x="9" y="2" width="6" height="6" rx="1" /> <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" /> <path d="M12 12V8" /></symbol><symbol id="i-radar" viewBox="0 0 24 24"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34" /> <path d="M4 6h.01" /> <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35" /> <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67" /> <path d="M12 18h.01" /> <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67" /> <circle cx="12" cy="12" r="2" /> <path d="m13.41 10.59 5.66-5.66" /></symbol><symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /></symbol><symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /> <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /> <path d="M7 21h10" /> <path d="M12 3v18" /> <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" /></symbol><symbol id="i-scan-search" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2" /> <path d="M17 3h2a2 2 0 0 1 2 2v2" /> <path d="M21 17v2a2 2 0 0 1-2 2h-2" /> <path d="M7 21H5a2 2 0 0 1-2-2v-2" /> <circle cx="12" cy="12" r="3" /> <path d="m16 16-1.9-1.9" /></symbol><symbol id="i-server" viewBox="0 0 24 24"><rect width="20" height="8" x="2" y="2" rx="2" ry="2" /> <rect width="20" height="8" x="2" y="14" rx="2" ry="2" /> <line x1="6" x2="6.01" y1="6" y2="6" /> <line x1="6" x2="6.01" y1="18" y2="18" /></symbol><symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /> <path d="m9 12 2 2 4-4" /></symbol><symbol id="i-siren" viewBox="0 0 24 24"><path d="M7 18v-6a5 5 0 1 1 10 0v6" /> <path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" /> <path d="M21 12h1" /> <path d="M18.5 4.5 18 5" /> <path d="M2 12h1" /> <path d="M12 2v1" /> <path d="m4.929 4.929.707.707" /> <path d="M12 12v6" /></symbol><symbol id="i-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2" /> <line x1="12" x2="15" y1="14" y2="11" /> <circle cx="12" cy="14" r="8" /></symbol><symbol id="i-trending-down" viewBox="0 0 24 24"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7" /> <polyline points="16 17 22 17 22 11" /></symbol><symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /> <path d="M12 9v4" /> <path d="M12 17h.01" /></symbol><symbol id="i-unplug" viewBox="0 0 24 24"><path d="m19 5 3-3" /> <path d="m2 22 3-3" /> <path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z" /> <path d="M7.5 13.5 10 11" /> <path d="M10.5 16.5 13 14" /> <path d="m12 6 6 6 2.3-2.3a2.4 2.4 0 0 0 0-3.4l-2.6-2.6a2.4 2.4 0 0 0-3.4 0Z" /></symbol><symbol id="i-user-check" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <circle cx="9" cy="7" r="4" /> <polyline points="16 11 18 13 22 9" /></symbol><symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01" /> <path d="M8.5 16.429a5 5 0 0 1 7 0" /> <path d="M5 12.859a10 10 0 0 1 5.17-2.69" /> <path d="M19 12.859a10 10 0 0 0-2.007-1.523" /> <path d="M2 8.82a15 15 0 0 1 4.177-2.643" /> <path d="M22 8.82a15 15 0 0 0-11.288-3.764" /> <path d="m2 2 20 20" /></symbol><symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" /></symbol></svg>
 <main class="halaman">
+  <svg class="jaringan atas" viewBox="0 0 430 250" aria-hidden="true"><line x1="300" y1="110" x2="290" y2="108"/><line x1="300" y1="110" x2="273" y2="95"/><line x1="277" y1="25" x2="235" y2="23"/><line x1="277" y1="25" x2="310" y2="75"/><line x1="230" y1="94" x2="247" y2="101"/><line x1="230" y1="94" x2="248" y2="115"/><line x1="32" y1="127" x2="24" y2="109"/><line x1="32" y1="127" x2="24" y2="164"/><line x1="24" y1="109" x2="71" y2="122"/><line x1="37" y1="29" x2="33" y2="56"/><line x1="37" y1="29" x2="68" y2="36"/><line x1="184" y1="201" x2="181" y2="185"/><line x1="184" y1="201" x2="225" y2="213"/><line x1="59" y1="60" x2="68" y2="36"/><line x1="59" y1="60" x2="33" y2="56"/><line x1="268" y1="230" x2="225" y2="213"/><line x1="268" y1="230" x2="296" y2="147"/><line x1="247" y1="101" x2="248" y2="115"/><line x1="412" y1="19" x2="414" y2="36"/><line x1="412" y1="19" x2="363" y2="76"/><line x1="363" y1="76" x2="370" y2="81"/><line x1="363" y1="76" x2="310" y2="75"/><line x1="136" y1="199" x2="181" y2="185"/><line x1="136" y1="199" x2="184" y2="201"/><line x1="83" y1="144" x2="71" y2="122"/><line x1="83" y1="144" x2="109" y2="142"/><line x1="273" y1="95" x2="290" y2="108"/><line x1="273" y1="95" x2="247" y2="101"/><line x1="235" y1="23" x2="196" y2="78"/><line x1="138" y1="145" x2="109" y2="142"/><line x1="138" y1="145" x2="136" y2="199"/><line x1="196" y1="78" x2="230" y2="94"/><line x1="196" y1="78" x2="247" y2="101"/><line x1="337" y1="172" x2="325" y2="142"/><line x1="337" y1="172" x2="296" y2="147"/><line x1="310" y1="75" x2="300" y2="110"/><line x1="310" y1="75" x2="290" y2="108"/><line x1="414" y1="36" x2="370" y2="81"/><line x1="71" y1="122" x2="32" y2="127"/><line x1="24" y1="164" x2="24" y2="109"/><line x1="325" y1="142" x2="296" y2="147"/><line x1="370" y1="81" x2="310" y2="75"/><line x1="296" y1="147" x2="300" y2="110"/><line x1="356" y1="229" x2="337" y2="172"/><line x1="356" y1="229" x2="268" y2="230"/><line class="tebal" x1="300" y1="110" x2="277" y2="25"/><line class="tebal" x1="300" y1="110" x2="230" y2="94"/><line class="tebal" x1="300" y1="110" x2="32" y2="127"/><line class="tebal" x1="300" y1="110" x2="24" y2="109"/><line class="tebal" x1="300" y1="110" x2="37" y2="29"/><line class="tebal" x1="300" y1="110" x2="184" y2="201"/><circle class="hub" cx="300" cy="110" r="4.2"/><circle class="" cx="277" cy="25" r="1.7"/><circle class="" cx="230" cy="94" r="1.7"/><circle class="" cx="32" cy="127" r="1.7"/><circle class="kuning" cx="24" cy="109" r="2.4"/><circle class="" cx="37" cy="29" r="1.7"/><circle class="" cx="184" cy="201" r="1.7"/><circle class="merah" cx="59" cy="60" r="2.4"/><circle class="" cx="268" cy="230" r="1.7"/><circle class="" cx="247" cy="101" r="1.7"/><circle class="" cx="412" cy="19" r="1.7"/><circle class="" cx="363" cy="76" r="1.7"/><circle class="" cx="68" cy="36" r="1.7"/><circle class="kuning" cx="136" cy="199" r="2.4"/><circle class="" cx="83" cy="144" r="1.7"/><circle class="" cx="273" cy="95" r="1.7"/><circle class="" cx="235" cy="23" r="1.7"/><circle class="" cx="33" cy="56" r="1.7"/><circle class="" cx="290" cy="108" r="1.7"/><circle class="" cx="138" cy="145" r="1.7"/><circle class="merah" cx="196" cy="78" r="2.4"/><circle class="" cx="337" cy="172" r="1.7"/><circle class="kuning" cx="109" cy="142" r="2.4"/><circle class="" cx="225" cy="213" r="1.7"/><circle class="" cx="310" cy="75" r="1.7"/><circle class="" cx="414" cy="36" r="1.7"/><circle class="" cx="181" cy="185" r="1.7"/><circle class="" cx="71" cy="122" r="1.7"/><circle class="" cx="24" cy="164" r="1.7"/><circle class="" cx="325" cy="142" r="1.7"/><circle class="" cx="370" cy="81" r="1.7"/><circle class="kuning" cx="296" cy="147" r="2.4"/><circle class="" cx="248" cy="115" r="1.7"/><circle class="merah" cx="356" cy="229" r="2.4"/></svg>
+  <svg class="jaringan bawah" viewBox="0 0 780 70" preserveAspectRatio="none" aria-hidden="true"><line x1="354" y1="38" x2="357" y2="23"/><line x1="354" y1="38" x2="345" y2="53"/><line x1="714" y1="33" x2="703" y2="33"/><line x1="714" y1="33" x2="740" y2="54"/><line x1="396" y1="40" x2="390" y2="44"/><line x1="396" y1="40" x2="405" y2="43"/><line x1="149" y1="36" x2="154" y2="48"/><line x1="149" y1="36" x2="153" y2="21"/><line x1="489" y1="51" x2="508" y2="41"/><line x1="489" y1="51" x2="435" y2="32"/><line x1="80" y1="24" x2="75" y2="26"/><line x1="80" y1="24" x2="85" y2="11"/><line x1="77" y1="52" x2="64" y2="42"/><line x1="77" y1="52" x2="75" y2="26"/><line x1="538" y1="10" x2="508" y2="41"/><line x1="538" y1="10" x2="593" y2="30"/><line x1="758" y1="60" x2="770" y2="62"/><line x1="758" y1="60" x2="745" y2="49"/><line x1="128" y1="9" x2="153" y2="21"/><line x1="128" y1="9" x2="98" y2="21"/><line x1="412" y1="11" x2="435" y2="32"/><line x1="412" y1="11" x2="405" y2="43"/><line x1="153" y1="21" x2="171" y2="23"/><line x1="31" y1="33" x2="8" y2="19"/><line x1="31" y1="33" x2="64" y2="42"/><line x1="345" y1="53" x2="357" y2="23"/><line x1="405" y1="43" x2="390" y2="44"/><line x1="770" y1="62" x2="745" y2="49"/><line x1="650" y1="46" x2="655" y2="29"/><line x1="650" y1="46" x2="617" y2="18"/><line x1="249" y1="20" x2="229" y2="12"/><line x1="249" y1="20" x2="171" y2="23"/><line x1="229" y1="12" x2="171" y2="23"/><line x1="593" y1="30" x2="603" y2="23"/><line x1="593" y1="30" x2="617" y2="18"/><line x1="655" y1="29" x2="617" y2="18"/><line x1="740" y1="54" x2="745" y2="49"/><line x1="740" y1="54" x2="758" y2="60"/><line x1="8" y1="19" x2="64" y2="42"/><line x1="703" y1="33" x2="740" y2="54"/><line x1="757" y1="29" x2="745" y2="49"/><line x1="757" y1="29" x2="740" y2="54"/><line x1="64" y1="42" x2="75" y2="26"/><line x1="603" y1="23" x2="617" y2="18"/><line x1="75" y1="26" x2="85" y2="11"/><line x1="98" y1="21" x2="97" y2="31"/><line x1="98" y1="21" x2="85" y2="11"/><line x1="435" y1="32" x2="405" y2="43"/><line x1="154" y1="48" x2="153" y2="21"/><line x1="108" y1="43" x2="97" y2="31"/><line x1="108" y1="43" x2="98" y2="21"/><line x1="171" y1="23" x2="149" y2="36"/><circle class="" cx="354" cy="38" r="1.7"/><circle class="" cx="714" cy="33" r="1.7"/><circle class="" cx="396" cy="40" r="1.7"/><circle class="" cx="149" cy="36" r="1.7"/><circle class="kuning" cx="489" cy="51" r="2.4"/><circle class="" cx="80" cy="24" r="1.7"/><circle class="" cx="77" cy="52" r="1.7"/><circle class="merah" cx="538" cy="10" r="2.4"/><circle class="" cx="758" cy="60" r="1.7"/><circle class="" cx="508" cy="41" r="1.7"/><circle class="" cx="128" cy="9" r="1.7"/><circle class="" cx="412" cy="11" r="1.7"/><circle class="" cx="153" cy="21" r="1.7"/><circle class="kuning" cx="31" cy="33" r="2.4"/><circle class="" cx="345" cy="53" r="1.7"/><circle class="" cx="405" cy="43" r="1.7"/><circle class="" cx="390" cy="44" r="1.7"/><circle class="" cx="357" cy="23" r="1.7"/><circle class="" cx="770" cy="62" r="1.7"/><circle class="" cx="650" cy="46" r="1.7"/><circle class="merah" cx="249" cy="20" r="2.4"/><circle class="" cx="229" cy="12" r="1.7"/><circle class="kuning" cx="593" cy="30" r="2.4"/><circle class="" cx="655" cy="29" r="1.7"/><circle class="" cx="740" cy="54" r="1.7"/><circle class="" cx="8" cy="19" r="1.7"/><circle class="" cx="703" cy="33" r="1.7"/><circle class="" cx="757" cy="29" r="1.7"/><circle class="" cx="64" cy="42" r="1.7"/><circle class="" cx="603" cy="23" r="1.7"/><circle class="" cx="75" cy="26" r="1.7"/><circle class="kuning" cx="745" cy="49" r="2.4"/><circle class="" cx="98" cy="21" r="1.7"/><circle class="merah" cx="85" cy="11" r="2.4"/><circle class="" cx="617" cy="18" r="1.7"/><circle class="" cx="435" cy="32" r="1.7"/><circle class="" cx="154" cy="48" r="1.7"/><circle class="" cx="108" cy="43" r="1.7"/><circle class="" cx="97" cy="31" r="1.7"/><circle class="" cx="171" cy="23" r="1.7"/></svg>
 
   <header class="kepala">
     <div class="merek">
-      <svg viewBox="0 0 48 48" aria-hidden="true">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
         <path d="M24 3 41 9.5V22c0 11-7.4 19-17 23C14.4 41 7 33 7 22V9.5Z" fill="rgba(62,240,161,.07)" stroke="#3ef0a1" stroke-width="2.4" stroke-linejoin="round"/>
         <circle cx="24" cy="24" r="10.5" fill="none" stroke="#3ef0a1" stroke-opacity=".4" stroke-width="1.2"/>
         <circle cx="24" cy="24" r="5.5" fill="none" stroke="#3ef0a1" stroke-opacity=".4" stroke-width="1.2"/>
@@ -103,12 +139,23 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
       </svg>
       <div><b>NUSANTARA SHIELD</b><span>v5.1 · posko pertahanan siber luring</span></div>
     </div>
-    <div class="lomba">Kartika Cyber Hackathon 2026<br><b>Kategori 02 · Penangkalan</b></div>
+    <div class="kanan">
+      <div class="lomba"><span class="bangsa">Karya anak bangsa</span><br>Kartika Cyber Hackathon 2026<br><b>Kategori 02 · Penangkalan</b></div>
+      <svg class="bendera" viewBox="0 0 3 2" role="img" aria-label="Bendera Merah Putih"><rect width="3" height="1" fill="#e70011"/><rect y="1" width="3" height="1" fill="#ffffff"/></svg>
+    </div>
   </header>
 
   <section class="judul">
     <h1>Sistem pendukung keputusan untuk posko siber satuan. <em>Mesin mempercepat, manusia memutuskan.</em></h1>
-    <p>Posko pertahanan siber luring yang <b>memperingatkan lebih dulu</b>, <b>memutus dalam ±1,2 detik</b>, dan <b>tidak pernah menghapus barang bukti</b>. Menjaga jaringan kantor (IT) dan sistem kendali fasilitas (OT), seperti genset rumah sakit, dalam satu layar.</p>
+    <p>Posko pertahanan siber luring yang <b>memperingatkan lebih dulu</b>, <b>memutus dalam ±1,2 detik</b>, dan <b>tidak pernah menghapus barang bukti</b>. Jaringan kantor (IT) dan sistem kendali fasilitas (OT) dijaga dalam satu layar.</p>
+    <div class="aset">
+      <span>ASET DIJAGA (DATA LATIHAN):</span>
+      <span class="chip"><svg class="ik" aria-hidden="true"><use href="#i-laptop"/></svg>Endpoint</span>
+      <span class="chip"><svg class="ik" aria-hidden="true"><use href="#i-server"/></svg>Server & DNS</span>
+      <span class="chip"><svg class="ik" aria-hidden="true"><use href="#i-code-xml"/></svg>API & web</span>
+      <span class="chip"><svg class="ik" aria-hidden="true"><use href="#i-database"/></svg>Basis data</span>
+      <span class="chip ot"><svg class="ik" aria-hidden="true"><use href="#i-zap"/></svg>OT · genset Modbus</span>
+    </div>
   </section>
 
   <div class="legenda">
@@ -119,53 +166,54 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
   </div>
 
   <section class="angka">
-    <div><b>66% → 20%</b><span>peluang serangan genset setelah kabar celah Modbus, sebelum dan sesudah Perketat</span></div>
-    <div><b>±1,2 dtk</b><span>dari keputusan Operator sampai jaringan terputus, bukti sudah disegel</span></div>
-    <div><b>224</b><span>uji otomatis lulus, juga saat dipasang luring di Mac (Python 3.12)</span></div>
-    <div><b>0</b><span>panggilan ke internet saat berjalan; AI dihitung di <i>server</i> satuan</span></div>
+    <div><i class="bulat"><svg class="ik" aria-hidden="true"><use href="#i-trending-down"/></svg></i><b>66% → 20%</b><span>peluang serangan genset setelah kabar celah Modbus, sebelum dan sesudah Perketat</span></div>
+    <div><i class="bulat"><svg class="ik" aria-hidden="true"><use href="#i-timer"/></svg></i><b>±1,2 dtk</b><span>dari keputusan Operator sampai jaringan terputus, bukti sudah disegel</span></div>
+    <div><i class="bulat"><svg class="ik" aria-hidden="true"><use href="#i-flask-conical"/></svg></i><b>224 uji</b><span>otomatis lulus, juga saat dipasang luring di Mac (Python 3.12)</span></div>
+    <div><i class="bulat"><svg class="ik" aria-hidden="true"><use href="#i-wifi-off"/></svg></i><b>0</b><span>panggilan ke internet saat berjalan; AI dihitung di <i>server</i> satuan</span></div>
   </section>
 
   <section class="kotak">
-    <p class="label">Satu alur utuh, dari peringatan sampai pulih <small>urutan dikunci di server; jalan pintas ditolak (409)</small></p>
+    <p class="label"><span class="kiri"><svg class="ik" aria-hidden="true"><use href="#i-network"/></svg>Satu alur utuh, dari peringatan sampai pulih</span><small>urutan dikunci di server; jalan pintas ditolak (409)</small></p>
     <div class="alur">
-      <div class="langkah" style="--warna: var(--biru)"><b>Deteksi</b><span>Kabar ancaman (CTI) + AI lokal <i>Isolation Forest</i></span><em class="panah">›</em></div>
-      <div class="langkah" style="--warna: var(--kuning)"><b>WASPADA</b><span>aset berisiko naik status sebelum diserang</span><em class="panah">›</em></div>
-      <div class="langkah" style="--warna: var(--kuning)"><b>Perketat</b><span>paparan dipotong 70% <span class="tanda simulasi">SIMULASI</span></span><em class="panah">›</em></div>
-      <div class="langkah" style="--warna: var(--biru)"><b>Segel bukti</b><span>SHA-256 + berita acara bernomor</span><em class="panah">›</em></div>
-      <div class="langkah" style="--warna: var(--merah)"><b>Isolasi</b><span>IT dan jalur OT ±1,2 dtk; genset tetap menyala</span><em class="panah">›</em></div>
-      <div class="langkah" style="--warna: var(--kuning)"><b>LAPSIT</b><span>laporan situasi terbit otomatis</span><em class="panah">›</em></div>
-      <div class="langkah" style="--warna: var(--neon)"><b>Pulihkan</b><span>terkunci sampai sidik jari bukti cocok ulang</span></div>
+      <div class="langkah" style="--warna: var(--biru)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-radar"/></svg></i><b>Deteksi</b><span>Kabar ancaman (CTI) + AI lokal <i>Isolation Forest</i></span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--kuning)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-triangle-alert"/></svg></i><b>WASPADA</b><span>aset berisiko naik status sebelum diserang</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--kuning)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-lock-keyhole"/></svg></i><b>Perketat</b><span>paparan dipotong 70% <span class="tanda simulasi">SIMULASI</span></span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--biru)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-fingerprint"/></svg></i><b>Segel bukti</b><span>SHA-256 + berita acara bernomor</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--merah)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-unplug"/></svg></i><b>Isolasi</b><span>IT dan jalur OT ±1,2 dtk; genset tetap menyala</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--kuning)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-file-text"/></svg></i><b>LAPSIT</b><span>laporan situasi terbit otomatis (PDF)</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--neon)"><i class="ikon-langkah"><svg class="ik" aria-hidden="true"><use href="#i-rotate-ccw"/></svg></i><b>Pulihkan</b><span>terkunci sampai sidik jari bukti cocok ulang</span></div>
     </div>
+    <div class="lapor"><svg class="ik" aria-hidden="true"><use href="#i-file-check"/></svg><span><b>Format laporan audit siap lapor:</b> status layanan, insiden, dan bukti keutuhan log HMAC sebagai bahan pelaporan insiden ke BSSN dan pemberitahuan menurut UU PDP. <em>Belum diaudit kepatuhan.</em></span></div>
     <div class="kunci-dua">
-      <div><b style="color: var(--biru)">KUNCI 1 · MESIN</b> — CTI dan AI hanya menaikkan status ke WASPADA, selalu dengan alasannya.</div>
-      <div><b style="color: var(--neon)">KUNCI 2 · MANUSIA</b> — hanya Operator yang memutus (tahan tombol 0,6 dtk); Pengamat ditolak (403).</div>
+      <div><span style="color: var(--biru); display: inline-flex"><svg class="ik" aria-hidden="true"><use href="#i-cpu"/></svg></span><span><b style="color: var(--biru)">KUNCI 1 · MESIN</b> — CTI dan AI hanya menaikkan status ke WASPADA, selalu dengan alasannya.</span></div>
+      <div><span style="color: var(--neon); display: inline-flex"><svg class="ik" aria-hidden="true"><use href="#i-user-check"/></svg></span><span><b style="color: var(--neon)">KUNCI 2 · MANUSIA</b> — hanya Operator yang memutus (tahan tombol 0,6 dtk); Pengamat ditolak (403).</span></div>
     </div>
   </section>
 
   <section>
-    <p class="label">Dipetakan ke enam fungsi NIST CSF 2.0 <small>pemetaan mandiri oleh tim, bukan sertifikasi · rincian: Dokumentasi Teknis §2.6</small></p>
+    <p class="label"><span class="kiri"><svg class="ik" aria-hidden="true"><use href="#i-badge-check"/></svg>Dipetakan ke enam fungsi NIST CSF 2.0</span><small>pemetaan mandiri oleh tim, bukan sertifikasi · rincian: Dokumentasi Teknis §2.6</small></p>
     <div class="csf">
-      <div class="fungsi"><h3>Govern <small>GV</small></h3><p>siapa berwenang atas apa</p><ul>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi"><svg class="ik" aria-hidden="true"><use href="#i-scale"/></svg></i><div><h3>Govern</h3><p>siapa berwenang atas apa</p></div><span class="kode">GV</span></div><ul>
         <li><span>Peran Pengamat dan Operator; dua kunci konfirmasi</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Nilai Kesiapan Siber A–E untuk Dansat</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Akun Operator hanya lewat kode undangan</span> <span class="tanda jalan">BERJALAN</span></li></ul></div>
-      <div class="fungsi"><h3>Identify <small>ID</small></h3><p>tahu apa yang dijaga dan risikonya</p><ul>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi"><svg class="ik" aria-hidden="true"><use href="#i-scan-search"/></svg></i><div><h3>Identify</h3><p>tahu apa yang dijaga dan risikonya</p></div><span class="kode">ID</span></div><ul>
         <li><span>Inventaris aset IT dan zona kendali OT</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Peluang serangan per aset dari korelasi CTI × aset</span> <span class="tanda jalan">BERJALAN</span></li>
-        <li class="rencana"><span>Inventaris dari sistem satuan yang sebenarnya</span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
-      <div class="fungsi"><h3>Protect <small>PR</small></h3><p>memperkecil celah</p><ul>
+        <li class="rencana tajam"><span><b>Integrasi Direktori Aktif (IAM) &amp; Pemantauan Login</b></span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi"><svg class="ik" aria-hidden="true"><use href="#i-shield-check"/></svg></i><div><h3>Protect</h3><p>memperkecil celah</p></div><span class="kode">PR</span></div><ul>
         <li><span>Akses posko berlapis (PBKDF2, token kedaluwarsa, CSP)</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Kepatuhan backup &lt; 24 jam dan uji pulih</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Perketat aset yang diprediksi diserang</span> <span class="tanda simulasi">SIMULASI</span></li></ul></div>
-      <div class="fungsi"><h3>Detect <small>DE</small></h3><p>melihat ancaman lebih awal</p><ul>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi"><svg class="ik" aria-hidden="true"><use href="#i-eye"/></svg></i><div><h3>Detect</h3><p>melihat ancaman lebih awal</p></div><span class="kode">DE</span></div><ul>
         <li><span>AI lokal menilai 9 aset ±10 ms, dengan alasan</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Triase: Selesai atau Positif Palsu (<i>False Positive</i>), beralasan</span> <span class="tanda jalan">BERJALAN</span></li>
-        <li class="rencana"><span>Sensor nyata dan peristiwa identitas (<i>login</i>, hak akses)</span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
-      <div class="fungsi"><h3>Respond <small>RS</small></h3><p>menanggapi insiden</p><ul>
+        <li class="rencana"><span>Sensor jaringan nyata (Wazuh, Suricata, Zeek)</span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi"><svg class="ik" aria-hidden="true"><use href="#i-siren"/></svg></i><div><h3>Respond</h3><p>menanggapi insiden</p></div><span class="kode">RS</span></div><ul>
         <li><span>Bukti dulu → isolasi ±1,2 dtk → LAPSIT</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Pemutusan perangkat sasaran</span> <span class="tanda simulasi">SIMULASI</span></li>
         <li class="rencana"><span>LAPSIT berjenjang ke Sansidam dan Kartika CSIRT</span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
-      <div class="fungsi"><h3>Recover <small>RC</small></h3><p>kembali normal tanpa merusak bukti</p><ul>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi"><svg class="ik" aria-hidden="true"><use href="#i-life-buoy"/></svg></i><div><h3>Recover</h3><p>kembali normal tanpa merusak bukti</p></div><span class="kode">RC</span></div><ul>
         <li><span>Pulihkan terkunci sampai SHA-256 cocok ulang</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Isolasi darurat wajib beralasan; bukti susulan sebelum pulih</span> <span class="tanda jalan">BERJALAN</span></li>
         <li><span>Semua langkah tercatat di buku berantai HMAC</span> <span class="tanda jalan">BERJALAN</span></li></ul></div>
@@ -174,7 +222,7 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
 
   <section class="bawah">
     <div class="kotak">
-      <p class="label">Posko ini sendiri dijaga berlapis <span class="tanda jalan">BERJALAN</span></p>
+      <p class="label"><span class="kiri"><svg class="ik" aria-hidden="true"><use href="#i-lock"/></svg>Posko ini sendiri dijaga berlapis</span><span class="tanda jalan">BERJALAN</span></p>
       <ul>
         <li>Kata sandi PBKDF2-SHA256 200.000 putaran; <i>login</i> dibatasi 5 kali per menit</li>
         <li>Token acak yang kedaluwarsa; <i>server</i> hanya menyimpan <i>hash</i>-nya</li>
@@ -185,7 +233,7 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
       </ul>
     </div>
     <div class="kotak">
-      <p class="label" style="color: var(--samar)">Yang kami akui terus terang</p>
+      <p class="label" style="color: var(--samar)"><span class="kiri"><svg class="ik" aria-hidden="true"><use href="#i-info"/></svg>Yang kami akui terus terang</span></p>
       <ul class="jujur">
         <li>Data latihan sintetis (alamat RFC 5737); pemutusan perangkat masih simulasi</li>
         <li>Belum ada verifikasi dua langkah dan uji penetrasi independen</li>
@@ -196,7 +244,7 @@ body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-a
   </section>
 
   <footer class="kaki">
-    <span><b>Sepenuhnya defensif</b> · berjalan luring penuh · keputusan di tangan manusia · data sintetis</span>
+    <span><b>Sepenuhnya defensif</b> · berjalan luring penuh · keputusan di tangan manusia · data sintetis · ikon: Lucide (ISC)</span>
     <span>NIST CSF 2.0 = NIST CSWP 29 (2024) · github.com/pisangsisir/nusantara-shield-v5.1</span>
   </footer>
 </main>

@@ -446,6 +446,7 @@ Sesuai pasal 5.4, berikut pustaka dan alat pihak ketiga yang digunakan:
 | **pytest** dan **HTTPX** | Uji otomatis | MIT dan BSD-3-Clause |
 | **Mermaid** dan **Playwright (Chromium)** | Hanya untuk menggambar diagram dan mencetak dokumen ini; tidak dipakai aplikasi | MIT, Apache-2.0, dan BSD-3-Clause |
 | **scikit-learn** dan **NumPy** | Engine Deteksi Anomali (_Isolation Forest_), berjalan lokal | BSD-3-Clause |
+| **Lucide** (v0.460.0) | Ikon pada poster, disematkan sebagai SVG sebaris; tidak dipakai aplikasi | ISC |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi | Layanan komersial |
 | **Blok alamat Internet Protocol (IP) Request for Comments (RFC) 5737** | Data latihan sintetis | Standar terbuka IETF |
 

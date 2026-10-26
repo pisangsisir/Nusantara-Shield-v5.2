@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poster Nusantara Shield</title>
+<!-- Poster satu halaman A4. Setiap butir berlabel BERJALAN (ada di purwarupa), SIMULASI (alur nyata, perangkat tiruan),
+     atau PETA JALAN (belum dibangun). Semua ikon, bendera, dan ilustrasi berupa SVG sebaris: tanpa CDN, fon, atau gambar luar.
+     Ikon: Lucide v0.460.0 (lisensi ISC). Cetak ke PDF dari Chrome: Cetak → Simpan sebagai PDF, kertas A4, margin Tidak ada,
+     centang Grafis latar. Berkas ini dibangkitkan; ubah templatnya, bukan hasilnya. -->
+<style>
+:root {
+  --latar: #0a1120; --permukaan: #101a2d; --permukaan-2: #14213a; --garis: #1f2d47;
+  --teks: #d7e3f2; --redup: #9aabc4; --samar: #7a8ba6;
+  --neon: #3ef0a1; --neon-lembut: rgba(62, 240, 161, .12); --neon-garis: rgba(62, 240, 161, .4);
+  --kuning: #f2c14e; --kuning-lembut: rgba(242, 193, 78, .12);
+  --merah: #ff5c74; --merah-lembut: rgba(255, 92, 116, .12);
+  --biru: #7aa2d6; --biru-lembut: rgba(122, 162, 214, .14);
+  --huruf: Inter, "Segoe UI", "DejaVu Sans", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--latar); }
+body { color: var(--teks); font: 10.5px/1.45 var(--huruf); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.halaman { width: 210mm; height: 297mm; margin: 0 auto; padding: 10mm 11mm 8mm; display: flex; flex-direction: column;
+  justify-content: space-between; overflow: hidden; position: relative; isolation: isolate;
+  background: radial-gradient(120mm 80mm at 100% 0%, rgba(62, 240, 161, .07), transparent 70%), var(--latar); }
+.ik { width: 1em; height: 1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.14em; }
+
+/* Ilustrasi jaringan abstrak (latar) */
+.jaringan { position: absolute; z-index: -1; pointer-events: none; }
+.jaringan line { stroke: var(--neon); stroke-opacity: .14; stroke-width: 1; }
+.jaringan line.tebal { stroke-opacity: .22; stroke-dasharray: 3 4; }
+.jaringan circle { fill: var(--neon); fill-opacity: .35; }
+.jaringan circle.hub { fill-opacity: .55; }
+.jaringan circle.kuning { fill: var(--kuning); fill-opacity: .55; }
+.jaringan circle.merah { fill: var(--merah); fill-opacity: .55; }
+.jaringan.atas { right: 0; top: 0; width: 430px; height: 250px; opacity: .5; }
+.jaringan.bawah { left: 7mm; bottom: 11mm; width: 780px; height: 70px; opacity: .55; }
+
+/* Kepala */
+.kepala { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.merek { display: flex; align-items: center; gap: 10px; }
+.merek .logo { width: 42px; height: 42px; }
+.merek b { display: block; font: 800 21px/1 var(--huruf); letter-spacing: .5px; }
+.merek span { font: 600 8.6px var(--mono); letter-spacing: 1.4px; color: var(--samar); text-transform: uppercase; }
+.kanan { display: flex; align-items: center; gap: 10px; text-align: right; }
+.bendera { width: 34px; height: 23px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 2px 8px rgba(0, 0, 0, .4); overflow: hidden; display: block; }
+.lomba { font: 600 8.6px/1.55 var(--mono); letter-spacing: .8px; color: var(--redup); text-transform: uppercase; }
+.lomba b { color: var(--neon); }
+.lomba .bangsa { color: #fff; }
+
+.judul h1 { margin: 0; font: 800 24px/1.14 var(--huruf); letter-spacing: -.3px; max-width: 182mm; text-shadow: 0 0 12px var(--latar), 0 0 4px var(--latar); }
+.judul h1 em { font-style: normal; color: var(--neon); }
+.judul p { margin: 5px 0 0; font-size: 12px; color: var(--redup); max-width: 170mm; }
+.judul p b { color: var(--teks); }
+.aset { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 7px; font: 600 8.4px var(--mono); color: var(--samar); letter-spacing: .5px; }
+.aset span.chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; background: var(--permukaan); border: 1px solid var(--garis); color: var(--teks); font: 600 9px var(--huruf); letter-spacing: 0; }
+.aset span.chip .ik { font-size: 11px; color: var(--biru); }
+.aset span.chip.ot .ik { color: var(--kuning); }
+
+/* Legenda status */
+.legenda { display: flex; gap: 6px; align-items: center; font: 8.6px var(--huruf); color: var(--samar); white-space: nowrap; }
+.legenda > span:first-child { font: 700 8.5px var(--mono); letter-spacing: 1px; margin-right: 2px; }
+.legenda .tanda { margin-left: 8px; }
+.tanda { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; font: 700 7.5px/1.2 var(--mono); letter-spacing: .6px; white-space: nowrap; }
+.tanda.jalan { color: var(--neon); background: var(--neon-lembut); border: 1px solid var(--neon-garis); }
+.tanda.rencana { color: var(--samar); border: 1px dashed var(--samar); }
+.tanda.simulasi { color: var(--kuning); background: var(--kuning-lembut); border: 1px solid rgba(242, 193, 78, .4); }
+
+/* Angka */
+.angka { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; }
+.angka > div { background: var(--permukaan); border: 1px solid var(--garis); border-radius: 9px; padding: 8px 10px; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; }
+.angka .bulat { grid-row: span 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--neon-lembut); border: 1px solid var(--neon-garis); color: var(--neon); font-size: 15px; }
+.angka b { font: 800 20px/1.1 var(--mono); color: var(--neon); white-space: nowrap; }
+.angka span { grid-column: 1 / -1; margin-top: 5px; font-size: 9px; color: var(--redup); }
+
+/* Alur */
+.kotak { background: rgba(16, 26, 45, .92); border: 1px solid var(--garis); border-radius: 10px; padding: 9px 11px; }
+.label { font: 700 9px var(--mono); letter-spacing: 1.4px; text-transform: uppercase; color: var(--neon); margin: 0 0 7px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.label .kiri { display: inline-flex; align-items: center; gap: 6px; }
+.label .kiri .ik { font-size: 12px; }
+.label small { font: 600 8px var(--mono); letter-spacing: .4px; text-transform: none; color: var(--samar); }
+.alur { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; align-items: stretch; }
+.langkah { position: relative; background: var(--permukaan-2); border: 1px solid var(--garis); border-top: 3px solid var(--warna, var(--neon)); border-radius: 6px; padding: 6px 6px 5px; }
+.langkah .ikon-langkah { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; margin-bottom: 4px; color: var(--warna, var(--neon)); background: color-mix(in srgb, var(--warna, var(--neon)) 14%, transparent); font-size: 14px; }
+.langkah b { display: block; font: 800 9.5px/1.2 var(--huruf); letter-spacing: .3px; text-transform: uppercase; color: var(--warna, var(--neon)); }
+.langkah span { display: block; font-size: 8.3px; line-height: 1.35; color: var(--teks); margin-top: 2px; }
+.langkah span i { font-style: italic; }
+.langkah .panah { position: absolute; right: -6px; top: 18px; color: var(--samar); font: 700 10px var(--mono); font-style: normal; z-index: 1; }
+.lapor { display: flex; align-items: center; gap: 8px; margin-top: 5px; padding: 5px 9px; border-radius: 6px; font-size: 8.8px; background: var(--kuning-lembut); border: 1px solid rgba(242, 193, 78, .35); }
+.lapor .ik { font-size: 13px; color: var(--kuning); }
+.lapor b { color: var(--kuning); }
+.lapor em { color: var(--samar); font-style: normal; }
+.kunci-dua { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 5px; }
+.kunci-dua div { display: flex; gap: 7px; align-items: center; font-size: 8.6px; padding: 5px 8px; border-radius: 6px; background: var(--latar); border: 1px solid var(--garis); }
+.kunci-dua .ik { font-size: 15px; }
+.kunci-dua b { font: 700 8.6px var(--mono); }
+
+/* NIST CSF */
+.csf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.fungsi { background: rgba(16, 26, 45, .92); border: 1px solid var(--garis); border-radius: 9px; padding: 8px 10px; }
+.fungsi .kepala-fungsi { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; margin-bottom: 5px; }
+.fungsi .ikon-fungsi { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-size: 15px; color: var(--neon); background: var(--neon-lembut); border: 1px solid var(--neon-garis); }
+.fungsi h3 { margin: 0; font: 800 12.5px/1.15 var(--huruf); }
+.fungsi h3 + p { margin: 1px 0 0; font-size: 8.4px; color: var(--samar); }
+.fungsi .kode { font: 700 8.5px var(--mono); color: var(--samar); letter-spacing: .5px; align-self: start; }
+.fungsi ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3.5px; }
+.fungsi li { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: start; font-size: 9px; line-height: 1.32; }
+.fungsi li.rencana { color: var(--samar); }
+.fungsi li.tajam { color: var(--teks); }
+.fungsi li.tajam b { color: #fff; }
+
+/* Bawah */
+.bawah { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3mm; }
+.bawah ul { margin: 0; padding-left: 13px; display: grid; gap: 2.5px; font-size: 9px; }
+.bawah li::marker { color: var(--neon); }
+.bawah .jujur li::marker { color: var(--samar); }
+.bawah .jujur li { color: var(--redup); }
+.kaki { display: flex; justify-content: space-between; gap: 10px; font: 600 7.8px/1.45 var(--mono); color: var(--samar); letter-spacing: .4px; border-top: 1px solid var(--garis); padding-top: 5px; background: var(--latar); }
+.kaki b { color: var(--redup); }
+</style>
+</head>
+<body>
+{{sprite}}
+<main class="halaman">
+  <svg class="jaringan atas" viewBox="0 0 430 250" aria-hidden="true">{{jaringan_atas}}</svg>
+  <svg class="jaringan bawah" viewBox="0 0 780 70" preserveAspectRatio="none" aria-hidden="true">{{jaringan_bawah}}</svg>
+
+  <header class="kepala">
+    <div class="merek">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M24 3 41 9.5V22c0 11-7.4 19-17 23C14.4 41 7 33 7 22V9.5Z" fill="rgba(62,240,161,.07)" stroke="#3ef0a1" stroke-width="2.4" stroke-linejoin="round"/>
+        <circle cx="24" cy="24" r="10.5" fill="none" stroke="#3ef0a1" stroke-opacity=".4" stroke-width="1.2"/>
+        <circle cx="24" cy="24" r="5.5" fill="none" stroke="#3ef0a1" stroke-opacity=".4" stroke-width="1.2"/>
+        <path d="M24 24 32.5 17.5" stroke="#3ef0a1" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="24" cy="24" r="2.2" fill="#3ef0a1"/><circle cx="29.5" cy="29" r="1.6" fill="#f2c14e"/>
+      </svg>
+      <div><b>NUSANTARA SHIELD</b><span>v5.1 · posko pertahanan siber luring</span></div>
+    </div>
+    <div class="kanan">
+      <div class="lomba"><span class="bangsa">Karya anak bangsa</span><br>Kartika Cyber Hackathon 2026<br><b>Kategori 02 · Penangkalan</b></div>
+      <svg class="bendera" viewBox="0 0 3 2" role="img" aria-label="Bendera Merah Putih"><rect width="3" height="1" fill="#e70011"/><rect y="1" width="3" height="1" fill="#ffffff"/></svg>
+    </div>
+  </header>
+
+  <section class="judul">
+    <h1>Sistem pendukung keputusan untuk posko siber satuan. <em>Mesin mempercepat, manusia memutuskan.</em></h1>
+    <p>Posko pertahanan siber luring yang <b>memperingatkan lebih dulu</b>, <b>memutus dalam ±1,2 detik</b>, dan <b>tidak pernah menghapus barang bukti</b>. Jaringan kantor (IT) dan sistem kendali fasilitas (OT) dijaga dalam satu layar.</p>
+    <div class="aset">
+      <span>ASET DIJAGA (DATA LATIHAN):</span>
+      <span class="chip">{{i:laptop}}Endpoint</span>
+      <span class="chip">{{i:server}}Server & DNS</span>
+      <span class="chip">{{i:code-xml}}API & web</span>
+      <span class="chip">{{i:database}}Basis data</span>
+      <span class="chip ot">{{i:zap}}OT · genset Modbus</span>
+    </div>
+  </section>
+
+  <div class="legenda">
+    <span>LABEL STATUS:</span>
+    <span class="tanda jalan">BERJALAN</span><span>ada di purwarupa, dikunci uji</span>
+    <span class="tanda simulasi">SIMULASI</span><span>alurnya nyata, perangkat sasarannya tiruan</span>
+    <span class="tanda rencana">PETA JALAN</span><span>belum dibangun</span>
+  </div>
+
+  <section class="angka">
+    <div><i class="bulat">{{i:trending-down}}</i><b>66% → 20%</b><span>peluang serangan genset setelah kabar celah Modbus, sebelum dan sesudah Perketat</span></div>
+    <div><i class="bulat">{{i:timer}}</i><b>±1,2 dtk</b><span>dari keputusan Operator sampai jaringan terputus, bukti sudah disegel</span></div>
+    <div><i class="bulat">{{i:flask-conical}}</i><b>224 uji</b><span>otomatis lulus, juga saat dipasang luring di Mac (Python 3.12)</span></div>
+    <div><i class="bulat">{{i:wifi-off}}</i><b>0</b><span>panggilan ke internet saat berjalan; AI dihitung di <i>server</i> satuan</span></div>
+  </section>
+
+  <section class="kotak">
+    <p class="label"><span class="kiri">{{i:network}}Satu alur utuh, dari peringatan sampai pulih</span><small>urutan dikunci di server; jalan pintas ditolak (409)</small></p>
+    <div class="alur">
+      <div class="langkah" style="--warna: var(--biru)"><i class="ikon-langkah">{{i:radar}}</i><b>Deteksi</b><span>Kabar ancaman (CTI) + AI lokal <i>Isolation Forest</i></span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--kuning)"><i class="ikon-langkah">{{i:triangle-alert}}</i><b>WASPADA</b><span>aset berisiko naik status sebelum diserang</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--kuning)"><i class="ikon-langkah">{{i:lock-keyhole}}</i><b>Perketat</b><span>paparan dipotong 70% <span class="tanda simulasi">SIMULASI</span></span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--biru)"><i class="ikon-langkah">{{i:fingerprint}}</i><b>Segel bukti</b><span>SHA-256 + berita acara bernomor</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--merah)"><i class="ikon-langkah">{{i:unplug}}</i><b>Isolasi</b><span>IT dan jalur OT ±1,2 dtk; genset tetap menyala</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--kuning)"><i class="ikon-langkah">{{i:file-text}}</i><b>LAPSIT</b><span>laporan situasi terbit otomatis (PDF)</span><em class="panah">›</em></div>
+      <div class="langkah" style="--warna: var(--neon)"><i class="ikon-langkah">{{i:rotate-ccw}}</i><b>Pulihkan</b><span>terkunci sampai sidik jari bukti cocok ulang</span></div>
+    </div>
+    <div class="lapor">{{i:file-check}}<span><b>Format laporan audit siap lapor:</b> status layanan, insiden, dan bukti keutuhan log HMAC sebagai bahan pelaporan insiden ke BSSN dan pemberitahuan menurut UU PDP. <em>Belum diaudit kepatuhan.</em></span></div>
+    <div class="kunci-dua">
+      <div><span style="color: var(--biru); display: inline-flex">{{i:cpu}}</span><span><b style="color: var(--biru)">KUNCI 1 · MESIN</b> — CTI dan AI hanya menaikkan status ke WASPADA, selalu dengan alasannya.</span></div>
+      <div><span style="color: var(--neon); display: inline-flex">{{i:user-check}}</span><span><b style="color: var(--neon)">KUNCI 2 · MANUSIA</b> — hanya Operator yang memutus (tahan tombol 0,6 dtk); Pengamat ditolak (403).</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="label"><span class="kiri">{{i:badge-check}}Dipetakan ke enam fungsi NIST CSF 2.0</span><small>pemetaan mandiri oleh tim, bukan sertifikasi · rincian: Dokumentasi Teknis §2.6</small></p>
+    <div class="csf">
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi">{{i:scale}}</i><div><h3>Govern</h3><p>siapa berwenang atas apa</p></div><span class="kode">GV</span></div><ul>
+        <li><span>Peran Pengamat dan Operator; dua kunci konfirmasi</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Nilai Kesiapan Siber A–E untuk Dansat</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Akun Operator hanya lewat kode undangan</span> <span class="tanda jalan">BERJALAN</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi">{{i:scan-search}}</i><div><h3>Identify</h3><p>tahu apa yang dijaga dan risikonya</p></div><span class="kode">ID</span></div><ul>
+        <li><span>Inventaris aset IT dan zona kendali OT</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Peluang serangan per aset dari korelasi CTI × aset</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li class="rencana tajam"><span><b>Integrasi Direktori Aktif (IAM) &amp; Pemantauan Login</b></span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi">{{i:shield-check}}</i><div><h3>Protect</h3><p>memperkecil celah</p></div><span class="kode">PR</span></div><ul>
+        <li><span>Akses posko berlapis (PBKDF2, token kedaluwarsa, CSP)</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Kepatuhan backup &lt; 24 jam dan uji pulih</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Perketat aset yang diprediksi diserang</span> <span class="tanda simulasi">SIMULASI</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi">{{i:eye}}</i><div><h3>Detect</h3><p>melihat ancaman lebih awal</p></div><span class="kode">DE</span></div><ul>
+        <li><span>AI lokal menilai 9 aset ±10 ms, dengan alasan</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Triase: Selesai atau Positif Palsu (<i>False Positive</i>), beralasan</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li class="rencana"><span>Sensor jaringan nyata (Wazuh, Suricata, Zeek)</span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi">{{i:siren}}</i><div><h3>Respond</h3><p>menanggapi insiden</p></div><span class="kode">RS</span></div><ul>
+        <li><span>Bukti dulu → isolasi ±1,2 dtk → LAPSIT</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Pemutusan perangkat sasaran</span> <span class="tanda simulasi">SIMULASI</span></li>
+        <li class="rencana"><span>LAPSIT berjenjang ke Sansidam dan Kartika CSIRT</span> <span class="tanda rencana">PETA JALAN</span></li></ul></div>
+      <div class="fungsi"><div class="kepala-fungsi"><i class="ikon-fungsi">{{i:life-buoy}}</i><div><h3>Recover</h3><p>kembali normal tanpa merusak bukti</p></div><span class="kode">RC</span></div><ul>
+        <li><span>Pulihkan terkunci sampai SHA-256 cocok ulang</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Isolasi darurat wajib beralasan; bukti susulan sebelum pulih</span> <span class="tanda jalan">BERJALAN</span></li>
+        <li><span>Semua langkah tercatat di buku berantai HMAC</span> <span class="tanda jalan">BERJALAN</span></li></ul></div>
+    </div>
+  </section>
+
+  <section class="bawah">
+    <div class="kotak">
+      <p class="label"><span class="kiri">{{i:lock}}Posko ini sendiri dijaga berlapis</span><span class="tanda jalan">BERJALAN</span></p>
+      <ul>
+        <li>Kata sandi PBKDF2-SHA256 200.000 putaran; <i>login</i> dibatasi 5 kali per menit</li>
+        <li>Token acak yang kedaluwarsa; <i>server</i> hanya menyimpan <i>hash</i>-nya</li>
+        <li>Kiriman di atas 16 KB ditolak; kolom tak dikenal ditolak</li>
+        <li>Kebijakan keamanan konten ketat; tanpa CDN atau skrip luar</li>
+        <li>Log audit dan Buku Rantai Bukti berantai HMAC: diubah = ketahuan</li>
+        <li>Paket pasang luring bersidik jari SHA-256 untuk jaringan <i>air-gapped</i></li>
+      </ul>
+    </div>
+    <div class="kotak">
+      <p class="label" style="color: var(--samar)"><span class="kiri">{{i:info}}Yang kami akui terus terang</span></p>
+      <ul class="jujur">
+        <li>Data latihan sintetis (alamat RFC 5737); pemutusan perangkat masih simulasi</li>
+        <li>Belum ada verifikasi dua langkah dan uji penetrasi independen</li>
+        <li>Saat tersambung ke perangkat nyata, wajib: brankas kredensial, hak minimum per <i>playbook</i>, <i>playbook</i> bertanda tangan, persetujuan dua orang</li>
+        <li>Asisten narasi LLM lokal masih peta jalan</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="kaki">
+    <span><b>Sepenuhnya defensif</b> · berjalan luring penuh · keputusan di tangan manusia · data sintetis · ikon: Lucide (ISC)</span>
+    <span>NIST CSF 2.0 = NIST CSWP 29 (2024) · github.com/pisangsisir/nusantara-shield-v5.1</span>
+  </footer>
+</main>
+</body>
+</html>

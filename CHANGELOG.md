@@ -9,7 +9,7 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 - Dokumentasi Teknis §2.6: pemetaan fitur ke **NIST CSF 2.0** (CSWP 29) per kategori, dengan status (berjalan, simulasi, peta jalan) dan berkas uji yang membuktikannya. Pemetaan mandiri, bukan sertifikasi.
 - Dokumentasi Teknis §2.7: **keamanan posko itu sendiri**, berupa tabel ancaman → pengamanan → uji, beserta batasnya (HTTPS lewat *proxy* balik, sesi di memori, belum ada verifikasi dua langkah, belum ada uji penetrasi independen, syarat saat tersambung ke perangkat nyata).
 - Peta jalan: pemantauan peristiwa identitas (Active Directory) dan pengamanan integrasi nyata (brankas kredensial, hak minimum per *playbook*, *playbook* bertanda tangan, persetujuan dua orang).
-- `docs/poster/`: poster satu halaman A4 (HTML, PDF, PNG); setiap butir berlabel BERJALAN, SIMULASI, atau PETA JALAN.
+- `docs/poster/`: poster satu halaman A4 (HTML, PDF, PNG); setiap butir berlabel BERJALAN, SIMULASI, atau PETA JALAN. Bendera Merah Putih, ikon Lucide (ISC) sebagai SVG sebaris pada metrik, alur, enam fungsi CSF, dan jenis aset, ilustrasi jaringan abstrak, baris format laporan siap lapor (bahan pelaporan ke BSSN dan UU PDP; belum diaudit kepatuhan), dan peta jalan "Integrasi Direktori Aktif (IAM) & Pemantauan Login". Sumber dan pembangkitnya di `docs/poster/sumber/`.
 - Tanpa perubahan kode aplikasi; 224 uji lulus.
 
 ### Perbaikan uji paket lintas-OS — 26 Oktober 2026 (branch `fix/uji-paket-lintas-os`)

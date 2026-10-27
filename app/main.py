@@ -741,8 +741,9 @@ def verifikasi_audit(akun: Akun = Depends(butuh_izin("lihat"))) -> dict:
 def ekspor_lapsit(akun: Akun = Depends(butuh_izin("lihat"))) -> Response:
     with _kunci_state:
         data = [_tampilan(l) for l in LAYANAN.values()]
+        peringatan = MENARA.peringatan_lapsit(LAYANAN)
     LOG.catat(akun.nama, "EKSPOR_LAPSIT", {"jumlah_layanan": len(data)})
-    pdf = buat_pdf(data, LOG.verifikasi(), akun.nama)
+    pdf = buat_pdf(data, LOG.verifikasi(), akun.nama, peringatan)
     nama_berkas = f"LAPSIT-NusantaraShield-{datetime.now(timezone.utc):%Y%m%d-%H%M}.pdf"
     return Response(pdf, media_type="application/pdf",
                     headers={"Content-Disposition": f'attachment; filename="{nama_berkas}"'})

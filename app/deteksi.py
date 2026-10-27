@@ -1,5 +1,6 @@
 """
-Engine Deteksi Aturan — membaca PERISTIWA MENTAH (upaya login dan koneksi jaringan), lalu menyimpulkan temuan.
+Engine Deteksi Aturan — membaca PERISTIWA MENTAH (upaya login, koneksi jaringan, dan perintah Modbus ke
+zona kendali OT), lalu menyimpulkan temuan. Label MITRE ATT&CK tiap aturan ada di app/mitre.py.
 
 Analogi: petugas jaga yang membaca buku tamu. Satu tamu salah menyebut nama sekali itu wajar; orang yang
 sama mencoba 8 nama berbeda dalam satu menit patut dicurigai. Orang yang mengetuk 15 pintu berbeda dalam
@@ -26,9 +27,26 @@ ATURAN: dict[str, dict] = {
                      "keparahan": "tinggi", "peluang": 0.85},
     "pindai_port": {"nama": "Pemindaian port", "ambang": 15, "jendela": 10,
                     "keparahan": "tinggi", "peluang": 0.35},
+    # IT/OT: aturan deterministik untuk zona kendali (Modbus/TCP port 502)
+    "ot_tanpa_izin": {"nama": "Koneksi IT ke zona kendali OT tanpa izin", "jendela": 600,
+                      "keparahan": "tinggi", "peluang": 0.50},
+    "tulis_ot_luar_jadwal": {"nama": "Perintah tulis Modbus di luar jendela pemeliharaan", "jendela": 60,
+                             "keparahan": "kritis", "peluang": 0.70},
+    "rantai_it_ot": {"nama": "Rantai IT ke OT: koneksi tanpa izin disusul perintah tulis", "jendela": 600,
+                     "keparahan": "kritis", "peluang": 0.90},
 }
 MASA_AKTIF = 300   # detik sejak peristiwa terakhir: selama itu temuan masih menyumbang peluang serangan
 AWALAN = "DET-"    # penanda sumber peluang dari Engine Deteksi Aturan (bandingkan "CTI-…" dan "AI-ANOMALI")
+
+# Daftar jalur OT yang diizinkan (di satuan: ditetapkan pejabat siber satuan). Selain alamat ini, koneksi ke zona kendali = temuan.
+JALUR_OT_DIIZINKAN = {"192.0.2.140"}          # stasiun rekayasa OT (RFC 5737)
+JENDELA_PEMELIHARAAN = (22, 2)                # perintah tulis hanya wajar pukul 22.00–02.00 waktu setempat
+FUNGSI_TULIS_MODBUS = {5, 6, 15, 16}          # write coil/register; fungsi baca (1–4) tidak dihitung
+
+
+def dalam_jendela_pemeliharaan(jam: int) -> bool:
+    mulai, akhir = JENDELA_PEMELIHARAAN
+    return mulai <= jam < akhir if mulai <= akhir else (jam >= mulai or jam < akhir)   # boleh melewati tengah malam
 
 
 @dataclass
@@ -63,6 +81,16 @@ class Temuan:
         if self.aturan == "login_tembus":
             return (f"login berhasil dari {self.sumber} setelah {self.rincian.get('gagal', 0)} kali gagal "
                     f"(dalam {a['jendela']} dtk)")
+        if self.aturan == "ot_tanpa_izin":
+            return (f"{self.sumber} membuka {self.jumlah} koneksi Modbus ke zona kendali; "
+                    f"alamat ini tidak ada di daftar jalur OT yang diizinkan")
+        if self.aturan == "tulis_ot_luar_jadwal":
+            m, s = JENDELA_PEMELIHARAAN
+            return (f"{self.jumlah} perintah tulis Modbus (fungsi {self.rincian['fungsi']}) dari {self.sumber} "
+                    f"pukul {self.rincian['jam']:02d}.00; jendela pemeliharaan {m:02d}.00–{s:02d}.00")
+        if self.aturan == "rantai_it_ot":
+            return (f"koneksi tanpa izin ({self.rincian['koneksi']}) disusul perintah tulis "
+                    f"({self.rincian['tulis']}) dari {self.sumber} dalam {durasi} dtk")
         return (f"{self.jumlah} kombinasi alamat:port berbeda dari {self.sumber} dalam {durasi} dtk "
                 f"(ambang {a['ambang']} dalam {a['jendela']} dtk)")
 
@@ -97,7 +125,48 @@ class MesinDeteksi:
             return self._login(peristiwa, t)
         if peristiwa["jenis"] == "koneksi":
             return self._koneksi_masuk(peristiwa, t)
+        if peristiwa["jenis"] == "koneksi_ot":
+            return self._koneksi_ot(peristiwa, t)
+        if peristiwa["jenis"] == "modbus":
+            return self._modbus(peristiwa, t)
         raise ValueError("Jenis peristiwa tidak dikenal")
+
+    # -- aturan IT/OT -----------------------------------------------------------
+    def _perpanjang_atau_baru(self, aturan: str, sumber: str, aset: str, t: float,
+                              rincian: dict | None = None) -> tuple[Temuan, bool]:
+        """Episode yang masih dalam jendela diperpanjang; selain itu temuan baru. → (temuan, baru?)"""
+        ep = self._episode.get((aturan, sumber, aset))
+        if ep and t - ep.terakhir <= ATURAN[aturan]["jendela"]:
+            ep.terakhir, ep.jumlah = t, ep.jumlah + 1
+            return ep, False
+        tm = self._baru(aturan, sumber, [aset], t, t, 1, rincian)
+        self._episode[(aturan, sumber, aset)] = tm
+        return tm, True
+
+    def _koneksi_ot(self, p: dict, t: float) -> list[Temuan]:
+        if p["sumber"] in JALUR_OT_DIIZINKAN:
+            return []
+        tm, baru = self._perpanjang_atau_baru("ot_tanpa_izin", p["sumber"], p["aset"], t)
+        return [tm] if baru else []
+
+    def _modbus(self, p: dict, t: float) -> list[Temuan]:
+        if p["fungsi"] not in FUNGSI_TULIS_MODBUS or dalam_jendela_pemeliharaan(p["jam"]):
+            return []
+        sumber, aset = p["sumber"], p["aset"]
+        tulis, baru = self._perpanjang_atau_baru("tulis_ot_luar_jadwal", sumber, aset, t,
+                                                 {"fungsi": p["fungsi"], "jam": p["jam"]})
+        hasil = [tulis] if baru else []
+        koneksi = self._episode.get(("ot_tanpa_izin", sumber, aset))
+        rantai = self._episode.get(("rantai_it_ot", sumber, aset))
+        if koneksi and t - koneksi.terakhir <= ATURAN["rantai_it_ot"]["jendela"]:
+            if rantai and rantai.mulai >= koneksi.mulai:          # rantai yang sama: cukup diperpanjang
+                rantai.terakhir = t
+            else:
+                tm = self._baru("rantai_it_ot", sumber, [aset], koneksi.mulai, t, 2,
+                                {"koneksi": koneksi.id, "tulis": tulis.id})
+                self._episode[("rantai_it_ot", sumber, aset)] = tm
+                hasil.append(tm)
+        return hasil
 
     # -- aturan login --------------------------------------------------------
     def _login(self, p: dict, t: float) -> list[Temuan]:
@@ -161,6 +230,8 @@ class MesinDeteksi:
 IP_PENEBAK = "203.0.113.77"     # RFC 5737 TEST-NET-3 (luar gerbang)
 IP_PEMINDAI = "198.51.100.66"   # RFC 5737 TEST-NET-2 (luar gerbang)
 IP_ADMIN = "192.0.2.150"        # RFC 5737 TEST-NET-1 (stasiun kerja admin internal, login wajar)
+IP_REKAYASA_OT = "192.0.2.140"  # stasiun rekayasa OT yang diizinkan (ada di JALUR_OT_DIIZINKAN)
+IP_PENYUSUP = "192.0.2.183"     # stasiun kerja kantor yang sudah disusupi (RFC 5737)
 PORT_DICOBA = [21, 22, 23, 25, 53, 80, 110, 135, 139, 143, 443, 445, 993, 995, 1433, 3306,
                3389, 5432, 5900, 6379, 8080, 8443, 502, 873]
 
@@ -182,7 +253,18 @@ def rangkaian_latihan(jenis: str, aset: dict, dmz: list[dict]) -> list[tuple[flo
                                             "aset": s["id"] if port == s["port"] else None}))
                 i += 1
         return ev
+    if jenis == "akses_ot":
+        aid = aset["id"]
+        return [  # stasiun rekayasa resmi: tersambung dan MEMBACA register (wajar) → bukan temuan
+            (0.5, {"jenis": "koneksi_ot", "sumber": IP_REKAYASA_OT, "aset": aid}),
+            (1.0, {"jenis": "modbus", "sumber": IP_REKAYASA_OT, "aset": aid, "fungsi": 3, "jam": 14}),
+            # stasiun kerja kantor yang disusupi: menyeberang ke zona kendali, lalu menulis register siang hari
+            (3.0, {"jenis": "koneksi_ot", "sumber": IP_PENYUSUP, "aset": aid}),
+            *[(6.0 + i, {"jenis": "modbus", "sumber": IP_PENYUSUP, "aset": aid, "fungsi": 16, "jam": 14})
+              for i in range(3)],
+        ]
     raise ValueError("Jenis latihan deteksi tidak dikenal")
 
 
-JENIS_LATIHAN = ("login_gagal", "login_tembus", "pindai_port")
+JENIS_LATIHAN = ("login_gagal", "login_tembus", "pindai_port", "akses_ot")
+ASET_LATIHAN_OT = "genset"      # latihan akses_ot selalu menyasar pengendali genset (aset OT)

@@ -25,6 +25,7 @@ KELOMPOK = {
     "test_triase_kesiapan.py": "Triase & Kesiapan Siber: penutupan peringatan beralasan, nilai A–E terbuka",
     "test_deteksi.py": "Engine Deteksi Aturan: login gagal berulang, login tembus, pemindaian port (ambang terbuka)",
     "test_linimasa.py": "Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI MTTC dan insiden",
+    "test_ot_mitre_lapsit.py": "Aturan OT, label MITRE ATT&CK, label sumber data, dan pengesahan dua tanda tangan LAPSIT",
 }
 _berkas_terakhir = {"nama": None}
 _CONFIG = {"config": None}

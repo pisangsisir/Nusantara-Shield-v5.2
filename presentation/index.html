@@ -285,7 +285,7 @@ h2 em { font-style: normal; color: var(--neon); }
 .darurat b { color: var(--merah); font-family: var(--huruf-mono); letter-spacing: .1em; font-size: 14px; white-space: nowrap; }
 
 /* =====================================================================
-   SLIDE 3 · Server: grafik CPU menurun (−74%) + 254 uji
+   SLIDE 3 · Server: grafik CPU menurun (−74%) + 280 uji
    ===================================================================== */
 .dua-kolom { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .grafik { padding: 22px 26px 18px; }
@@ -635,7 +635,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <div class="angka"><b>66%→20%</b><span>genset WASPADA sebelum diserang; Perketat menurunkannya</span></div>
         <div class="angka"><b>±1,2 dtk</b><span>keputusan → jaringan terputus, bukti sudah aman</span></div>
         <div class="angka"><b>±1,5%</b><span>CPU (prosesor) <i class="asing">server</i> untuk 300 layar (±1,7% saat serangan)</span></div>
-                <div class="angka"><b>254</b><span>uji otomatis, termasuk uji AI lokal dan aturan deteksi</span></div>
+                <div class="angka"><b>280</b><span>uji otomatis, termasuk uji AI lokal dan aturan deteksi IT/OT</span></div>
       </div>
     </div>
 
@@ -769,6 +769,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
 
   <aside class="catatan">
     <h4>Catatan pembicara · Slide 3 · Doktrin dan SOP F-04</h4>
+    <p><b>Kalimat pembeda (dua kunci):</b> "Isolasi otomatis terdengar cepat, sampai ia memutus segmen OT karena alarm keliru. Di Nusantara Shield, isolasi selalu didahului bukti tersegel dan keputusan Operator. Yang diputus jalurnya, genset tetap menyala." Aturan OT baru (jalur tanpa izin, tulis Modbus di luar jendela pemeliharaan) pun hanya menaikkan WASPADA.</p>
     <p>Tekankan: <b>kecepatan dan ketertiban forensik tidak lagi saling bertentangan.</b> Operator tidak perlu mengingat urutan; <i class="asing">server</i> yang menjaganya. Ini menjawab temuan audit F-04 (<i class="asing">chain of custody</i>).</p>
     <ul>
       <li><b>Bahasa yang sama dengan buku Onno W. Purbo dan Gildas Deograt Lumy (2025):</b> lima langkah ini adalah siklus <i class="asing">detect → contain → eradicate → recover</i>, ditutup <i class="asing">After-Action Review</i> (AAR) di langkah Evaluasi. Kontainmen tidak mematikan fungsi layanan (<i class="asing">mission continuity</i>, contoh genset), dan pemulihan tidak menghapus jejak forensik.</li>
@@ -791,7 +792,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="penanda"><b>04</b>Keunggulan <i class="asing">Server</i> · Skalabilitas dan Uji</div>
     <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
   </div>
-  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 254 uji.</em></h2>
+  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 280 uji.</em></h2>
 
   <div class="dua-kolom">
     <div>
@@ -823,7 +824,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
           <div class="t-baris t-ai" style="--i:0"><span>▶ AI lokal<small>Isolation Forest · luring · alasan</small></span><em>10 PASSED</em></div>
           <div class="t-baris" style="--i:1"><span>▶ Manajemen akun<small>pendaftaran, dasbor akun</small></span><em>18 PASSED</em></div>
           <div class="t-baris" style="--i:2"><span>▶ Intelijen ancaman dan SOAR<small>prediksi, isolasi</small></span><em>18 PASSED</em></div>
-          <div class="t-baris" style="--i:3"><span>▶ Kamus istilah<small>istilah satuan</small></span><em>33 PASSED</em></div>
+          <div class="t-baris" style="--i:3"><span>▶ Kamus istilah<small>istilah satuan</small></span><em>36 PASSED</em></div>
           <div class="t-baris" style="--i:4"><span>▶ Keamanan dan akses<small><i class="asing">login</i>, peran, batas laju</small></span><em>38 PASSED</em></div>
           <div class="t-baris" style="--i:5"><span>▶ Rantai komando dan LAPSIT<small><i class="asing">pre-authorized</i></small></span><em>22 PASSED</em></div>
           <div class="t-baris t-ot" style="--i:6"><span>▶ Sinergi IT/OT<small>Modbus → WASPADA · isolasi OT</small></span><em>6 PASSED</em></div>
@@ -833,7 +834,8 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
           <div class="t-baris" style="--i:10"><span>▶ Triase dan Kesiapan Siber<small>alasan wajib · A–E terbuka</small></span><em>16 PASSED</em></div>
           <div class="t-baris" style="--i:11"><span>▶ Engine Deteksi Aturan<small><i class="asing">login</i> gagal 8/60 dtk · pindai <i class="asing">port</i></small></span><em>24 PASSED</em></div>
           <div class="t-baris" style="--i:12"><span>▶ Linimasa dan KPI<small>60 menit · pita AI · MTTC</small></span><em>6 PASSED</em></div>
-          <div class="t-akhir" style="--i:13">═══ 254 passed in 33.82s ═══</div>
+          <div class="t-baris t-ot" style="--i:13"><span>▶ Aturan OT, ATT&amp;CK, LAPSIT<small>IT → OT tanpa izin · 2 tanda tangan</small></span><em>23 PASSED</em></div>
+          <div class="t-akhir" style="--i:14">═══ 280 passed in 54.77s ═══</div>
         </div>
       </div>
       <p class="terminal-ket">Uji mengunci <b>aturan doktrin</b>, bukan sekadar fungsi: isolasi tanpa bukti ditolak 409 · pemulihan terkunci bila <i class="asing">hash</i> berbeda · sabotase OT diputus ±1,2 dtk tanpa mematikan genset · sandi tidak pernah tercatat di log · AI menilai tanpa satu pun koneksi jaringan · data layar hasil rakitan delta identik dengan <i class="asing">server</i>.</p>
@@ -847,7 +849,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Komponen: Loket Application Programming Interface (API) <code>app/main.py</code> · Gerbang keamanan <code>app/keamanan.py</code> · Dapur situasi <code>app/telemetri.py</code> · Engine Deteksi Anomali <code>app/ai_anomali.py</code> · Brankas bukti <code>app/bukti.py</code> · Buku berantai <code>app/audit.py</code> · Hub siaran <code>app/siaran.py</code> + <code>app/delta.py</code> · Dasbor <code>static/</code>.</li>
       <li>Gerbang ASGI memeriksa ukuran kiriman sebelum menyentuh logika aplikasi; lebih dari 16 KB diputus dengan kode 413.</li>
       <li>Batas yang sebaiknya disebut sendiri: sistem berjalan sebagai <b>satu proses <i class="asing">server</i></b>. Operasi multiproses adalah langkah lanjutan.</li>
-      <li>Uji bisa dijalankan ulang juri dalam ±50 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli versi akhir: 254 passed in 33.82s (Linux, Python 3.13), termasuk 24 uji Engine Deteksi Aturan dan 6 uji linimasa dan KPI.</li>
+      <li>Uji bisa dijalankan ulang juri dalam ±50 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli versi akhir: 280 passed in 54.77s (Linux, Python 3.13, 27 Okt 2026), termasuk 24 uji Engine Deteksi Aturan dan 6 uji linimasa dan KPI.</li>
       <li>Kebutuhan minimum: Python 3.10+, 2 inti, 512 MB memori bebas, 50 MB penyimpanan (paket rilis 187 KB). Memori terukur ±207 MB untuk 300 layar, termasuk pustaka scikit-learn dan numpy (±130 MB).</li>
     </ul>
   </aside>
@@ -916,6 +918,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
 
   <aside class="catatan">
     <h4>Catatan pembicara · Slide 5 · Kedaulatan sistem (Proposal §5.1, Dokumentasi §4)</h4>
+    <p><b>Kalimat pembeda (luring):</b> "“Tanpa awan” harus berlaku sampai ke demonya. Nusantara Shield dipasang dari paket bersidik jari tanpa internet, lalu seluruh uji dijalankan di mesin itu juga."</p>
     <p><b>Kalimat kunci:</b> "Yang kami demonstrasikan hari ini adalah inti di panel kiri, termasuk AI deteksi anomali, dan semuanya sudah berjalan tanpa internet. Panel kanan adalah peta jalan, belum dibangun."</p>
     <ul>
       <li><b>Pesan karya sendiri:</b> "Bapak/Ibu, pada Mode Berdaulat tidak ada satu pun data posko yang keluar ke server asing, termasuk server AI asing. Korelasi ancaman, skor anomali AI, sidik jari bukti, dan laporan dihitung di <i class="asing">server</i> milik satuan sendiri. Sistem ini kami bangun sendiri, dan kodenya dapat diperiksa baris per baris."</li>
@@ -943,7 +946,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="besar kartu-dasar" style="--i:0"><b>66→20%</b><strong>Peringatan dini</strong><span>genset naik WASPADA sebelum diserang; satu klik Perketat menurunkan peluangnya.</span></div>
     <div class="besar kartu-dasar" style="--i:1"><b>±1,2 dtk</b><strong>Penahanan ancaman</strong><span>dari keputusan operator sampai jaringan terputus, bukti sudah aman.</span></div>
     <div class="besar kartu-dasar" style="--i:2"><b class="biru">±1,5%</b><strong>CPU <i class="asing">server</i></strong><span>untuk 300 layar komando (±1,7% saat serangan), diukur ulang pada versi akhir.</span></div>
-    <div class="besar kartu-dasar" style="--i:3"><b class="biru">254</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin, ambang deteksi, dan AI lokal; lulus semua.</span></div>
+    <div class="besar kartu-dasar" style="--i:3"><b class="biru">280</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin, ambang deteksi, dan AI lokal; lulus semua.</span></div>
   </div>
 
   <div class="jaminan">
@@ -971,7 +974,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <p><b>Kalimat penutup (pilih satu, ucapkan pelan):</b></p>
     <ul>
       <li>"Alarm, dari mana pun asalnya, hanya memberi tahu. Pertanyaan di satuan adalah siapa yang berwenang memutus dan apakah buktinya masih sah di meja penyidik. Di Nusantara Shield, mesin menaikkan WASPADA, manusia memutus, dan setiap langkah terkunci dalam rantai HMAC."</li>
-      <li>"Sistem yang butuh API awan untuk berpikir akan ikut lumpuh saat jalur internasional terganggu. Aturan deteksi, AI, dan korelasi ancaman Nusantara Shield berjalan di <i class="asing">server</i> satuan sendiri, dan dikunci 254 uji yang bisa diulang Dewan Juri."</li>
+      <li>"Sistem yang butuh API awan untuk berpikir akan ikut lumpuh saat jalur internasional terganggu. Aturan deteksi, AI, dan korelasi ancaman Nusantara Shield berjalan di <i class="asing">server</i> satuan sendiri, dan dikunci 280 uji yang bisa diulang Dewan Juri."</li>
       <li>Jangan menyebut tim lain. Bila ditanya "AI kan banyak alarm palsu?": AI kami tidak pernah memutus; ia hanya menaikkan WASPADA, dan Operator memilah Positif Palsu (<i class="asing">False Positive</i>) dengan alasan tertulis yang tercatat di Buku Rantai Bukti. Jangan mengklaim nol <i class="asing">false positive</i>.</li>
     </ul>
     <ul>
@@ -1013,12 +1016,12 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="penanda"><b>08</b>Lampiran B · Peta Kriteria dan Asal Angka</div>
     <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
   </div>
-  <h2>Setiap klaim bisa diperiksa. <em>Ini petanya.</em></h2>
+  <h2>Angka kami bukan animasi. <em>Setiap angka punya alamat.</em></h2>
   <div class="dua-kolom kamus-kolom">
     <table class="kamus peta"><tbody>
       <tr><td><b>Relevansi · 25%</b></td><td>IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan); LAPSIT untuk Dansat</td></tr>
       <tr><td><b>Inovasi · 25%</b></td><td>Bukti dulu baru putus, dikunci <i class="asing">server</i> (409); rantai HMAC; dua kunci; AI luring yang menjelaskan alasannya; isolasi OT memutus jalur, genset tetap menyala</td></tr>
-      <tr><td><b>Fungsionalitas · 25%</b></td><td>Berjalan penuh; 254 uji lulus; paket luring diuji di Mac tanpa internet. <span class="batas">Batas: data sintetis, sakelar simulasi</span></td></tr>
+      <tr><td><b>Fungsionalitas · 25%</b></td><td>Berjalan penuh; 280 uji lulus; paket luring diuji di Mac tanpa internet. <span class="batas">Batas: data sintetis, sakelar simulasi</span></td></tr>
       <tr><td><b>Kelayakan · 15%</b></td><td>Satu proses Python; ±1,5% CPU untuk 300 layar; pemasangan luring bersidik jari; peran Operator dan Pengamat</td></tr>
       <tr><td><b>Dokumentasi · 10%</b></td><td>Proposal, Dokumentasi Teknis, Panduan Belajar, dek, poster, README, CHANGELOG, deklarasi dan atribusi</td></tr>
     </tbody></table>
@@ -1028,11 +1031,11 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <tr><td><b>8× / 60 dtk</b></td><td>Ambang di <code>app/deteksi.py</code>; dikunci <code>test_deteksi</code></td></tr>
       <tr><td><b>±1,5% CPU</b></td><td><code>tools/ukur_beban.py</code>, 26 Okt 2026, 300 siaran SSE sungguhan</td></tr>
       <tr><td><b>±10 ms AI</b></td><td><code>skor_ms</code> di <code>app/ai_anomali.py</code>; uji membatasi &lt; 100 ms</td></tr>
-      <tr><td><b>254 uji</b></td><td><code>./run_tests.sh</code>, lulus 27 Okt 2026 di Linux dan Mac</td></tr>
+      <tr><td><b>280 uji</b></td><td><code>./run_tests.sh</code>, lulus 27 Okt 2026 di Linux dan Mac</td></tr>
     </tbody></table>
   </div>
   <p class="dokumen-lengkap">Rincian lengkap: Proposal §7 di <a href="https://github.com/pisangsisir/nusantara-shield-v5.1">github.com/pisangsisir/nusantara-shield-v5.1</a></p>
-  <aside class="catatan"><h4>Catatan pembicara · Lampiran B</h4><p>Tampilkan bila juri menanyakan asal sebuah angka atau kecocokan dengan kriteria. Kalimat kunci: "Setiap angka di slide ini punya alamat: berkas, uji, atau alat ukur yang bisa dijalankan ulang."</p></aside>
+  <aside class="catatan"><h4>Catatan pembicara · Lampiran B</h4><p>Tampilkan bila juri menanyakan asal sebuah angka atau kecocokan dengan kriteria. Kalimat kunci: "Angka di dasbor kami bukan animasi. Setiap angka punya alamat: berkas, uji, atau alat ukur yang bisa dijalankan ulang Dewan Juri."</p></aside>
   <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>08 / 08</span></div>
 </section>
 

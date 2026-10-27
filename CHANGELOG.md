@@ -4,6 +4,14 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Fase 2: aturan OT, label MITRE ATT&CK, label sumber data, pengesahan LAPSIT — 27 Oktober 2026 (branch `feature/fase2-mitre-ot-lapsit`)
+- **Aturan OT deterministik** di Engine Deteksi Aturan: koneksi IT ke zona kendali OT dari alamat yang tidak terdaftar (tinggi, 0,50), perintah tulis Modbus di luar jendela pemeliharaan 22.00–02.00 (kritis, 0,70), dan rantai keduanya dari alamat yang sama dalam 600 detik (kritis, 0,90). Jalur resmi dan perintah baca bukan temuan. **Dua kunci tetap:** temuan hanya menaikkan pengendali genset ke WASPADA; tidak ada insiden, bukti, atau isolasi yang terpicu. Latihan baru **Akses OT tanpa izin** di bilah latihan.
+- **Label MITRE ATT&CK®** (`app/mitre.py`, luring) di tabel Peringatan terbaru, log peristiwa, dan LAPSIT: T1110, T1078, T1046, T1486, T1490, T1498, serta ATT&CK for ICS T0886 dan T0855. AI lokal sengaja tanpa label.
+- **Label batasan** di setiap peringatan: sumber datanya dan apa yang masih simulasi.
+- **LAPSIT PDF:** bagian baru *Peringatan terbaru* (dengan teknik ATT&CK dan sumber data) dan blok **pengesahan dua tanda tangan** (Operator jaga; Mengetahui, pejabat siber/komandan dari kamus istilah). Judul dan kotak tanda tangan tidak terpisah halaman; nama layanan panjang tidak lagi menimpa kolom status. LAPSIT kini memproses peristiwa deteksi yang sudah jatuh tempo sebelum dicetak.
+- Kalimat pembeda di catatan pembicara slide 3 dan 5, judul Lampiran B, dan README.
+- **280 uji** (sebelumnya 254): 23 uji baru di `tests/test_ot_mitre_lapsit.py`, 3 uji kamus istilah baru. Blok terminal di Dokumentasi Teknis §4.2 dibuat ulang dari jalannya uji yang sebenarnya.
+
 ### Peta kriteria penilaian dan asal angka — 27 Oktober 2026 (branch `docs/peta-kriteria-asal-angka`)
 - **Proposal §7:** peta lima kriteria Rulebook (bagian H) ke bukti di karya dan cara memeriksanya, serta tabel **asal setiap angka** (berkas, uji, atau alat ukur), termasuk batas tiap angka. Contoh: ±1,2 detik adalah jeda baku alur purwarupa (`JEDA_RUNBOOK`), bukan waktu sakelar fisik.
 - **Dek:** slide baru **Lampiran B · Peta Kriteria dan Asal Angka** (dek kini 8 slide); kalimat pembeda di catatan pembicara slide 2 dan 6.

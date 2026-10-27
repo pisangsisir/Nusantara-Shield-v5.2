@@ -73,7 +73,9 @@ def test_ambang_terbuka_sesuai_dokumentasi():
     assert (ATURAN["login_gagal"]["ambang"], ATURAN["login_gagal"]["jendela"]) == (8, 60)
     assert (ATURAN["pindai_port"]["ambang"], ATURAN["pindai_port"]["jendela"]) == (15, 10)
     assert ATURAN["login_tembus"]["jendela"] == 120 and MASA_AKTIF == 300
-    assert {a: ATURAN[a]["peluang"] for a in ATURAN} == {"login_gagal": 0.60, "login_tembus": 0.85, "pindai_port": 0.35}
+    assert {a: ATURAN[a]["peluang"] for a in ATURAN} == {"login_gagal": 0.60, "login_tembus": 0.85, "pindai_port": 0.35,
+                                                         "ot_tanpa_izin": 0.50, "tulis_ot_luar_jadwal": 0.70,
+                                                         "rantai_it_ot": 0.90}
 
 
 def test_temuan_muncul_tepat_pada_gagal_kedelapan(k):

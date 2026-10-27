@@ -9,8 +9,10 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 (bukti → isolasi → LAPSIT, otomatis setelah satu keputusan Operator; perintah ke perangkat masih simulasi).
 *Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
-Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **254 uji** yang bisa dijalankan ulang siapa pun; asal setiap angka dan peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
+Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **280 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
 
+- **Isolasi tidak pernah otomatis.** Isolasi otomatis terdengar cepat, sampai ia memutus segmen OT karena alarm keliru. Di sini isolasi selalu didahului bukti tersegel dan keputusan Operator; yang diputus jalurnya, genset tetap menyala.
+- **"Tanpa awan" berlaku sampai ke demonya.** Aplikasi dipasang dari paket bersidik jari tanpa internet, lalu seluruh uji dijalankan di mesin itu juga.
 - Semua data **sintetis**: alamat IP dari blok dokumentasi RFC 5737, nama orang & instansi **fiktif**.
 - Berjalan **luring** (tanpa internet): tidak ada CDN, font, atau gambar dari luar.
 - Tidak menyimpan data pribadi; log audit tidak menyimpan alamat IP pengunjung.
@@ -20,7 +22,7 @@ Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bu
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          254 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tests/          280 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), diagram alur, dan logo
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
@@ -284,7 +286,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 254 uji** dalam 13 kelompok.
+**Total: 280 uji** dalam 14 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -340,13 +342,20 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - Isolasi darurat menolak alasan kosong; alasannya terikat ke buku bukti, log audit, dan LAPSIT
 - Bukti atau berita acara yang dirusak → pemulihan dikunci di semua pintu
 
-**Kamus istilah** — `tests/test_istilah.py` (33 uji)
+**Kamus istilah** — `tests/test_istilah.py` (36 uji)
 - Tidak ada label yang tertanam di luar `app/istilah.py`; playbook dirakit dari kamus
 
 **Engine Deteksi Aturan** — `tests/test_deteksi.py` (24 uji)
 - Ambang terbuka dikunci: 8 _login_ gagal dalam 60 dtk (ke-7 belum, ke-8 terdeteksi), _login_ tembus ≤ 120 dtk, 15 kombinasi aset:port dalam 10 dtk
 - Di bawah ambang, di luar jendela, atau port yang sama berulang: tidak ada temuan; rentetan berlanjut tidak menggandakan temuan
 - Temuan hanya menaikkan WASPADA (tanpa isolasi/SOAR); Perketat, triase, kedaluwarsa 300 dtk; label isolasi = Operator + nomor bukti sebenarnya
+
+**Aturan OT, label MITRE ATT&CK, sumber data, dan pengesahan LAPSIT** — `tests/test_ot_mitre_lapsit.py` (23 uji)
+- Koneksi ke zona kendali dari alamat yang tidak terdaftar → temuan; jalur resmi dan perintah baca Modbus → bukan temuan
+- Perintah tulis Modbus di luar jendela pemeliharaan 22.00–02.00 → temuan kritis (diuji per jam); koneksi tanpa izin disusul tulis → rantai IT → OT
+- Dua kunci utuh: latihan Akses OT hanya menaikkan genset ke WASPADA, tanpa insiden, bukti, atau isolasi; hanya Operator yang boleh memutarnya
+- Setiap aturan dan skenario berlabel MITRE ATT&CK (AI sengaja tanpa label); setiap peringatan menulis sumber datanya
+- LAPSIT PDF memuat teknik ATT&CK, label sumber data, dan blok pengesahan dua tanda tangan
 
 **Linimasa & KPI** — `tests/test_linimasa.py` (6 uji)
 - 60 menit data latihan berbenih tetap tanpa kejadian karangan; tiap 60 dtk satu titik posko; menit insiden ditandai
@@ -433,7 +442,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                254 uji otomatis (lihat bagian 6)
+tests/                280 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/buat_peta.mjs   pembuat titik peta dunia (sekali pakai)
 run_tests.sh / .bat   menjalankan uji dengan umpan balik per uji

@@ -1133,7 +1133,12 @@ function gambarPeringatan(daftar) {
       el("td", { kelas: "kol-peringatan", "data-label": "Peringatan" },
         ikon(x.aturan === "pindai_port" ? "periksa" : IKON_PERINGATAN[x.jenis] || "kuning"),
         el("div", { kelas: "isi-peringatan" }, el("b", { teks: nama }),
-          x.rincian ? el("small", { teks: x.rincian, title: x.rincian }) : null)),
+          x.rincian ? el("small", { teks: x.rincian, title: x.rincian }) : null,
+          // Fase 2: teknik MITRE ATT&CK (pemetaan mandiri; tabel di app/mitre.py) dan label batasan sumber data
+          (x.mitre || []).length ? el("span", { kelas: "baris-mitre", "aria-label": "Teknik MITRE ATT&CK" },
+            ...x.mitre.map((m) => el("span", { kelas: `tag-mitre${m.matriks === "ICS" ? " ics" : ""}`, teks: m.id,
+              title: `MITRE ATT&CK ${m.matriks === "ICS" ? "for ICS" : "Enterprise"}: ${m.id} ${m.nama}` }))) : null,
+          x.sumber_data ? el("small", { kelas: "sumber-data", teks: x.sumber_data, title: x.sumber_data }) : null)),
       el("td", { kelas: "kol-aset", "data-label": "Aset", teks: aset }),
       el("td", { kelas: "kol-status status-peringatan", "data-label": "Status", teks: x.status }),
       el("td", { kelas: "kol-waktu", "data-label": "Waktu" }, el("time", { datetime: x.waktu, teks: jamLokal(x.waktu) })));

@@ -61,6 +61,11 @@ ISTILAH: dict = {
     "tutup_fp": "False Positive",
     "tombol_tutup_peringatan": "Tutup peringatan",
     "kesiapan": "Kesiapan Siber",
+
+    # --- LAPSIT: blok pengesahan dua tanda tangan (dua kunci juga di atas kertas) ---------------
+    "ttd_judul": "Pengesahan",
+    "ttd_pembuat": "Operator jaga (pembuat laporan)",
+    "ttd_mengetahui": "Mengetahui",
 }
 
 

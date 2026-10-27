@@ -458,7 +458,7 @@ Sesuai Rulebook bagian G (Ketentuan Karya), berikut pustaka dan alat pihak ketig
 | **Lucide** (v0.460.0) | Ikon pada poster, disematkan sebagai SVG sebaris; tidak dipakai aplikasi | ISC |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi | Layanan komersial |
 | **Gemini (Google)** | Eksplorasi awal konsep logo; logo final digambar ulang tim sebagai vektor SVG dan tidak memuat gambar hasil AI | Layanan komersial |
-| **Inter** (Rasmus Andersson) | Huruf pada logo horizontal | SIL Open Font License 1.1 |
+| **Inter** dan **JetBrains Mono** | Huruf pada logo horizontal dan spanduk README | SIL Open Font License 1.1 |
 | **Blok alamat Internet Protocol (IP) Request for Comments (RFC) 5737** | Data latihan sintetis | Standar terbuka IETF |
 
 ### 6.3 Rujukan Kerangka

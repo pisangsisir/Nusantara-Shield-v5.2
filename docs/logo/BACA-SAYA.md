@@ -8,6 +8,8 @@
 | `logo-horizontal.svg` / `.png` | Simbol dan tulisan, latar gelap |
 | `logo-horizontal-terang.svg` / `.png` | Simbol dan tulisan, latar terang |
 | `simbol-transparan-1024.png` | Gambar resolusi tinggi bila SVG tidak bisa dipakai |
+| `banner.png` | Spanduk di halaman depan README (2560 × 1280) |
+| `social-preview.png` | Gambar pratinjau tautan GitHub, 1280 × 640 (diunggah lewat Settings → Social preview) |
 
 Salinan yang dipakai aplikasi ada di `static/logo.svg` dan `static/favicon.ico`. Dek presentasi dan poster menyematkan simbol yang sama.
 
@@ -29,4 +31,4 @@ Salinan yang dipakai aplikasi ada di `static/logo.svg` dan `static/favicon.ico`.
 
 ## Asal-usul
 
-Konsep awal dijajaki dengan Gemini (Google). Logo final digambar ulang tim sebagai vektor SVG: siluet pulau dijiplak lalu disederhanakan, unsur yang tidak terbaca di 32 px dibuang, dan lintasan ancaman ditambahkan. Tidak ada gambar hasil AI di dalam berkas ini. Tulisan pada logo horizontal memakai huruf Inter (SIL Open Font License 1.1).
+Konsep awal dijajaki dengan Gemini (Google). Logo final digambar ulang tim sebagai vektor SVG: siluet pulau dijiplak lalu disederhanakan, unsur yang tidak terbaca di 32 px dibuang, dan lintasan ancaman ditambahkan. Tidak ada gambar hasil AI di dalam berkas ini. Tulisan pada logo horizontal memakai huruf Inter; spanduk memakai Inter dan JetBrains Mono (keduanya SIL Open Font License 1.1).

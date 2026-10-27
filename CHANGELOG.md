@@ -4,6 +4,9 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Panduan Belajar diperbarui untuk Fase 2–3 — 27 Oktober 2026 (branch `docs/panduan-fase2-3`)
+- `docs/03-Panduan-Belajar-Nusantara-Shield.pdf` (62 halaman): Bab 7 menambah *Aturan OT, label MITRE ATT&CK, dan label sumber data* (termasuk pengesahan dua tanda tangan LAPSIT) serta *Impor log luring*; Bab 9 menambah *Lisensi: GNU GPL v3.0*; jumlah uji diperbarui menjadi 298 dalam 15 kelompok.
+
 ### Fase 3: impor log luring — 27 Oktober 2026 (branch `feature/fase3-impor-log`)
 - **Impor log asli** lewat tombol *Impor log…* di bilah Latihan (Operator saja) dan `POST /api/deteksi/impor`. Format: log autentikasi OpenSSH (auth.log/secure/journal), log firewall UFW/iptables (`SRC=`, `DST=`, `DPT=`), dan CSV berkepala `waktu,jenis,sumber,…`. Modul `app/impor_log.py` hanya menyalin baris relevan menjadi peristiwa mentah; **aturan yang menilainya sama persis dengan aturan latihan**.
 - Validasi ketat: IP, *port*, fungsi Modbus, jam, dan aset diperiksa; baris tidak sah dilewati dan dihitung; berkas tak dikenali ditolak 422. Maks. ±2 MB dan 50.000 baris.

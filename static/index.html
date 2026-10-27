@@ -7,6 +7,8 @@
   <title>Nusantara Shield v5.1</title>
   <!-- Semua gaya & skrip berasal dari server sendiri (sesuai Content-Security-Policy).
        Tidak ada CDN, font, atau gambar dari luar: aplikasi siap berjalan tanpa internet. -->
+  <link rel="icon" href="/static/favicon.ico" sizes="any">
+  <link rel="icon" href="/static/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/penjadwal.js" defer></script>  <!-- Fase 3: satu mesin animasi berbasis visibilitas -->
   <script src="/static/radar.js" defer></script>
@@ -19,15 +21,9 @@
   <!-- ===================== KEPALA ===================== -->
   <header class="kepala">
     <div class="merek">
-      <!-- Logo generik: perisai abstrak + sapuan radar. Bukan logo instansi mana pun. -->
-      <svg class="logo" viewBox="0 0 48 48" role="img" aria-label="Logo sistem">
-        <path class="logo-perisai" d="M24 3 41 9.5V22c0 11-7.4 19-17 23C14.4 41 7 33 7 22V9.5Z"/>
-        <circle class="logo-cincin" cx="24" cy="24" r="10.5"/>
-        <circle class="logo-cincin" cx="24" cy="24" r="5.5"/>
-        <path class="logo-sapu" d="M24 24 32.5 17.5"/>
-        <circle class="logo-pusat" cx="24" cy="24" r="2.2"/>
-        <circle class="logo-titik" cx="29.5" cy="29" r="1.6"/>
-      </svg>
+      <!-- Logo Nusantara Shield (docs/logo/). Bukan lambang negara atau instansi mana pun. -->
+      <img class="logo" src="/static/logo.svg" width="40" height="40" alt="Logo Nusantara Shield">
+
       <div>
         <p class="nama-produk" data-istilah="produk"></p>
         <p class="sub">Nusantara Shield v5.1 · Minimalist Incident UI · data sintetis</p>

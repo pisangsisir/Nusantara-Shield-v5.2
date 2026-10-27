@@ -1,8 +1,14 @@
 # Riwayat Perubahan — Nusantara Shield
 
-Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi pasal 5.3 di Proposal. Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
+Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi di Proposal §6.1 (Rulebook bagian G). Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
-## v5.1 — 15–26 Oktober 2026
+## v5.1 — 15–27 Oktober 2026
+
+### Logo resmi dan penyesuaian Rulebook — 27 Oktober 2026 (branch `docs/rulebook-logo-v2`)
+- **Logo Nusantara Shield** menggantikan logo generik di dasbor (beserta favicon), dek presentasi, dan poster: perisai, Merah Putih 3:2, radar dua cincin, Nusantara, dan ancaman yang terkunci di perimeter. Berkas, makna, dan aturan pemakaian ada di `docs/logo/`. Poster kini mengambil logo langsung dari `docs/logo/simbol.svg`.
+- **Rujukan aturan** di Proposal, Dokumentasi Teknis, dan riwayat ini diganti dari "pasal 5.3/5.4 Syarat dan Ketentuan" ke **Rulebook bagian G (Ketentuan Karya)**, karena Rulebook terbaru tidak lagi memakai nomor pasal. Isi deklarasi tidak berubah.
+- **Atribusi** ditambah Gemini (eksplorasi awal konsep logo) dan huruf Inter (OFL) untuk logo horizontal.
+- **Dek:** slide Lampiran kini memuat tautan ke repositori dan folder `docs/`, karena dokumentasi teknis tidak lagi diserahkan sebagai berkas terpisah tetapi tetap dinilai.
 
 ### Susunan tim di Proposal — 26 Oktober 2026 (branch `docs/nama-tim`)
 - Baris **Tim** di Proposal diisi: Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah (sebelumnya masih *placeholder*).

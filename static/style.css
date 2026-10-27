@@ -69,12 +69,7 @@ code, .mono { font-family: var(--huruf-mono); font-size: .88em; }
   background: color-mix(in srgb, var(--latar) 88%, transparent); backdrop-filter: blur(8px);
 }
 .merek { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.logo { width: 40px; height: 40px; flex: none; }
-.logo-perisai { fill: rgba(62, 240, 161, .07); stroke: var(--neon); stroke-width: 2.4; stroke-linejoin: round; }
-.logo-cincin { fill: none; stroke: var(--neon); stroke-opacity: .4; stroke-width: 1.2; }
-.logo-sapu { stroke: var(--neon); stroke-width: 2; stroke-linecap: round; }
-.logo-pusat { fill: var(--neon); }
-.logo-titik { fill: var(--kuning); }
+.logo { width: 40px; height: 40px; flex: none; display: block; }
 .nama-produk { margin: 0; font-weight: 650; font-size: 1.05rem; }
 .sub { margin: 0; font-size: .8rem; color: var(--teks-redup); }
 .kepala-kanan { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }

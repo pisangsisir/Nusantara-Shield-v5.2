@@ -441,11 +441,11 @@ Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar 
 
 ### 6.1 Riwayat Pengembangan
 
-Sesuai pasal 5.3 Syarat dan Ketentuan, tim menyatakan bahwa seluruh kode Nusantara Shield **dikembangkan sejak 15 Oktober 2026**, setelah publikasi program (12 Oktober 2026), mulai dari versi 1 hingga versi 5.1 yang diserahkan. Selain pustaka sumber terbuka yang tercantum pada 6.2, tidak ada kode dari karya pihak lain atau karya tim yang dibuat sebelum tanggal tersebut.
+Sesuai Rulebook Kartika Cyber Hackathon 2026 bagian G (Ketentuan Karya), tim menyatakan bahwa seluruh kode Nusantara Shield **dikembangkan sejak 15 Oktober 2026**, setelah publikasi program (12 Oktober 2026), mulai dari versi 1 hingga versi 5.1 yang diserahkan. Selain pustaka sumber terbuka yang tercantum pada 6.2, tidak ada kode dari karya pihak lain atau karya tim yang dibuat sebelum tanggal tersebut.
 
 ### 6.2 Atribusi Pustaka dan Alat
 
-Sesuai pasal 5.4, berikut pustaka dan alat pihak ketiga yang digunakan:
+Sesuai Rulebook bagian G (Ketentuan Karya), berikut pustaka dan alat pihak ketiga yang digunakan:
 
 | Komponen | Kegunaan | Lisensi |
 | --- | --- | --- |
@@ -457,6 +457,8 @@ Sesuai pasal 5.4, berikut pustaka dan alat pihak ketiga yang digunakan:
 | **scikit-learn** dan **NumPy** | Engine Deteksi Anomali (_Isolation Forest_), berjalan lokal | BSD-3-Clause |
 | **Lucide** (v0.460.0) | Ikon pada poster, disematkan sebagai SVG sebaris; tidak dipakai aplikasi | ISC |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi | Layanan komersial |
+| **Gemini (Google)** | Eksplorasi awal konsep logo; logo final digambar ulang tim sebagai vektor SVG dan tidak memuat gambar hasil AI | Layanan komersial |
+| **Inter** (Rasmus Andersson) | Huruf pada logo horizontal | SIL Open Font License 1.1 |
 | **Blok alamat Internet Protocol (IP) Request for Comments (RFC) 5737** | Data latihan sintetis | Standar terbuka IETF |
 
 ### 6.3 Rujukan Kerangka

@@ -1,4 +1,5 @@
-"""Bangun poster A4 Nusantara Shield: templat + ikon Lucide (ISC) disematkan sebagai sprite SVG sebaris.
+"""Bangun poster A4 Nusantara Shield: templat + ikon Lucide (ISC) disematkan sebagai sprite SVG sebaris,
+ditambah logo dari docs/logo/simbol.svg.
 Pemakaian: python3 bangun_poster.py <folder lucide-static/icons> <keluaran.html>"""
 import random
 import re
@@ -47,6 +48,11 @@ def jaringan(lebar, tinggi, n, benih, hub=None):
 html = html.replace("{{jaringan_atas}}", jaringan(430, 250, 34, 7, hub=(300, 110)))
 html = html.replace("{{jaringan_bawah}}", jaringan(780, 70, 40, 11))
 html = html.replace("{{sprite}}", sprite)
+# Logo v2 dari docs/logo/simbol.svg (satu sumber untuk aplikasi, dek, dan poster)
+logo = (Path(__file__).resolve().parents[2] / "logo" / "simbol.svg").read_text(encoding="utf-8")
+logo = re.sub(r"<!--.*?-->|<title>.*?</title>", "", logo, flags=re.S)
+logo = re.sub(r"<svg[^>]*>", '<svg class="logo" viewBox="0 0 512 512" aria-hidden="true">', logo, count=1)
+html = html.replace("{{logo}}", re.sub(r"\s+", " ", logo).strip())
 assert "{{" not in html, re.findall(r"\{\{[^}]*\}\}", html)
 KELUAR.write_text(html, encoding="utf-8")
 print("ikon:", len(dipakai), "·", KELUAR)

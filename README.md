@@ -26,6 +26,7 @@ tests/          280 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), diagram alur, dan logo
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
+LICENSE         GNU GPL v3.0 (GPL-3.0-only)
 CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (20 Okt 2026)
 ```
 
@@ -484,3 +485,18 @@ pytest.ini            pengaturan tampilan pytest
    Ciri lalu lintas AI di purwarupa masih sintetis; penerapan nyata mengambilnya dari sensor satuan (Wazuh, Suricata, Zeek).
 6. Perluasan OT: sensor protokol industri (Modbus/DNP3) dan webhook ke sakelar terkelola **sungguhan**
    (di purwarupa, perintah sakelar masih simulasi) — **rencana**.
+
+## Lisensi dan Hak Cipta
+
+Copyright (c) 2026 Nusantara Shield Team (Muhammad Isa Ananta, Hasan Basri, Melia Fajar Hasanah).
+Dikembangkan untuk Kartika Cyber Hackathon 2026.
+
+Kode sumber dilisensikan di bawah **GNU General Public License v3.0** (`GPL-3.0-only`); teks lengkapnya ada di
+[`LICENSE`](LICENSE), dan setiap berkas kode memuat penanda `SPDX-License-Identifier`. Artinya, siapa pun boleh
+memakai, mempelajari, dan mengubah kode ini, asalkan turunannya yang disebarkan **tetap berlisensi GPLv3, terbuka
+kode sumbernya, dan mencantumkan hak cipta tim**. Hak cipta atas karya tetap milik tim; lisensi non-eksklusif untuk
+Penyelenggara diatur Rulebook bagian N.
+
+Pustaka pihak ketiga (FastAPI, scikit-learn, ReportLab, ikon Lucide, dan lainnya) tetap tunduk pada lisensinya
+masing-masing; daftarnya ada di Proposal §6.2. Nama dan logo Nusantara Shield (`docs/logo/`) dipakai untuk merujuk
+proyek ini; mohon tidak dipakai sebagai merek produk lain.

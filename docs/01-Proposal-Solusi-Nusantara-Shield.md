@@ -465,7 +465,11 @@ Sesuai Rulebook bagian G (Ketentuan Karya), berikut pustaka dan alat pihak ketig
 | **Inter** dan **JetBrains Mono** | Huruf pada logo horizontal dan spanduk README | SIL Open Font License 1.1 |
 | **Blok alamat Internet Protocol (IP) Request for Comments (RFC) 5737** | Data latihan sintetis | Standar terbuka IETF |
 
-### 6.3 Rujukan Kerangka
+### 6.3 Lisensi
+
+Kode Nusantara Shield dilisensikan di bawah **GNU General Public License v3.0** (`GPL-3.0-only`, berkas `LICENSE`), Copyright (c) 2026 Nusantara Shield Team. Hak cipta tetap milik tim; turunan yang disebarkan wajib tetap berlisensi GPLv3 dan mencantumkan hak cipta tim. Lisensi ini sejalan dengan Rulebook bagian N: Penyelenggara tetap mendapat lisensi non-eksklusif untuk menampilkan dan mempromosikan karya, dan Pussiberad dapat mengadopsi pendekatannya untuk pertahanan siber.
+
+### 6.4 Rujukan Kerangka
 
 - Purbo, O. W., dan Lumy, G. D. (2025). _Cyber Warfare & Pertahanan Siber Indonesia_. Kerangka OODA, tiga lapis komando siber, _incident response_ militer, dan _After-Action Review_.
 - Peraturan Presiden Nomor 82 Tahun 2022 tentang Pelindungan Infrastruktur Informasi Vital.

@@ -379,6 +379,7 @@ ATURAN_LAJU = {
     "daftar": (5, 300),   # Fase 5: pembuatan akun mandiri paling banyak 5x per 5 menit per alamat
     "ubah": (30, 60),     # tindakan yang mengubah data
     "pdf": (5, 60),       # membuat PDF cukup berat
+    "impor": (6, 60),     # impor log luring: berkas sampai 2 MB, dibatasi lebih ketat
     "umum": (120, 60),    # baca biasa
 }
 
@@ -458,15 +459,20 @@ class BatasBody:
     3. Body yang lolos (≤ batas) diteruskan ke aplikasi dari memori, persis seperti aslinya.
     Memori yang dipakai per permintaan dibatasi ±batas byte, berapa pun besar kiriman penyerang."""
 
-    def __init__(self, app, batas: int) -> None:
-        self.app, self.batas = app, batas
+    def __init__(self, app, batas: int, khusus: dict[str, int] | None = None) -> None:
+        self.app, self.batas, self.khusus = app, batas, khusus or {}
 
     async def __call__(self, scope, receive, send) -> None:
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
         header = dict(scope["headers"])                       # nama header sudah huruf kecil (ASGI)
+        batas = self.batas
+        if scope["path"] in self.khusus:                      # jalur berkas besar (impor log): hanya untuk yang
+            if not header.get(b"authorization", b"").startswith(b"Bearer "):   # membawa token; tanpa token,
+                return await self._tolak(send, 401, b'{"detail":"Wajib login"}')  # body tidak dibaca sama sekali
+            batas = self.khusus[scope["path"]]
         panjang = header.get(b"content-length")
-        if panjang is not None and (not panjang.isdigit() or int(panjang) > self.batas):
+        if panjang is not None and (not panjang.isdigit() or int(panjang) > batas):
             return await self._tolak(send)
         berbody = (panjang not in (None, b"0") or b"transfer-encoding" in header
                    or scope["method"] in _METODE_BERBODY)
@@ -481,7 +487,7 @@ class BatasBody:
                 return                                        # klien sudah pergi; tidak ada yang dijawab
             isi = pesan.get("body", b"")
             total += len(isi)
-            if total > self.batas:
+            if total > batas:
                 return await self._tolak(send)                # router TIDAK PERNAH dipanggil
             potongan.append(isi)
             if not pesan.get("more_body", False):
@@ -499,7 +505,7 @@ class BatasBody:
         await self.app(scope, terima, send)
 
     @staticmethod
-    async def _tolak(send) -> None:
-        await send({"type": "http.response.start", "status": 413,
+    async def _tolak(send, status: int = 413, isi: bytes = b'{"detail":"Kiriman terlalu besar"}') -> None:
+        await send({"type": "http.response.start", "status": status,
                     "headers": [(b"content-type", b"application/json"), (b"connection", b"close")]})
-        await send({"type": "http.response.body", "body": b'{"detail":"Kiriman terlalu besar"}'})
+        await send({"type": "http.response.body", "body": isi})

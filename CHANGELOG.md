@@ -4,6 +4,15 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Fase 3: impor log luring — 27 Oktober 2026 (branch `feature/fase3-impor-log`)
+- **Impor log asli** lewat tombol *Impor log…* di bilah Latihan (Operator saja) dan `POST /api/deteksi/impor`. Format: log autentikasi OpenSSH (auth.log/secure/journal), log firewall UFW/iptables (`SRC=`, `DST=`, `DPT=`), dan CSV berkepala `waktu,jenis,sumber,…`. Modul `app/impor_log.py` hanya menyalin baris relevan menjadi peristiwa mentah; **aturan yang menilainya sama persis dengan aturan latihan**.
+- Validasi ketat: IP, *port*, fungsi Modbus, jam, dan aset diperiksa; baris tidak sah dilewati dan dihitung; berkas tak dikenali ditolak 422. Maks. ±2 MB dan 50.000 baris.
+- Hanya jalur impor yang boleh menerima kiriman sampai ±2,6 MB, dan hanya bila membawa token (tanpa token: 401 sebelum body dibaca). Jalur lain tetap 16 KB. Dibatasi 6 kali per menit.
+- Privasi: nama akun dalam log tidak disalin; log audit hanya mencatat nama berkas, jumlah baris, dan jumlah temuan.
+- Dua kunci tetap: temuan dari log asli hanya menaikkan WASPADA, dengan label "Sumber: log impor «nama berkas» dari Operator".
+- Contoh berkas sintetis di `docs/contoh-log/`. Baris terminal dek slide 4 dipadatkan agar 15 kelompok uji muat.
+- **298 uji** (sebelumnya 280): 18 uji baru di `tests/test_impor_log.py`.
+
 ### Lisensi GPLv3 dan penanda hak cipta — 27 Oktober 2026 (branch `chore/lisensi-gplv3`)
 - Berkas **`LICENSE`**: teks resmi GNU GPL v3.0 tanpa diubah (SHA-256 `3972dc97…986`).
 - Setiap berkas kode (`app/`, `tools/`, `static/*.js`, skrip `.sh`) diberi penanda `SPDX-License-Identifier: GPL-3.0-only` dan hak cipta "Copyright (c) 2026 Nusantara Shield Team. Dikembangkan untuk Kartika Cyber Hackathon 2026."

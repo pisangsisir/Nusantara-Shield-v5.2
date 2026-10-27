@@ -62,6 +62,8 @@ class Temuan:
     terakhir: float             # waktu monotonic peristiwa terakhir
     jumlah: int                 # banyaknya peristiwa (login gagal / kombinasi alamat:port berbeda)
     rincian: dict = field(default_factory=dict)
+    asal: str = "latihan"        # "latihan" (peristiwa sintetis) atau "impor" (log asli dari Operator)
+    berkas: str | None = None    # nama berkas log bila asal = "impor"
 
     @property
     def nama(self) -> str:

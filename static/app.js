@@ -1118,6 +1118,22 @@ async function latihanDeteksi(tombol, jenis) {
   setelahAksi();
 }
 
+// Fase 3: impor log ASLI secara luring. Berkas dibaca di browser lalu dikirim sebagai teks ke server sendiri;
+// tidak ada yang keluar dari jaringan satuan. Server menilainya dengan aturan yang sama dengan latihan.
+const MAKS_BERKAS_IMPOR = 2_000_000;
+async function imporLog(berkas) {
+  if (!berkas) return;
+  if (berkas.size > MAKS_BERKAS_IMPOR) { toast("Berkas terlalu besar (maks. ±2 MB). Pecah berkasnya lalu impor bertahap.", "galat"); return; }
+  const isi = await berkas.text();
+  const tombol = $("#tombol-impor-log");
+  const j = await coba(() => sibuk(tombol, () => api("/api/deteksi/impor", { metode: "POST", data: { nama: berkas.name, isi } })));
+  if (!j) return;
+  const naik = j.waspada.length ? ` ${j.waspada.join(", ")} naik ke WASPADA.` : "";
+  toast(`Impor «${j.berkas}» (${j.format}): ${j.dikenali} dari ${j.baris} baris dikenali → ${j.temuan.length} temuan.${naik}`,
+    j.temuan.length ? "peringatan" : "info");
+  setelahAksi();
+}
+
 // Daftar peringatan terbaru: label status disusun SERVER dari data sebenarnya (Operator, nomor bukti, aturan).
 const IKON_PERINGATAN = { deteksi: "masuk", ai: "petir", insiden: "merah", pulih: "pulih" };
 const LABEL_KEPARAHAN = { kritis: "Kritis", tinggi: "Tinggi", sedang: "Sedang", info: "Info" };
@@ -1583,6 +1599,8 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#tombol-siarkan-ot").addEventListener("click", (e) => siarkanBerita(e.currentTarget, "CTI-109"));
   $("#tombol-latihan-ai").addEventListener("click", (e) => latihanAI(e.currentTarget, "genset"));
   $$("[data-deteksi]").forEach((b) => b.addEventListener("click", (e) => latihanDeteksi(e.currentTarget, e.currentTarget.dataset.deteksi)));
+  $("#tombol-impor-log").addEventListener("click", () => $("#berkas-impor-log").click());
+  $("#berkas-impor-log").addEventListener("change", (e) => { imporLog(e.target.files[0]); e.target.value = ""; });
   $("#form-tutup").addEventListener("submit", kirimTutup);
   $("#tutup-alasan").addEventListener("input", hitungAlasanTutup);
 

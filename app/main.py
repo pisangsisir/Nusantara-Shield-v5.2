@@ -62,6 +62,11 @@ from .telemetri import (AKSI_GABUNGAN, ASET_BERPORT, MENARA, MIN_ALASAN_DARURAT,
                         STATUS_TUTUP)
 from .ai_anomali import POLA
 from .deteksi import JENIS_LATIHAN
+from .impor_log import GalatImpor
+
+JALUR_IMPOR = "/api/deteksi/impor"
+MAKS_ISI_IMPOR = 2_000_000                # karakter isi berkas log (±2 MB)
+BATAS_BODY_IMPOR = 2_600_000              # byte kiriman JSON untuk jalur impor (isi + pembungkus JSON)
 
 FOLDER_STATIS = Path(__file__).resolve().parent.parent / "static"
 
@@ -107,7 +112,8 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
-app.add_middleware(BatasBody, batas=KONFIG.batas_body_byte)   # F-08: sebelum router
+app.add_middleware(BatasBody, batas=KONFIG.batas_body_byte,    # F-08: sebelum router
+                   khusus={JALUR_IMPOR: BATAS_BODY_IMPOR})    # Fase 3: hanya impor log boleh ±2 MB
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=KONFIG.host_diizinkan)
 app.add_middleware(HeaderKeamanan)                            # F-15: paling luar, ASGI murni
 app.mount("/static", StaticFiles(directory=FOLDER_STATIS), name="static")
@@ -622,6 +628,12 @@ class LatihanDeteksiMasuk(Formulir):
     aset_id: IdAset | None = None
 
 
+class ImporLogMasuk(Formulir):
+    nama: str = Field(min_length=1, max_length=120)
+    isi: str = Field(min_length=1, max_length=MAKS_ISI_IMPOR)
+    aset_id: IdAset | None = None            # sasaran baris auth.log (bawaan: Akses admin SSH)
+
+
 @app.post("/api/cti/siarkan", dependencies=[Depends(batasi("ubah"))])
 def siarkan_cti(f: CtiMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
     """Radio satpam: siarkan berita ancaman berikutnya SEKARANG (untuk mengatur tempo demo).
@@ -704,6 +716,22 @@ def latihan_deteksi(f: LatihanDeteksiMasuk, akun: Akun = Depends(butuh_izin("uba
         except ValueError as e:
             raise HTTPException(422, str(e)) from None
     LOG.catat(akun.nama, "DETEKSI_LATIHAN", {"jenis": f.jenis, "aset": hasil["aset_id"]})
+    return hasil
+
+
+@app.post(JALUR_IMPOR, dependencies=[Depends(batasi("impor"))])
+def impor_log(f: ImporLogMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
+    """Fase 3 — impor log ASLI secara luring (auth.log OpenSSH, log firewall UFW/iptables, atau CSV). Aturan yang sama
+    dengan latihan menilainya; temuan hanya menaikkan WASPADA. Log audit mencatat nama berkas dan jumlah saja,
+    bukan isi log."""
+    nama = re.sub(r"[^\w.\- ]", "_", f.nama.replace("\\", "/").rsplit("/", 1)[-1])[:80] or "berkas"
+    with _kunci_state:
+        try:
+            hasil = MENARA.impor_log(LAYANAN, nama, f.isi, f.aset_id or "ssh")
+        except (GalatImpor, ValueError) as e:
+            raise HTTPException(422, str(e)) from None
+    LOG.catat(akun.nama, "IMPOR_LOG", {"berkas": nama, "baris": hasil["baris"], "dikenali": hasil["dikenali"],
+                                       "temuan": len(hasil["temuan"])})
     return hasil
 
 

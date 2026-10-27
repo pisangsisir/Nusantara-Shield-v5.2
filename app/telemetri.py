@@ -74,10 +74,12 @@ from .ai_anomali import DETEKTOR, POLA, POLA_SKENARIO, ciri_normal, ciri_pola
 from .deteksi import (ASET_LATIHAN_OT, ATURAN as ATURAN_DETEKSI, AWALAN as AWALAN_DET, JENIS_LATIHAN, MesinDeteksi,
                       rangkaian_latihan)
 from .mitre import ringkas as ringkas_mitre, teknik as teknik_mitre
+from .impor_log import baca as baca_log
 
 # Label batasan (kejujuran) per jenis peringatan: dari mana datanya, dan apa yang masih simulasi.
 SUMBER_DATA = {
     "deteksi": "Sumber: peristiwa latihan sintetis · aturan deteksi berjalan nyata",
+    "impor": "Sumber: log impor «{berkas}» dari Operator · aturan deteksi berjalan nyata",
     "ai": "Sumber: ciri lalu lintas sintetis · model AI berjalan nyata di server ini",
     "insiden": "Sumber: skenario latihan · perintah ke perangkat jaringan masih simulasi",
 }
@@ -1204,6 +1206,33 @@ class Menara:
         return {"jenis": jenis, "aset_id": aset_id, "peristiwa": len(rangkaian),
                 "durasi_detik": round(rangkaian[-1][0], 1)}
 
+    def impor_log(self, layanan: dict, nama: str, isi: str, aset_ssh: str = "ssh") -> dict:
+        """Log ASLI dari Operator → peristiwa mentah → aturan yang sama dengan latihan. Waktu diputar ulang relatif:
+        peristiwa terakhir di log = saat ini, jarak antarperistiwa tetap. Temuan hanya menaikkan WASPADA."""
+        if aset_ssh not in INDEKS_SIMPUL or not INDEKS_SIMPUL[aset_ssh]["port"]:
+            raise ValueError("Aset tidak dikenal")
+        peristiwa, ringkasan = baca_log(isi, SIMPUL, aset_ssh)
+        sekarang, akhir = self._jam(), peristiwa[-1][0]
+        baru = []
+        for t, ev in peristiwa:
+            for tm in self.deteksi.proses(ev, sekarang - (akhir - t)):
+                tm.asal, tm.berkas = "impor", nama
+                baru.append(tm)
+                aset = ", ".join(INDEKS_SIMPUL[a]["nama"] for a in tm.aset) or "tanpa port terbuka"
+                attck = ringkas_mitre(tm.aturan)
+                self.catat(tm.keparahan, f"Deteksi ▶ {tm.nama} ({tm.id}) ke {aset} dari {tm.sumber} — {tm.alasan()} "
+                                         f"(log impor {nama})" + (f" [ATT&CK {attck}]" if attck else ""), jenis="deteksi")
+        prediksi = self._prediksi(layanan)
+        naik = sorted({a for tm in baru for a in tm.aset if prediksi.get(a, {}).get("proaktif")})
+        self.catat("info", f"Impor log «{nama}»: {ringkasan['dikenali']} dari {ringkasan['baris']} baris dikenali "
+                           f"({ringkasan['format']}) → {len(baru)} temuan", jenis="deteksi")
+        self.ubah()
+        return {**ringkasan, "berkas": nama,
+                "temuan": [{"id": tm.id, "aturan": tm.aturan, "nama": tm.nama, "keparahan": tm.keparahan,
+                            "sumber": tm.sumber, "aset": tm.aset, "alasan": tm.alasan(), "mitre": teknik_mitre(tm.aturan)}
+                           for tm in baru],
+                "waspada": [INDEKS_SIMPUL[a]["nama"] for a in naik]}
+
     def _proses_deteksi(self) -> None:
         sekarang = self._jam()
         siap = [x for x in self._antre_det if x[0] <= sekarang]
@@ -1255,7 +1284,8 @@ class Menara:
             hasil.append({"id": tm.id, "jenis": "deteksi", "aturan": tm.aturan, "judul": f"{tm.nama} · {sasaran}",
                           "rincian": tm.alasan(), "keparahan": tm.keparahan, "waktu": self._iso_mono(tm.mulai),
                           "status": status, "kelas": kelas, "mitre": teknik_mitre(tm.aturan),
-                          "sumber_data": SUMBER_DATA["deteksi"]})
+                          "sumber_data": (SUMBER_DATA["impor"].format(berkas=tm.berkas) if tm.asal == "impor"
+                                          else SUMBER_DATA["deteksi"])})
         for aid in sorted(self._tanda_ai):
             if aid in self._ai_sejak and aid in prediksi and prediksi[aid].get("ai"):
                 s = INDEKS_SIMPUL[aid]

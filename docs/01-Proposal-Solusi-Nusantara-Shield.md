@@ -8,7 +8,7 @@
 | **Kategori** | 02 · **Penangkalan (_Defensive Shield_)** — *Threat Intelligence Platform* dan *Automated Incident Response* |
 | **Tim** | Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah |
 | **Status purwarupa** | **Berfungsi penuh** · 254 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
-| **Tanggal** | 26 Oktober 2026 |
+| **Tanggal** | 27 Oktober 2026 |
 
 ---
 
@@ -50,7 +50,9 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 | Waktu AI lokal menilai lalu lintas 9 aset (_Isolation Forest_, tanpa internet) | **±10 milidetik** |
 | Perilaku sistem yang dikunci uji otomatis | **254 uji** |
 
-<p class="sumber-kecil">Angka CPU diukur ulang 26 Okt 2026 dengan tools/ukur_beban.py (Linux 2 inti, 300 siaran SSE sungguhan). Angka 2,8% pada versi dokumen sebelumnya diukur dengan alat dan mesin lain, sehingga tidak dibandingkan langsung.</p>
+<p class="sumber-kecil">Angka CPU diukur ulang 26 Okt 2026 dengan tools/ukur_beban.py (Linux 2 inti, 300 siaran SSE sungguhan). Angka 2,8% pada versi dokumen sebelumnya diukur dengan alat dan mesin lain, sehingga tidak dibandingkan langsung. Asal setiap angka dan pemetaan ke lima kriteria penilaian ada di §7.</p>
+
+> **Banyak sistem pertahanan berhenti di alarm.** Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dalam satu alur yang dikunci _server_ setelah satu keputusan Operator, dan semuanya berjalan tanpa internet.
 
 ---
 
@@ -392,7 +394,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 ### 5.2 Kesiapan Penerapan
 
 - **Ringan:** satu laptop atau _server_ kecil; satu proses Python. Untuk 300 layar serentak, CPU _server_ ±1,5% saat siaga dan ±1,7% saat serangan, dengan memori ±207 MB termasuk pustaka AI (scikit-learn dan numpy), jauh di bawah 512 MB; diukur ulang 26 Okt 2026 dengan `tools/ukur_beban.py` (Linux 2 inti, 300 siaran SSE sungguhan). AI menambah kerja _server_ hanya ±0,05 milidetik per detik karena model baru dijalankan saat keadaan lalu lintas berubah.
-- **Teruji:** 254 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam ±45 detik.
+- **Teruji:** 254 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
 - **Cakupan OT saat ini:** purwarupa memantau **pengendali genset rumah sakit** (Modbus/TCP, _port_ 502) di **zona kendali** topologi. Kabar ancaman Modbus menaikkannya ke **WASPADA (±66%)** sebelum ada serangan. Pada skenario **Sabotase OT**, bukti diamankan, lalu jalur kantor → zona kendali diputus lewat _webhook_ (simulasi) ke sakelar terkelola ±1,2 detik kemudian; genset tetap menyala dengan kendali lokal. Pemulihan jalur kendali terkunci sampai sidik jari bukti cocok.
 - **Langkah lanjutan** (semuanya sumber terbuka dan dapat berjalan _air-gapped_ atau _on-premise_):
     - telemetri nyata dari sensor dan SIEM satuan (Wazuh, Suricata, Zeek) serta sensor protokol industri Modbus/DNP3;
@@ -470,6 +472,34 @@ Sesuai Rulebook bagian G (Ketentuan Karya), berikut pustaka dan alat pihak ketig
 - National Institute of Standards and Technology (2024). _The NIST Cybersecurity Framework (CSF) 2.0_ (NIST CSWP 29). Enam fungsi dan kategorinya dipakai untuk **memetakan** fitur (Dokumentasi Teknis §2.6); pemetaan dilakukan tim sendiri, bukan sertifikasi.
 
 ---
+
+## 7. Peta Kriteria Penilaian dan Asal Angka
+
+Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria Rulebook (bagian H) dipetakan ke bukti di karya, dan setiap angka di dokumen, slide, dan poster ditautkan ke sumbernya.
+
+### 7.1 Peta Kriteria Penilaian
+
+| Kriteria (bobot) | Bukti di Nusantara Shield | Cara memeriksa |
+| --- | --- | --- |
+| **Relevansi dan Manfaat** (25%) | Menjaga aset IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan) dengan LAPSIT untuk Dansat; usulan alur laporan ke Sansidam dan Kartika CSIRT (§5.3); label satuan diatur dari satu kamus istilah | §2 dan §5.3 dokumen ini; Dokumentasi Teknis §3 (SOP respons insiden) |
+| **Inovasi Teknis** (25%) | "Bukti dulu, baru putus" dikunci _server_ (isolasi tanpa bukti ditolak 409); rantai HMAC-SHA256 untuk log audit dan Buku Rantai Bukti; dua kunci (mesin hanya menaikkan WASPADA, manusia memutus); AI _Isolation Forest_ luring yang menjelaskan alasannya; korelasi kabar ancaman × aset sebelum serangan; isolasi OT dengan memutus **jalur**, bukan mematikan genset; siaran ralat (_delta_) yang menekan beban _server_ | Uji `test_rantai_bukti` (36), `test_ai` (10), `test_ot` (6), `test_deteksi` (24); Dokumentasi Teknis §2.3–2.8 |
+| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; 254 uji otomatis lulus; paket luring dipasang dan diuji di Mac tanpa internet. **Batas yang kami akui:** telemetri dan kabar ancaman masih sintetis, dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
+| **Kelayakan Implementasi** (15%) | Satu proses Python di laptop atau _server_ kecil; ±1,5% CPU untuk 300 layar; berjalan dan dipasang tanpa internet dengan sidik jari SHA-256; peran Operator dan Pengamat; peta jalan ke sensor sumber terbuka (Wazuh, Suricata, Zeek) dan MISP | §5 dokumen ini; Dokumentasi Teknis §4.4 (pemasangan luring) |
+| **Kualitas Dokumentasi** (10%) | Proposal ini, Dokumentasi Teknis, Panduan Belajar (PDF), dek presentasi, poster A4, README, CHANGELOG per perubahan, dan deklarasi serta atribusi (§6) | Folder `docs/` dan `presentation/` di repositori |
+
+### 7.2 Asal Setiap Angka
+
+| Angka | Artinya | Sumber | Catatan |
+| --- | --- | --- | --- |
+| **±66% → ±20%** | Peluang serangan pengendali genset setelah kabar celah Modbus, sebelum dan sesudah Perketat | Rumus korelasi di `app/telemetri.py` (0,80 × 0,75 × 1,1 ≈ 66%); dikunci `test_ot` (60–70%, lalu di bawah 30%) | Kabar ancaman dan bobotnya data latihan sintetis |
+| **±1,2 detik** | Jeda baku dari bukti aman sampai jalur pertama diputus | Konstanta `JEDA_RUNBOOK = 1.2` di `app/telemetri.py`; urutannya dikunci `test_ot` dan `test_rantai_bukti` | Waktu alur di purwarupa; pemutusan ke sakelar masih simulasi, jadi ini bukan waktu sakelar fisik |
+| **0,6 detik** | Lama tombol isolasi harus ditahan Operator | `static/app.js` (tahan 600 ms) | Mencegah klik tak sengaja |
+| **8 kali / 60 detik**, **≤120 detik**, **15 kombinasi / 10 detik** | Ambang _login_ gagal berulang, _login_ tembus, dan pemindaian _port_ | `app/deteksi.py`; dikunci `test_deteksi::test_ambang_terbuka_sesuai_dokumentasi` | Dihitung atas peristiwa sintetis |
+| **±1,5% siaga · ±1,7% serangan**, **±207 MB**, **0,28–0,40 MB/s** | CPU, memori, dan lalu lintas _server_ untuk 300 layar | `tools/ukur_beban.py`, 26 Okt 2026, Linux 2 inti, 300 siaran SSE sungguhan; Dokumentasi Teknis §2.3 | Bisa diulang siapa pun dengan alat yang sama |
+| **−80% (8,4 → 1,7 MB/s)** | Efek optimasi siaran ralat | Uji beban 15–17 Okt 2026; Dokumentasi Teknis §2.3 | Riwayat optimasi dengan mesin dan alat ukur awal yang tidak disertakan di repositori; tidak dibandingkan langsung dengan angka versi akhir |
+| **±10 milidetik** | Waktu AI menilai 9 aset | `skor_ms` di `app/ai_anomali.py`; dikunci `test_ai` (di bawah 100 ms) | Ukuran di mesin pengembang; uji sengaja memberi batas longgar |
+| **254 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 254 lulus pada 27 Okt 2026 (Linux ±55 detik, Mac ±30 detik) | Termasuk saat paket luring dipasang tanpa internet di Mac |
+| **200.000 putaran**, **5 percobaan/menit**, **16 KB** | PBKDF2-SHA256 untuk kata sandi, batas _login_, batas kiriman | `app/keamanan.py`; dikunci `test_keamanan` (`test_tebak_sandi_dibatasi`, uji batas kiriman) | — |
 
 ## Lampiran: Kamus Istilah
 

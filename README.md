@@ -1,5 +1,7 @@
 # Nusantara Shield v5.1
 
+<p align="center"><img src="docs/logo/logo-horizontal.png" width="560" alt="Logo Nusantara Shield: perisai berisi Merah Putih, radar dua cincin, peta Nusantara, dan titik ancaman yang terkunci di cincin luar"></p>
+
 > **Perisai pertahanan (_Defensive Shield_) luring yang mendeteksi, mencegah, dan membantu merespons serangan siber: memperingatkan lebih dulu, memutus dalam 1,2 detik, dan tidak pernah menghapus barang bukti.**
 
 Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hackathon 2026, kategori 02 Penangkalan (*Defensive Shield*).
@@ -18,7 +20,7 @@ app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lo
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
 tests/          254 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
-docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), dan diagram alur
+docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), diagram alur, dan logo
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
 CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (20 Okt 2026)
 ```

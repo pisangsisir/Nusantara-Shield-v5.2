@@ -451,6 +451,10 @@ aside.catatan { display: none; }
 i.asing { font-style: italic !important; color: inherit !important; font-family: inherit !important; margin: 0 !important; display: inline !important; width: auto !important; height: auto !important; background: none !important; }
 
 .kamus-kolom { align-items: start; gap: 28px; }
+table.kamus.peta td { white-space: normal; font-family: inherit; }
+table.kamus.peta td:first-child { white-space: nowrap; font-family: var(--huruf-mono); }
+table.kamus.peta code { font-size: 13px; color: var(--teks); }
+.batas { color: var(--kuning); }
 .dokumen-lengkap { margin: 14px 0 0; font-size: 15px; color: var(--teks-redup); }
 .dokumen-lengkap a { color: var(--neon); text-decoration: none; font-family: var(--huruf-mono); }
 table.kamus { width: 100%; border-collapse: collapse; font-size: 14.5px; }
@@ -609,7 +613,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li><b>Dua panel di kanan adalah ilustrasi</b> yang diolah dari pemberitaan (detikINET, CNBC Indonesia, Bisnis.com), bukan tangkapan layar berita. Angka "1,5 TB" adalah klaim pelaku yang belum terverifikasi.</li>
     </ul>
   </aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>01 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>01 / 08</span></div>
 </section>
 
 <!-- =============================== SLIDE 2 =============================== -->
@@ -687,12 +691,13 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Tiga kartu merah = peta jalan presentasi. Setiap slide berikutnya menutup satu titik lemah.</li>
       <li><b>Dua kunci konfirmasi:</b> "Tidak ada satu sinyal pun yang memutus jaringan vital secara otomatis penuh (<i class="asing">autonomous</i>) tanpa keputusan akhir manusia. Kunci pertama mesin: CTI dan AI lokal hanya menaikkan status ke WASPADA. Kunci kedua manusia: hanya Operator yang bisa memerintahkan isolasi; akun Pengamat ditolak <i class="asing">server</i>."</li>
       <li>Radar: <b>jarak dari pusat = zona jaringan</b> (internal, DMZ, luar gerbang); <b>warna = keparahan</b>. Arah titik hanya penanda alamat Internet Protocol (IP), <b>bukan lokasi geografis</b>.</li>
-      <li>±1,2 dtk: dari operator selesai menahan tombol sampai jaringan aset terputus, dengan bukti sudah diamankan lebih dulu.</li>
+      <li><b>Kalimat pembeda:</b> "Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dalam satu alur yang dikunci <i class="asing">server</i>, tanpa internet."</li>
+      <li>±1,2 dtk: dari operator selesai menahan tombol sampai jaringan aset terputus, dengan bukti sudah diamankan lebih dulu. Ini jeda baku alur purwarupa (<code>JEDA_RUNBOOK</code>); perintah ke sakelar masih simulasi. Asal semua angka: Proposal §7.2 dan slide Lampiran B.</li>
       <li>±1,5% CPU (siaga) dan ±1,7% (serangan) diukur ulang pada versi akhir, 26 Okt 2026, dengan <code>tools/ukur_beban.py</code>: 300 siaran SSE sungguhan, Linux 2 inti. Angka −80% lalu lintas berasal dari uji beban optimasi siaran ralat (uvicorn + Chromium, 15–17 Okt 2026).</li>
       <li>Kategori: <b>02 Penangkalan</b>, sesuai contoh panitia: <i class="asing">Threat Intelligence Platform</i> dan <i class="asing">Automated Incident Response</i>.</li>
     </ul>
   </aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>02 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>02 / 08</span></div>
 </section>
 
 <!-- =============================== SLIDE 2 =============================== -->
@@ -777,7 +782,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Semua label (jabatan penerima laporan, nama satuan) berasal dari satu kamus istilah <code>app/istilah.py</code>, sehingga bisa disesuaikan tanpa mengubah logika.</li>
     </ul>
   </aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>03 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>03 / 08</span></div>
 </section>
 
 <!-- =============================== SLIDE 3 =============================== -->
@@ -846,7 +851,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Kebutuhan minimum: Python 3.10+, 2 inti, 512 MB memori bebas, 50 MB penyimpanan (paket rilis 187 KB). Memori terukur ±207 MB untuk 300 layar, termasuk pustaka scikit-learn dan numpy (±130 MB).</li>
     </ul>
   </aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>04 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>04 / 08</span></div>
 </section>
 
 <!-- =============================== SLIDE 4 =============================== -->
@@ -923,7 +928,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Variabel penting: <code>NS_OPERATOR_PASSWORD</code>/<code>NS_VIEWER_PASSWORD</code> (sandi bawaan, min. 12), <code>NS_AUDIT_KEY</code> (kunci HMAC, mengaktifkan penyimpanan permanen), <code>NS_KODE_OPERATOR</code> (kode undangan operator).</li>
     </ul>
   </aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>05 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>05 / 08</span></div>
 </section>
 
 <!-- =============================== SLIDE 5 =============================== -->
@@ -963,6 +968,12 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
 
   <aside class="catatan">
     <h4>Catatan pembicara · Slide 6 · Bekal tanya jawab</h4>
+    <p><b>Kalimat penutup (pilih satu, ucapkan pelan):</b></p>
+    <ul>
+      <li>"Alarm, dari mana pun asalnya, hanya memberi tahu. Pertanyaan di satuan adalah siapa yang berwenang memutus dan apakah buktinya masih sah di meja penyidik. Di Nusantara Shield, mesin menaikkan WASPADA, manusia memutus, dan setiap langkah terkunci dalam rantai HMAC."</li>
+      <li>"Sistem yang butuh API awan untuk berpikir akan ikut lumpuh saat jalur internasional terganggu. Aturan deteksi, AI, dan korelasi ancaman Nusantara Shield berjalan di <i class="asing">server</i> satuan sendiri, dan dikunci 254 uji yang bisa diulang Dewan Juri."</li>
+      <li>Jangan menyebut tim lain. Bila ditanya "AI kan banyak alarm palsu?": AI kami tidak pernah memutus; ia hanya menaikkan WASPADA, dan Operator memilah Positif Palsu (<i class="asing">False Positive</i>) dengan alasan tertulis yang tercatat di Buku Rantai Bukti. Jangan mengklaim nol <i class="asing">false positive</i>.</li>
+    </ul>
     <ul>
       <li><b>"Dipasang di mana, siapa operatornya?"</b> Di posko siber tiap rumah sakit Tentara Nasional Indonesia Angkatan Darat (TNI AD), satu <i class="asing">server</i> luring per satuan. Operatornya petugas TI rumah sakit atau Bintara Siber; Dansat sebagai pengamat. Laporan dan bukti naik ke Sandi dan Siber Kodam (Sansidam) (Tim Penangkalan Siber) lalu ke Pusat Siber Angkatan Darat (Pussiberad) dan Kartika Computer Security Incident Response Team (CSIRT). Pengiriman otomatis ke pusat belum dibangun.</li>
       <li><b>"Bagaimana angka ini diukur?"</b> Uvicorn sungguhan dengan 100 dan 300 klien siaran serentak; CPU dan memori dibaca dari proses <i class="asing">server</i>; Chromium untuk waktu skrip kanvas.</li>
@@ -980,20 +991,49 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Saat demo: isi <code>NS_AUDIT_KEY</code> agar nomor LAPSIT dan buku HMAC berlanjut setelah <i class="asing">server</i> dinyalakan ulang.</li>
     </ul>
   </aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>06 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>06 / 08</span></div>
 </section>
 
 <!-- =============================== SLIDE 7 · LAMPIRAN =============================== -->
 <section class="slide" data-judul="Lampiran: Kamus Singkatan">
   <div class="kepala">
-    <div class="penanda"><b>07</b>Lampiran · Kamus Singkatan</div>
+    <div class="penanda"><b>07</b>Lampiran A · Kamus Singkatan</div>
     <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
   </div>
   <h2>Kamus singkatan. <em>Kepanjangan dulu, singkatan sesudahnya.</em></h2>
   <div class="dua-kolom kamus-kolom"><table class="kamus"><tbody><tr><td><b>AAR</b></td><td>After-Action Review</td></tr><tr><td><b>API</b></td><td>Application Programming Interface</td></tr><tr><td><b>BSSN</b></td><td>Badan Siber dan Sandi Negara</td></tr><tr><td><b>CDN</b></td><td>Content Delivery Network</td></tr><tr><td><b>CDOC</b></td><td>Cyber Defense Operation Center</td></tr><tr><td><b>CPU</b></td><td>Central Processing Unit</td></tr><tr><td><b>CSF</b></td><td>Cybersecurity Framework (NIST)</td></tr><tr><td><b>CSIRT</b></td><td>Computer Security Incident Response Team</td></tr><tr><td><b>CTI</b></td><td>Cyber Threat Intelligence</td></tr><tr><td><b>DDoS</b></td><td>Distributed Denial of Service</td></tr><tr><td><b>DMZ</b></td><td>Demilitarized Zone</td></tr><tr><td><b>HMAC</b></td><td>Hash-based Message Authentication Code</td></tr><tr><td><b>IP</b></td><td>Internet Protocol</td></tr><tr><td><b>IT</b></td><td>Information Technology</td></tr><tr><td><b>LAPSIT</b></td><td>Laporan Situasi</td></tr></tbody></table><table class="kamus"><tbody><tr><td><b>LLM</b></td><td>Large Language Model</td></tr><tr><td><b>MISP</b></td><td>Malware Information Sharing Platform</td></tr><tr><td><b>NIST</b></td><td>National Institute of Standards and Technology</td></tr><tr><td><b>OODA</b></td><td>Observe–Orient–Decide–Act</td></tr><tr><td><b>OSINT</b></td><td>Open Source Intelligence</td></tr><tr><td><b>OT</b></td><td>Operational Technology</td></tr><tr><td><b>PDNS</b></td><td>Pusat Data Nasional Sementara</td></tr><tr><td><b>RDP</b></td><td>Remote Desktop Protocol</td></tr><tr><td><b>RFC</b></td><td>Request for Comments</td></tr><tr><td><b>SHA-256</b></td><td>Secure Hash Algorithm 256-bit</td></tr><tr><td><b>SIMRS</b></td><td>Sistem Informasi Manajemen Rumah Sakit</td></tr><tr><td><b>SOAR</b></td><td>Security Orchestration, Automation and Response</td></tr><tr><td><b>Sansidam</b></td><td>Sandi dan Siber Kodam</td></tr><tr><td><b>SOC</b></td><td>Security Operations Center</td></tr><tr><td><b>SPK</b></td><td>Sistem Pendukung Keputusan</td></tr><tr><td><b>SSE</b></td><td>Server-Sent Events</td></tr></tbody></table></div>
   <p class="dokumen-lengkap">Dokumen lengkap (Proposal, Dokumentasi Teknis, Panduan Belajar) dan kode: <a href="https://github.com/pisangsisir/nusantara-shield-v5.1">github.com/pisangsisir/nusantara-shield-v5.1</a> → folder <code>docs/</code></p>
   <aside class="catatan"><h4>Catatan pembicara · Lampiran</h4><p>Tampilkan slide ini bila juri bertanya arti sebuah singkatan. Arti sederhana tiap istilah ada di lampiran Proposal dan Dokumentasi Teknis.</p></aside>
-  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>07 / 07</span></div>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>07 / 08</span></div>
+</section>
+
+<!-- =============================== SLIDE 8 · LAMPIRAN B =============================== -->
+<section class="slide" data-judul="Lampiran: Peta Kriteria dan Asal Angka">
+  <div class="kepala">
+    <div class="penanda"><b>08</b>Lampiran B · Peta Kriteria dan Asal Angka</div>
+    <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
+  </div>
+  <h2>Setiap klaim bisa diperiksa. <em>Ini petanya.</em></h2>
+  <div class="dua-kolom kamus-kolom">
+    <table class="kamus peta"><tbody>
+      <tr><td><b>Relevansi · 25%</b></td><td>IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan); LAPSIT untuk Dansat</td></tr>
+      <tr><td><b>Inovasi · 25%</b></td><td>Bukti dulu baru putus, dikunci <i class="asing">server</i> (409); rantai HMAC; dua kunci; AI luring yang menjelaskan alasannya; isolasi OT memutus jalur, genset tetap menyala</td></tr>
+      <tr><td><b>Fungsionalitas · 25%</b></td><td>Berjalan penuh; 254 uji lulus; paket luring diuji di Mac tanpa internet. <span class="batas">Batas: data sintetis, sakelar simulasi</span></td></tr>
+      <tr><td><b>Kelayakan · 15%</b></td><td>Satu proses Python; ±1,5% CPU untuk 300 layar; pemasangan luring bersidik jari; peran Operator dan Pengamat</td></tr>
+      <tr><td><b>Dokumentasi · 10%</b></td><td>Proposal, Dokumentasi Teknis, Panduan Belajar, dek, poster, README, CHANGELOG, deklarasi dan atribusi</td></tr>
+    </tbody></table>
+    <table class="kamus peta"><tbody>
+      <tr><td><b>66%→20%</b></td><td>Rumus korelasi <code>app/telemetri.py</code>; dikunci <code>test_ot</code></td></tr>
+      <tr><td><b>±1,2 dtk</b></td><td><code>JEDA_RUNBOOK</code> alur purwarupa; urutan dikunci <code>test_rantai_bukti</code>; sakelar masih simulasi</td></tr>
+      <tr><td><b>8× / 60 dtk</b></td><td>Ambang di <code>app/deteksi.py</code>; dikunci <code>test_deteksi</code></td></tr>
+      <tr><td><b>±1,5% CPU</b></td><td><code>tools/ukur_beban.py</code>, 26 Okt 2026, 300 siaran SSE sungguhan</td></tr>
+      <tr><td><b>±10 ms AI</b></td><td><code>skor_ms</code> di <code>app/ai_anomali.py</code>; uji membatasi &lt; 100 ms</td></tr>
+      <tr><td><b>254 uji</b></td><td><code>./run_tests.sh</code>, lulus 27 Okt 2026 di Linux dan Mac</td></tr>
+    </tbody></table>
+  </div>
+  <p class="dokumen-lengkap">Rincian lengkap: Proposal §7 di <a href="https://github.com/pisangsisir/nusantara-shield-v5.1">github.com/pisangsisir/nusantara-shield-v5.1</a></p>
+  <aside class="catatan"><h4>Catatan pembicara · Lampiran B</h4><p>Tampilkan bila juri menanyakan asal sebuah angka atau kecocokan dengan kriteria. Kalimat kunci: "Setiap angka di slide ini punya alamat: berkas, uji, atau alat ukur yang bisa dijalankan ulang."</p></aside>
+  <div class="kaki"><span>NUSANTARA SHIELD v5.1 · PROPOSAL DAN DOKUMENTASI TEKNIS</span><span>08 / 08</span></div>
 </section>
 
 </main>

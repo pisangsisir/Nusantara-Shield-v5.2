@@ -26,3 +26,9 @@ Thumbs.db
 # Hasil pengemasan (python tools/kemas_rilis.py)
 dist/
 *.zip
+
+# Catatan internal tim (analisis kompetitor/OSINT, bahan lomba pihak lain): tidak untuk repositori publik
+catatan-internal/
+Belanja Masalah/
+*OSINT*
+*osint*

@@ -4,6 +4,13 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Peta kriteria penilaian dan asal angka — 27 Oktober 2026 (branch `docs/peta-kriteria-asal-angka`)
+- **Proposal §7:** peta lima kriteria Rulebook (bagian H) ke bukti di karya dan cara memeriksanya, serta tabel **asal setiap angka** (berkas, uji, atau alat ukur), termasuk batas tiap angka. Contoh: ±1,2 detik adalah jeda baku alur purwarupa (`JEDA_RUNBOOK`), bukan waktu sakelar fisik.
+- **Dek:** slide baru **Lampiran B · Peta Kriteria dan Asal Angka** (dek kini 8 slide); kalimat pembeda di catatan pembicara slide 2 dan 6.
+- Ringkasan Eksekutif Proposal dan README memuat kalimat pembeda: sistem berlanjut dari alarm sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, tanpa internet.
+- Waktu menjalankan uji diperbarui sesuai pengukuran nyata (±30 detik di Mac, ±55 detik di Linux).
+- `.gitignore` menolak catatan internal tim (folder `catatan-internal/`, `Belanja Masalah/`, dan berkas berlabel OSINT).
+
 ### Spanduk halaman depan — 27 Oktober 2026 (branch `docs/banner-readme`)
 - README dibuka dengan spanduk lebar: simbol, nama, tiga kata kerja Penangkalan, dan keterangan lomba. Disertakan juga `social-preview.png` (1280 × 640) untuk pratinjau tautan GitHub.
 

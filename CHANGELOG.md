@@ -4,6 +4,9 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Spanduk halaman depan — 27 Oktober 2026 (branch `docs/banner-readme`)
+- README dibuka dengan spanduk lebar: simbol, nama, tiga kata kerja Penangkalan, dan keterangan lomba. Disertakan juga `social-preview.png` (1280 × 640) untuk pratinjau tautan GitHub.
+
 ### Logo resmi dan penyesuaian Rulebook — 27 Oktober 2026 (branch `docs/rulebook-logo-v2`)
 - **Logo Nusantara Shield** menggantikan logo generik di dasbor (beserta favicon), dek presentasi, dan poster: perisai, Merah Putih 3:2, radar dua cincin, Nusantara, dan ancaman yang terkunci di perimeter. Berkas, makna, dan aturan pemakaian ada di `docs/logo/`. Poster kini mengambil logo langsung dari `docs/logo/simbol.svg`.
 - **Rujukan aturan** di Proposal, Dokumentasi Teknis, dan riwayat ini diganti dari "pasal 5.3/5.4 Syarat dan Ketentuan" ke **Rulebook bagian G (Ketentuan Karya)**, karena Rulebook terbaru tidak lagi memakai nomor pasal. Isi deklarasi tidak berubah.

@@ -4,6 +4,11 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Lisensi GPLv3 dan penanda hak cipta — 27 Oktober 2026 (branch `chore/lisensi-gplv3`)
+- Berkas **`LICENSE`**: teks resmi GNU GPL v3.0 tanpa diubah (SHA-256 `3972dc97…986`).
+- Setiap berkas kode (`app/`, `tools/`, `static/*.js`, skrip `.sh`) diberi penanda `SPDX-License-Identifier: GPL-3.0-only` dan hak cipta "Copyright (c) 2026 Nusantara Shield Team. Dikembangkan untuk Kartika Cyber Hackathon 2026."
+- README dan Proposal §6.3 menjelaskan lisensi; rujukan kerangka pindah ke §6.4.
+
 ### Fase 2: aturan OT, label MITRE ATT&CK, label sumber data, pengesahan LAPSIT — 27 Oktober 2026 (branch `feature/fase2-mitre-ot-lapsit`)
 - **Aturan OT deterministik** di Engine Deteksi Aturan: koneksi IT ke zona kendali OT dari alamat yang tidak terdaftar (tinggi, 0,50), perintah tulis Modbus di luar jendela pemeliharaan 22.00–02.00 (kritis, 0,70), dan rantai keduanya dari alamat yang sama dalam 600 detik (kritis, 0,90). Jalur resmi dan perintah baca bukan temuan. **Dua kunci tetap:** temuan hanya menaikkan pengendali genset ke WASPADA; tidak ada insiden, bukti, atau isolasi yang terpicu. Latihan baru **Akses OT tanpa izin** di bilah latihan.
 - **Label MITRE ATT&CK®** (`app/mitre.py`, luring) di tabel Peringatan terbaru, log peristiwa, dan LAPSIT: T1110, T1078, T1046, T1486, T1490, T1498, serta ATT&CK for ICS T0886 dan T0855. AI lokal sengaja tanpa label.

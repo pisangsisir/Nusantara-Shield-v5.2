@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 Nusantara Shield Team. Dikembangkan untuk Kartika Cyber Hackathon 2026.
+# Dilisensikan di bawah GNU General Public License v3.0; lihat berkas LICENSE.
 # ---------------------------------------------------------------------------
 # Menjalankan seluruh uji otomatis Nusantara Shield v5.1 dengan umpan balik PER UJI.
 #   ./run_tests.sh                 semua uji

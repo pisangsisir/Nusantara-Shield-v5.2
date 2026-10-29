@@ -4,6 +4,12 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### LAPSIT berkop logo — 29 Oktober 2026 (branch `feature/lapsit-kop-logo`)
+- **Kop di setiap halaman LAPSIT PDF**: logo Nusantara Shield digambar sebagai vektor langsung dari `static/logo.svg` (tanpa pustaka tambahan, tetap luring), identitas posko, nomor laporan `LAPSIT/NS/<tanggal-jam>`, waktu cetak, dan jenis laporan (*Laporan rutin* / *Laporan insiden (n aktif)*). Garis kop navy dan hijau sesuai warna merek.
+- **Kaki halaman**: nomor laporan, keterangan dokumen latihan/data sintetis, dan "Halaman x dari y".
+- Bila berkas logo tidak terbaca, LAPSIT tetap terbit tanpa logo (dikunci uji). Kop sengaja memakai identitas proyek sendiri, bukan kop surat atau lambang instansi.
+- Uji LAPSIT yang ada diperluas (kop, jenis laporan, nomor halaman, logo dan cadangannya); jumlah uji tetap 298. Contoh PDF di `docs/contoh-lapsit/` dibuat ulang.
+
 ### Contoh LAPSIT PDF — 29 Oktober 2026 (branch `docs/contoh-lapsit`)
 - `docs/contoh-lapsit/`: dua LAPSIT PDF yang diekspor dari aplikasi v5.1.3 (commit d1fbfdc) dengan data sintetis — kondisi normal (laporan rutin, 1 halaman) dan setelah latihan insiden (2 halaman) — beserta cara membuatnya ulang. Juri bisa melihat keluaran tanpa memasang aplikasi.
 - README: baris *LAPSIT kapan saja* di tabel doktrin.

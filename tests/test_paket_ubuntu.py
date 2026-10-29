@@ -428,6 +428,9 @@ def test_prasyarat_tidak_terpenuhi_berhenti_tanpa_perubahan(paket, tmp_path):
 def test_argumen_salah_dan_templat_repo_ditolak(paket, tmp_path):
     def jalankan(skrip, *arg):
         return subprocess.run(["sh", str(skrip), *arg], capture_output=True, text=True, timeout=30)
+    # Uji ini berjalan TANPA --awalan (bisa sebagai root). Pengaman: tanda tangan dibuang lebih dulu, sehingga
+    # seandainya pemeriksaan argumen rusak pun skrip berhenti di langkah keaslian (kode 10) sebelum mengubah sistem.
+    (paket / "SHA256SUMS.sig").unlink()
     r = jalankan(paket / "pasang.sh", "--tanpa-venv")                     # tanpa --awalan: tidak boleh
     assert r.returncode == 2 and "hanya untuk mode uji" in r.stderr
     assert jalankan(paket / "pasang.sh", "--pilihan-aneh").returncode == 2

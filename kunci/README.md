@@ -10,6 +10,15 @@ izin 600) di komputer pembuat rilis, di `~/.nusantara-shield/kunci-rilis.pem`, o
 python3 tools/kunci_rilis.py buat
 ```
 
+**Sidik jari kunci rilis yang berlaku** (dibuat 29 Oktober 2026 di Mac pembuat rilis):
+
+```
+00a223f10fe2848df6b5a1fcd016857dd0cfdb8506d9a96efbcb9bb006e5240a
+```
+
+Angka ini juga tertanam di `pasang.sh` setiap paket dan dicatat di berita acara. Bila kunci pernah diganti,
+paket lama tetap diverifikasi dengan kunci publik yang ikut di dalam paket itu.
+
 Sidik jari kunci publik (yang dicatat di berita acara) dihitung dengan:
 
 ```sh

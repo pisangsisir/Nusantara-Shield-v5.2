@@ -22,7 +22,7 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
   - memasang pengguna `nshield`, env rahasia yang dibuat sekali, layanan systemd, dan pembungkus `ns-verifikasi-audit`;
   - mengganti tautan `kini` secara atomik. Ada `--kembali`, `--hapus` (env dan data dipertahankan), dan penolakan versi sama/turun.
 - **`installer/nusantara-shield.service`**: pengguna tanpa login, `ProtectSystem=strict`, `NoNewPrivileges`, tanpa *capability*, `SystemCallFilter=@system-service`; hanya `/var/lib/nusantara-shield` yang boleh ditulis.
-- **333 uji** (sebelumnya 310): 23 uji baru di `tests/test_paket_ubuntu.py`, kelompok ke-17.
+- **334 uji** (sebelumnya 310): 24 uji baru di `tests/test_paket_ubuntu.py`, kelompok ke-17.
   - Semua kunci uji dibuat sementara.
   - Ke-14 pemeriksaan pengaman di `pasang.sh` diuji mutasi (dijalankan pada salinan repo): setiap pemeriksaan dimatikan bergantian, dan sedikitnya satu uji gagal.
   - Uji argumen yang berjalan tanpa `--awalan` dibuat aman: tanda tangannya dibuang lebih dulu, sehingga seandainya pemeriksaan argumen rusak pun skrip berhenti sebelum mengubah sistem.
@@ -33,6 +33,8 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
   - layanan dijalankan sebagai `nshield` dengan perintah dan env yang sama dengan berkas layanan: *login*, LAPSIT, dan `ns-verifikasi-audit` berhasil;
   - `--hapus` mempertahankan env dan data.
 - **Belum diuji:** systemd sungguhan (kontainer tanpa systemd; berkas layanan baru diperiksa `systemd-analyze verify`). Rencananya diuji di VM Ubuntu pada QA akhir.
+- Perbaikan setelah percobaan pertama di Mac: `kunci_rilis.py tandatangani` kini memeriksa berkas sebelum menanyakan kata sandi (sebelumnya sandi ditanyakan lalu gagal karena `SHA256SUMS` belum ada, sehingga terkesan sandi salah), dan `kemas_installer.py bungkus` memberi pesan jelas, bukan *traceback*, bila `susun` belum berhasil.
+- Kunci publik rilis (`kunci/kunci-publik-rilis.pem`, sidik jari `00a223f1…240a`) ditambahkan; kunci privatnya hanya ada di Mac pembuat rilis.
 - Dokumen: README (bagian paket Ubuntu dan kelompok uji ke-17), Dokumentasi Teknis §2.7 dan §4.4 (blok terminal dibuat ulang dari keluaran `./run_tests.sh` yang asli), Proposal, dek presentasi (slide 4: 17 kelompok), dan poster.
 
 ## v5.1 — 15–29 Oktober 2026

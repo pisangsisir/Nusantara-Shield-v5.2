@@ -207,6 +207,12 @@ def main(argv: list[str] | None = None) -> int:
             print("  Catat sidik jari ini di berita acara. Cadangkan kunci privat ke media luring yang disimpan terpisah;")
             print("  bila kunci privat atau kata sandinya hilang, rilis berikutnya harus memakai kunci baru.")
         elif a.perintah == "tandatangani":
+            # Periksa berkas DULU, baru tanya kata sandi: jangan sampai sandi diketik untuk berkas yang tidak ada.
+            for jalur, nama in ((Path(a.berkas), "berkas yang ditandatangani"),
+                                (Path(a.kunci_publik).expanduser(), "kunci publik"),
+                                (Path(a.kunci_privat).expanduser(), "kunci privat")):
+                if not jalur.is_file():
+                    raise GagalKunci(f"{nama} tidak ditemukan: {jalur} (kata sandi belum ditanyakan)", 2)
             sig, sidik, openssl = tandatangani(Path(a.berkas), Path(a.kunci_privat).expanduser(),
                                                Path(a.kunci_publik).expanduser(), baca_sandi(a.sandi_berkas, False))
             print(f"✓ {sig} ({sig.stat().st_size} bita) · kunci {sidik}")

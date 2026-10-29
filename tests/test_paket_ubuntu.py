@@ -437,3 +437,14 @@ def test_argumen_salah_dan_templat_repo_ditolak(paket, tmp_path):
     r = jalankan(AKAR / "installer" / "pasang.sh", "--awalan", str(tmp_path / "x"))
     assert r.returncode == 2 and "templat" in r.stderr
     assert jalankan(paket / "pasang.sh", "--bantuan").returncode == 0
+
+
+def test_langkah_yang_terlewat_memberi_pesan_jelas_tanpa_menanyakan_sandi(tmp_path, monkeypatch, capsys):
+    """Bila 'susun' gagal, 'tandatangani' tidak boleh menanyakan kata sandi lalu gagal (terkesan sandi salah),
+    dan 'bungkus' tidak boleh berakhir dengan traceback."""
+    monkeypatch.setattr(kr.getpass, "getpass", lambda *_: pytest.fail("kata sandi tidak boleh ditanyakan"))
+    assert kr.main(["tandatangani", str(tmp_path / "tidak-ada" / "SHA256SUMS"),
+                    "--kunci-publik", str(tmp_path / "pub.pem"), "--kunci-privat", str(tmp_path / "k.pem")]) == 2
+    assert "kata sandi belum ditanyakan" in capsys.readouterr().err
+    assert ki.main(["bungkus", str(tmp_path / "tidak-ada")]) == 1
+    assert "jalankan dulu" in capsys.readouterr().err

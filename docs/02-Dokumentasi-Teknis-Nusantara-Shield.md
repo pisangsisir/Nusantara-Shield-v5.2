@@ -68,6 +68,7 @@ Nusantara Shield adalah perisai pertahanan siber (kategori **Penangkalan, _Defen
 | `NS_KODE_OPERATOR` | Kode undangan untuk mendaftar sebagai operator | Pendaftaran operator mandiri **tertutup** |
 | `NS_DAFTAR_PENGAMAT` | `1` = siapa pun boleh mendaftar sebagai pengamat | Terbuka |
 | `NS_HTTPS` | `1` = aktifkan HTTP Strict Transport Security (HSTS) di belakang Hypertext Transfer Protocol Secure (HTTPS) | Nonaktif |
+| `NS_ZONA_WAKTU` | Zona waktu di LAPSIT PDF: `WIB`, `WITA`, atau `WIT` | `WIB` |
 
 ### 1.4 Data Latihan Sintetis
 
@@ -273,6 +274,18 @@ Kategori yang **sengaja tidak diklaim**, antara lain GV.SC (rantai pasok; baru s
 - Latihan: `POST /api/deteksi/latihan` (Operator saja; tercatat di log audit) memutar rangkaian peristiwa sintetis. Latihan **Akses OT tanpa izin** memutar 6 peristiwa ke pengendali genset: stasiun rekayasa resmi tersambung dan membaca register (bukan temuan), lalu stasiun kerja kantor 192.0.2.183 menyeberang ke zona kendali dan mengirim 3 perintah tulis pukul 14.00. Hasilnya tiga temuan dan genset naik ke WASPADA ±98%; tidak ada insiden, bukti, atau isolasi yang terpicu.
 - **Label MITRE ATT&CK®** (`app/mitre.py`, tabel statis luring) tampil di tabel Peringatan terbaru, log peristiwa, dan LAPSIT PDF. Skenario latihan juga dipetakan: _ransomware_ T1486, backup dimatikan T1490, DDoS T1498, Sabotase OT T0886 dan T0855. AI lokal sengaja tidak diberi label karena ia menilai pola, bukan mengenali teknik tertentu. Pemetaan dilakukan tim sendiri sebagai rujukan, bukan sertifikasi; MITRE ATT&CK® adalah merek dagang The MITRE Corporation.
 - **Label batasan.** Setiap peringatan menulis sumber datanya, misalnya "Sumber: peristiwa latihan sintetis · aturan deteksi berjalan nyata" atau "Sumber: skenario latihan · perintah ke perangkat jaringan masih simulasi".
+
+**LAPSIT PDF formal.** Ekspor LAPSIT (`POST /api/lapsit`, `app/lapsit.py`) disusun seperti laporan insiden formal (gaya SANS/NIST SP 800-61), dengan kop berlogo, nomor laporan, dan "Halaman x dari y" di setiap halaman. Isinya tujuh bagian, semuanya diambil dari keadaan sistem saat dicetak:
+
+1. **Ringkasan eksekutif**: satu atau dua paragraf naratif (apa, kapan, bagaimana ditangani, dan dampaknya) yang dirakit dari data insiden, bukti, laporan, dan MTTC.
+2. **Status layanan dan dampak operasional**: dampak terhadap misi tiap layanan dan prosedur kontinjensinya (`DAMPAK_OPERASIONAL` di `app/data_contoh.py`). Ini perkiraan menurut profil layanan contoh, bukan hasil ukur.
+3. **Insiden aktif dan tindakan**: kronologi gejala, lalu setiap langkah playbook dengan **waktu eksekusi, T+detik, dan aktor** (akun yang menahan tombol isolasi untuk tindakan SOAR berantai), bukti dan SHA-256-nya, MTTC, dan nomor laporan.
+4. **Indikator kompromi (IoC)**: alamat ancaman skenario (berstatus *Diblokir di firewall (simulasi)* hanya bila langkah pemutusnya sudah berjalan), alamat sumber temuan aturan deteksi, dan parameter Modbus (kode fungsi, misalnya 16 *Write Multiple Registers*). Sumber temuan aturan **tidak pernah** ditulis "diblokir", karena aturan tidak memutus apa pun.
+5. **Peringatan terbaru** dengan teknik ATT&CK dan label sumber data.
+6. **Integritas log audit**: sidik jari HMAC-SHA256 entri terakhir beserta cara auditor mencocokkannya (*Verifikasi rantai* atau `GET /api/audit/verifikasi`). Sidik jari ini menjamin keutuhan log, bukan keutuhan berkas PDF.
+7. **Pengesahan** dua tanda tangan.
+
+Waktu ditulis dalam zona `NS_ZONA_WAKTU` (bawaan WIB). Contoh hasilnya ada di `docs/contoh-lapsit/`.
 
 **Linimasa 60 menit dan KPI.** Linimasa terdiri atas 60 titik × 1 menit ditambah menit berjalan. Saat posko baru dibuka, isinya data latihan berbenih tetap (batang redup); setiap 60 detik, beban posko yang sebenarnya menjadi titik baru, dan menit yang memuat insiden ditandai. Di bawahnya, **pita anomali AI per aset** menyebut nama aset, lama anomali, dan alasan dari model; klik pita menyorot aset di topologi. **Waktu respons (MTTC)** adalah rata-rata dari insiden dimulai sampai langkah penahanan _playbook_ selesai, dan **Insiden sejak posko aktif** menghitung insiden yang dimulai. Keduanya dimulai ulang saat demo diatur ulang.
 

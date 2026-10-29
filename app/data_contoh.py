@@ -50,6 +50,31 @@ LAYANAN_AWAL: list[dict] = [
 # Batas kepatuhan backup (aturan main demo, bisa disesuaikan)
 BATAS_JAM_BACKUP = 24
 
+# Dampak operasional (misi) tiap layanan untuk LAPSIT: apa yang terganggu bila layanan berhenti, dan prosedur
+# kontinjensinya. PERKIRAAN dampak menurut profil layanan contoh, bukan hasil pengukuran.
+DAMPAK_OPERASIONAL: dict[str, dict[str, str]] = {
+    "imigrasi": {"misi": "pendaftaran daring dan jadwal kontrol pasien",
+                 "kontinjensi": "pendaftaran dilayani di loket"},
+    "perizinan": {"misi": "pemesanan dan pengadaan alat kesehatan",
+                  "kontinjensi": "pemesanan lewat surat dan telepon resmi"},
+    "pajak": {"misi": "pencairan anggaran dan pembayaran satuan",
+              "kontinjensi": "pencatatan manual; pembayaran mendesak dengan persetujuan berjenjang"},
+    "kesehatan": {"misi": "pendaftaran pasien, rekam medis elektronik, serta layanan laboratorium dan farmasi",
+                  "kontinjensi": "rekam medis, resep, dan permintaan laboratorium manual (formulir kertas)"},
+    "listrik": {"misi": "catu daya cadangan rumah sakit (IGD, ICU, ruang operasi)",
+                "kontinjensi": "genset dikendalikan lokal oleh teknisi di ruang mesin",
+                "saat_diisolasi": "jalur kendali jarak jauh diputus; genset TIDAK dimatikan dan tetap siap menyala"},
+    "logistik": {"misi": "distribusi obat dan perbekalan kesehatan",
+                 "kontinjensi": "kartu stok dan surat jalan manual"},
+}
+# Gangguan khas tiap skenario terhadap misi layanan ({misi} diisi dari DAMPAK_OPERASIONAL).
+GANGGUAN_SKENARIO: dict[str, str] = {
+    "ransomware": "berkas terenkripsi; {misi} tidak dapat diakses",
+    "backup_dimatikan": "layanan masih berjalan, tetapi cadangan dilepas sehingga {misi} berisiko tidak bisa dipulihkan",
+    "ddos": "{misi} melambat hingga tidak dapat diakses dari luar",
+    "sabotase_ot": "ada upaya mengubah jadwal start genset; {misi} berisiko terganggu",
+}
+
 
 def salin_layanan_awal() -> dict[str, dict]:
     """Membuat salinan baru data layanan agar data asli tidak ikut berubah."""

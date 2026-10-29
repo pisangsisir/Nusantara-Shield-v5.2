@@ -71,7 +71,7 @@ from .bukti import (BUKTI_DIAMANKAN, BUKTI_DIVERIFIKASI, BUKTI_GAGAL, ISOLASI_DA
                     VERIFIKASI_GAGAL, RantaiBukti)
 from .penomoran import PENCACAH, PencacahIR
 from .ai_anomali import DETEKTOR, POLA, POLA_SKENARIO, ciri_normal, ciri_pola
-from .deteksi import (ASET_LATIHAN_OT, ATURAN as ATURAN_DETEKSI, AWALAN as AWALAN_DET, JENIS_LATIHAN, MesinDeteksi,
+from .deteksi import (NAMA_FUNGSI_MODBUS, ASET_LATIHAN_OT, ATURAN as ATURAN_DETEKSI, AWALAN as AWALAN_DET, JENIS_LATIHAN, MesinDeteksi,
                       rangkaian_latihan)
 from .mitre import ringkas as ringkas_mitre, teknik as teknik_mitre
 from .impor_log import baca as baca_log
@@ -486,7 +486,8 @@ class Menara:
         self._panggilan: dict[str, list[dict]] = {}   # v4: riwayat panggilan darurat per lembaga
         self._ir: list[dict] = []                     # laporan terkirim (terbaru di akhir)
         self._ir_insiden: dict[str, dict] = {}        # laporan per insiden aktif
-        self._jejak: dict[str, dict[int, dict]] = {}  # F-02: bukti tiap langkah {indeks: {metode, label, detik}}
+        self._jejak: dict[str, dict[int, dict]] = {}  # F-02: bukti tiap langkah {indeks: {metode, label, detik, waktu, oleh}}
+        self._perintah_isolasi: dict[str, str] = {}  # akun yang menahan tombol isolasi (aktor tindakan SOAR berantai)
         self._sebab: dict[str, str] = {}              # v5: simpul topologi → layanan penyebab status
         self._bukti: dict[str, dict] = {}             # Fase 4: bukti yang diamankan per insiden aktif
         self._darurat: dict[str, dict] = {}           # Fase 4: isolasi darurat (beralasan) per insiden aktif
@@ -714,6 +715,7 @@ class Menara:
         self._mttc.pop(layanan_id, None)
         self._ir_insiden.pop(layanan_id, None)        # insiden baru = laporan baru
         self._jejak.pop(layanan_id, None)
+        self._perintah_isolasi.pop(layanan_id, None)
         self._bukti.pop(layanan_id, None)
         self._darurat.pop(layanan_id, None)
         for i, (menit, tingkat, pesan) in enumerate(log, start=1):
@@ -752,15 +754,16 @@ class Menara:
         return hasil
 
     def catat_langkah(self, layanan: dict, layanan_id: str, indeks: int, selesai: bool,
-                      metode: str = "manual", label: str | None = None) -> None:
-        """Satu pintu untuk mencentang langkah, baik oleh manusia maupun SOAR."""
+                      metode: str = "manual", label: str | None = None, oleh: str | None = None) -> None:
+        """Satu pintu untuk mencentang langkah, baik oleh manusia maupun SOAR. Jejaknya mencatat KAPAN (UTC) dan
+        OLEH SIAPA: untuk tindakan SOAR berantai, aktornya adalah akun yang menahan tombol isolasi."""
         l = layanan[layanan_id]
         ins = l["insiden"]
         ins["langkah_selesai"][indeks] = selesai
         jejak = self._jejak.setdefault(layanan_id, {})
         if selesai:
             jejak[indeks] = {"metode": metode, "label": label or ins["langkah"][indeks].split(":")[0],
-                             "detik": self._detik_insiden(layanan_id)}
+                             "detik": self._detik_insiden(layanan_id), "waktu": _iso(), "oleh": oleh}
         else:
             jejak.pop(indeks, None)
         judul = ins["langkah"][indeks].split(":")[0]
@@ -841,6 +844,7 @@ class Menara:
                                  f" → {len(sisa)} tindakan pemutus berurutan; "
                                  f"{ISTILAH['laporan']} menyusul setelah semuanya selesai)",
                        layanan=layanan_id, jenis="soar")
+            self._perintah_isolasi[layanan_id] = oleh
             self._jadwalkan_pemutus(layanan, layanan_id, sisa, JEDA_RUNBOOK if bukti_baru else 0.0)
             dijadwalkan = (["amankan_bukti"] if bukti_baru else []) + [a["id"] for a in sisa]
         else:
@@ -867,7 +871,7 @@ class Menara:
                     if alasan:
                         raise ValueError(alasan)
                     self.verifikasi_untuk_pemulihan(layanan, layanan_id, oleh)
-                self.catat_langkah(layanan, layanan_id, aksi["langkah"], True, "soar", aksi["label"])
+                self.catat_langkah(layanan, layanan_id, aksi["langkah"], True, "soar", aksi["label"], oleh)
             dijadwalkan = [aksi["id"]]
         self.ubah()
         lahir = None if sudah_ada_ir else self._ir_insiden.get(layanan_id)
@@ -890,7 +894,8 @@ class Menara:
                     self.catat("kritis", f"SOAR ✖ {aksi['label']} dibatalkan: bukti belum diamankan",
                                layanan=lid, jenis="soar")
                     continue
-                self.catat_langkah(layanan, lid, aksi["langkah"], True, "soar", aksi["label"])
+                self.catat_langkah(layanan, lid, aksi["langkah"], True, "soar", aksi["label"],
+                                   self._perintah_isolasi.get(lid))
 
     # ======================================================================
     # v5.1: AUTOMATED IR BLAST & QUICK CALL (Pre-Authorized Containment)
@@ -1034,7 +1039,7 @@ class Menara:
             ir["bukti"] = self._ringkas_bukti(layanan_id)
             self.catat("info", f"Adendum {ir['nomor']}: bukti {d['nomor']} diamankan T+{rekam['detik']} dtk",
                        layanan=layanan_id, jenis="ir")
-        self.catat_langkah(layanan, layanan_id, langkah_bukti(sk), True, metode, ISTILAH["langkah_bukti"])
+        self.catat_langkah(layanan, layanan_id, langkah_bukti(sk), True, metode, ISTILAH["langkah_bukti"], oleh)
         return rekam
 
     def _jadwalkan_pemutus(self, layanan: dict, layanan_id: str, sisa: list[dict], jeda_awal: float) -> None:
@@ -1073,6 +1078,7 @@ class Menara:
         self.catat("tinggi", f"⚠ {ISTILAH['tombol_darurat']} oleh {oleh} di {l['nama']}: bukti BELUM diamankan. "
                              f"Alasan: {alasan}", layanan=layanan_id, jenis="bukti")
         sudah_ada_ir = layanan_id in self._ir_insiden
+        self._perintah_isolasi[layanan_id] = oleh
         self._jadwalkan_pemutus(layanan, layanan_id, sisa, 0.0)
         self.ubah()
         lahir = None if sudah_ada_ir else self._ir_insiden.get(layanan_id)
@@ -1128,7 +1134,7 @@ class Menara:
             if alasan:
                 raise ValueError(alasan)
             self.verifikasi_untuk_pemulihan(layanan, layanan_id, oleh)
-        self.catat_langkah(layanan, layanan_id, indeks, selesai, metode="manual")
+        self.catat_langkah(layanan, layanan_id, indeks, selesai, metode="manual", oleh=oleh)
 
     def _forensik(self, layanan: dict) -> dict:
         hasil = {}
@@ -1151,6 +1157,7 @@ class Menara:
                                               "bukti": b["nomor"] if b else None})
         self._ir_insiden.pop(layanan_id, None)
         self._jejak.pop(layanan_id, None)
+        self._perintah_isolasi.pop(layanan_id, None)
         self._bukti.pop(layanan_id, None)       # berita acara tetap abadi di buku rantai bukti
         self._darurat.pop(layanan_id, None)
 
@@ -1323,6 +1330,68 @@ class Menara:
                           "mitre": teknik_mitre(r.get("skenario")), "sumber_data": SUMBER_DATA["insiden"]})
         hasil.sort(key=lambda x: x["waktu"], reverse=True)
         return hasil[:MAKS_PERINGATAN]
+
+    def rincian_lapsit(self, layanan: dict) -> dict:
+        """Bahan LAPSIT formal yang diambil dari keadaan SEBENARNYA (bukan teks tetap):
+        - per insiden aktif: jejak tiap langkah playbook (kapan, oleh siapa, T+detik), bukti, laporan, MTTC, darurat;
+        - tabel indikator kompromi (IoC): alamat ancaman skenario (diblokir hanya bila langkah pemutusnya sudah
+          berjalan) dan sumber temuan Engine Deteksi Aturan (tidak pernah diblokir otomatis: dua kunci)."""
+        self._proses_antre_soar(layanan)
+        self._proses_deteksi()
+        insiden = {}
+        for lid, l in layanan.items():
+            ins = l.get("insiden")
+            if not ins:
+                continue
+            jejak = self._jejak.get(lid, {})
+            antre = {a["langkah"] for _, x, aid in self._antre_soar if x == lid
+                     for a in SOAR[ins["skenario"]] if a["id"] == aid}
+            insiden[lid] = {
+                "langkah": [{"teks": teks, "selesai": ins["langkah_selesai"][i], "antre": i in antre, **jejak.get(i, {})}
+                            for i, teks in enumerate(ins["langkah"])],
+                "bukti": self._bukti.get(lid), "ir": self._ir_insiden.get(lid), "darurat": self._darurat.get(lid),
+                "mttc": (self._mttc.get(lid) or {}).get("detik"), "jeda_runbook": JEDA_RUNBOOK}
+        ioc, indeks = [], {}
+
+        def tambah(tipe, nilai, rujukan, konteks, status):
+            """Satu baris per nilai: temuan berbeda atas nilai yang sama digabung rujukan dan asetnya."""
+            if nilai in indeks:
+                x = indeks[nilai]
+                x["rujukan"] += [] if rujukan in x["rujukan"] else [rujukan]
+                x["konteks"] += [] if konteks in x["konteks"] else [konteks]
+                return
+            indeks[nilai] = {"tipe": tipe, "nilai": nilai, "rujukan": [rujukan], "konteks": [konteks], "status": status}
+            ioc.append(indeks[nilai])
+
+        for lid, l in layanan.items():
+            ins = l.get("insiden")
+            if not ins:
+                continue
+            langkah = DAMPAK[ins["skenario"]].get("langkah", {})
+            putus = next((i for i, e in langkah.items() if e.get("ancaman") == "isolasi"), None)
+            diblokir = putus is not None and ins["langkah_selesai"][putus]
+            for a in DAMPAK[ins["skenario"]].get("ancaman", []):
+                tambah(f"Alamat IP · {a['nama']}", f"{a['ip']}:{a['port']}", a["ioc"], l["nama"],
+                       "Diblokir di firewall (simulasi)" if diblokir else "Aktif · belum diblokir")
+        status_det = {x["id"]: x["status"] for x in self._peringatan(layanan, self._prediksi(layanan))
+                      if x["jenis"] == "deteksi"}
+        sekarang = self._jam()
+        for tm in self.deteksi.temuan[-10:]:
+            if not tm.aktif(sekarang):
+                continue
+            status = status_det.get(tm.id, "Dipantau")
+            status = status if "playbook" in status else f"{status} · tidak diblokir otomatis"
+            sasaran = ", ".join(INDEKS_SIMPUL[a]["nama"] for a in tm.aset) or "—"
+            tambah("Alamat IP sumber (temuan aturan deteksi)", tm.sumber, tm.id, sasaran, status)
+            if "fungsi" in tm.rincian:
+                for a in tm.aset:
+                    s = INDEKS_SIMPUL[a]
+                    tambah("Parameter Modbus (perintah tulis)",
+                           f"Fungsi {tm.rincian['fungsi']:02d} · {NAMA_FUNGSI_MODBUS.get(tm.rincian['fungsi'], 'tulis')} "
+                           f"ke {s['ip']}:{s['port']}, pukul {tm.rincian['jam']:02d}.00", tm.id, s["nama"], status)
+        for x in ioc:
+            x["rujukan"], x["konteks"] = ", ".join(x["rujukan"]), ", ".join(x["konteks"])
+        return {"insiden": insiden, "ioc": ioc}
 
     def peringatan_lapsit(self, layanan: dict) -> list[dict]:
         """Daftar peringatan terbaru (dengan teknik MITRE ATT&CK dan sumber data) untuk LAPSIT PDF.

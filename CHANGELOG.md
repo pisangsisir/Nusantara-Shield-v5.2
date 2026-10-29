@@ -19,6 +19,7 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
   - poster dan Panduan Belajar PDF.
 - Contoh LAPSIT di `docs/contoh-lapsit/` dibuat ulang.
 - Diuji ujung ke ujung dengan *server* berkunci sungguhan: sidik jari dari LAPSIT ditemukan di entri #6 (`EKSPOR_LAPSIT`). Setelah satu entri disunting, alat menunjuk entri #2 dan keluar dengan kode 1.
+- Di Mac (macOS, Apple Silicon): 310 lulus. CLI juga berjalan dengan Python 3.9 bawaan macOS, tanpa pustaka tambahan.
 
 ### LAPSIT formal — 29 Oktober 2026 (branch `feature/lapsit-formal`)
 - LAPSIT PDF disusun ulang seperti laporan insiden formal (gaya SANS/NIST SP 800-61), tujuh bagian, semuanya dari keadaan sistem saat dicetak:

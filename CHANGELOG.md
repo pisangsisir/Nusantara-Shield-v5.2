@@ -2,6 +2,39 @@
 
 Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi di Proposal §6.1 (Rulebook bagian G). Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
+## v5.2.0 — 29 Oktober 2026
+
+### Paket pasang luring bertanda tangan untuk Ubuntu 24.04 LTS (branch `feature/installer-ubuntu-ed25519`)
+- **Target tetap:** Ubuntu 24.04 LTS, x86_64, Python 3.12 bawaan Ubuntu (`/usr/bin/python3.12`). Paket tidak membawa Python; bila syarat tidak terpenuhi, pemasang berhenti dengan kode 20 dan tidak mengubah apa pun.
+- **`tools/kunci_rilis.py`** (komputer pembuat rilis): kunci Ed25519.
+  - Kunci privat disimpan terenkripsi (PKCS#8, kata sandi minimal 16 karakter yang diketik, izin 600) di `~/.nusantara-shield/`, **di luar repo**.
+  - Kunci tidak pernah ditimpa, dicetak, atau diterima sebagai argumen.
+  - Setiap tanda tangan langsung diverifikasi ulang dengan kunci publik yang diterbitkan, dan dengan OpenSSL 3 bila ada.
+- **`tools/kemas_installer.py`**: tiga langkah.
+  1. `susun`: payload `.tar.gz` deterministik dari commit bersih, berisi kode, wheel Linux CPython 3.12 (`--only-binary`), `persyaratan-terkunci.txt` (versi + SHA-256 setiap wheel), dan `manifest.json` (SHA-256 setiap berkas).
+  2. Penandatanganan `SHA256SUMS` dengan `kunci_rilis.py tandatangani`.
+  3. `bungkus`: memeriksa tanda tangan lalu membuat `.tar` luar dan `SIDIK-JARI-PAKET-*.txt` untuk berita acara.
+- **`installer/pasang.sh`** (POSIX sh, hanya alat bawaan Ubuntu):
+  - memeriksa sidik jari kunci yang tertanam, tanda tangan Ed25519 (`openssl pkeyutl -verify -rawin`), dan `sha256sum -c --strict`;
+  - memeriksa setiap anggota payload **sebelum ekstraksi** (tanpa jalur absolut/`..`/tautan/perangkat, harus tercatat di manifest);
+  - mengekstrak ke folder sementara dengan filter `data`, lalu mencocokkan SHA-256 setiap berkas;
+  - membuat venv `--without-pip` dan memasang pustaka dengan `pip --no-index --require-hashes`, lalu menjalankan uji asap `/api/health` (dan `--uji` untuk seluruh uji);
+  - memasang pengguna `nshield`, env rahasia yang dibuat sekali, layanan systemd, dan pembungkus `ns-verifikasi-audit`;
+  - mengganti tautan `kini` secara atomik. Ada `--kembali`, `--hapus` (env dan data dipertahankan), dan penolakan versi sama/turun.
+- **`installer/nusantara-shield.service`**: pengguna tanpa login, `ProtectSystem=strict`, `NoNewPrivileges`, tanpa *capability*, `SystemCallFilter=@system-service`; hanya `/var/lib/nusantara-shield` yang boleh ditulis.
+- **333 uji** (sebelumnya 310): 23 uji baru di `tests/test_paket_ubuntu.py`, kelompok ke-17.
+  - Semua kunci uji dibuat sementara.
+  - Ke-14 pemeriksaan pengaman di `pasang.sh` diuji mutasi (dijalankan pada salinan repo): setiap pemeriksaan dimatikan bergantian, dan sedikitnya satu uji gagal.
+  - Uji argumen yang berjalan tanpa `--awalan` dibuat aman: tanda tangannya dibuang lebih dulu, sehingga seandainya pemeriksaan argumen rusak pun skrip berhenti sebelum mengubah sistem.
+- `cryptography>=42` ditambahkan ke bagian pengujian/rilis `requirements.txt` (dipakai pembuat rilis dan uji; aplikasi tidak memakainya).
+- **Diuji ujung ke ujung (kontainer Ubuntu 24.04, kunci uji sementara):**
+  - paket dibuat dengan 36 wheel Linux asli (135 berkas, ±83 MB);
+  - dipasang **sebagai root dengan jaringan diputus** (`unshare -n`): **333 passed** dari venv terpasang;
+  - layanan dijalankan sebagai `nshield` dengan perintah dan env yang sama dengan berkas layanan: *login*, LAPSIT, dan `ns-verifikasi-audit` berhasil;
+  - `--hapus` mempertahankan env dan data.
+- **Belum diuji:** systemd sungguhan (kontainer tanpa systemd; berkas layanan baru diperiksa `systemd-analyze verify`). Rencananya diuji di VM Ubuntu pada QA akhir.
+- Dokumen: README (bagian paket Ubuntu dan kelompok uji ke-17), Dokumentasi Teknis §2.7 dan §4.4 (blok terminal dibuat ulang dari keluaran `./run_tests.sh` yang asli), Proposal, dek presentasi (slide 4: 17 kelompok), dan poster.
+
 ## v5.1 — 15–29 Oktober 2026
 
 ### Verifikasi audit tanpa server — 29 Oktober 2026 (branch `feature/verifikasi-audit-cli`)

@@ -1,0 +1,19 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-only
+# ns-verifikasi-audit — memverifikasi log audit dan Buku Rantai Bukti Nusantara Shield tanpa menyalakan server.
+# Dipasang oleh pasang.sh ke /usr/local/bin. Jalankan sebagai root (kunci audit hanya bisa dibaca root):
+#     sudo ns-verifikasi-audit
+#     sudo ns-verifikasi-audit --cocokkan <sidik jari dari LAPSIT>
+#     sudo ns-verifikasi-audit --json
+# Kunci NS_AUDIT_KEY dibaca dari /etc/nusantara-shield/env lalu diteruskan lewat variabel lingkungan
+# (tidak lewat argumen, jadi tidak terlihat di daftar proses dan tidak dicetak).
+set -eu
+ENV=/etc/nusantara-shield/env
+if [ ! -r "$ENV" ]; then
+	echo "GAGAL: $ENV tidak bisa dibaca. Jalankan dengan sudo." >&2
+	exit 2
+fi
+NS_AUDIT_KEY=$(sed -n 's/^NS_AUDIT_KEY=//p' "$ENV" | head -n 1)
+export NS_AUDIT_KEY
+cd /var/lib/nusantara-shield
+exec /usr/bin/python3.12 -I /opt/nusantara-shield/kini/tools/verifikasi_audit.py "$@"

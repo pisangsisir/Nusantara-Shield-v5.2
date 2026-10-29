@@ -2,6 +2,7 @@ fastapi>=0.115
 uvicorn[standard]>=0.30
 reportlab>=4.0
 scikit-learn>=1.3     # AI lokal: Isolation Forest (membawa numpy); berjalan luring
-# untuk pengujian
+# untuk pengujian dan penandatanganan rilis (tools/kunci_rilis.py)
 pytest>=8.0
 httpx>=0.27
+cryptography>=42

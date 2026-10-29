@@ -4,6 +4,20 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### LAPSIT formal — 29 Oktober 2026 (branch `feature/lapsit-formal`)
+- LAPSIT PDF disusun ulang seperti laporan insiden formal (gaya SANS/NIST SP 800-61), tujuh bagian, semuanya dari keadaan sistem saat dicetak:
+  1. **Ringkasan eksekutif** naratif (apa, kapan, bagaimana, dampak);
+  2. **Status layanan dan dampak operasional**, dengan profil misi dan kontinjensi per layanan (`DAMPAK_OPERASIONAL`, perkiraan);
+  3. **Insiden dan tindakan**: kronologi gejala, langkah playbook dengan waktu eksekusi, T+detik, dan aktor, bukti SHA-256, MTTC, dan nomor laporan;
+  4. **Tabel indikator kompromi (IoC)**: alamat ancaman skenario, alamat sumber temuan aturan, dan parameter Modbus (kode fungsi dan namanya);
+  5. **Peringatan terbaru** (ATT&CK, sumber data);
+  6. **Integritas log audit** dengan cara verifikasi untuk auditor;
+  7. **Pengesahan**.
+- Jejak langkah playbook kini mencatat **waktu (UTC) dan aktor**. Untuk tindakan SOAR berantai, aktornya adalah akun yang menahan tombol isolasi.
+- Status IoC jujur: *Diblokir di firewall (simulasi)* hanya bila langkah pemutusnya sudah berjalan; sumber temuan aturan ditulis "tidak diblokir otomatis".
+- Zona waktu laporan `NS_ZONA_WAKTU` (WIB/WITA/WIT, bawaan WIB).
+- Uji LAPSIT yang ada diperluas untuk ketujuh bagian; jumlah uji tetap 298. Contoh PDF di `docs/contoh-lapsit/` dibuat ulang.
+
 ### LAPSIT berkop logo — 29 Oktober 2026 (branch `feature/lapsit-kop-logo`)
 - **Kop di setiap halaman LAPSIT PDF**: logo Nusantara Shield digambar sebagai vektor langsung dari `static/logo.svg` (tanpa pustaka tambahan, tetap luring), identitas posko, nomor laporan `LAPSIT/NS/<tanggal-jam>`, waktu cetak, dan jenis laporan (*Laporan rutin* / *Laporan insiden (n aktif)*). Garis kop navy dan hijau sesuai warna merek.
 - **Kaki halaman**: nomor laporan, keterangan dokumen latihan/data sintetis, dan "Halaman x dari y".

@@ -222,13 +222,22 @@ def test_lapsit_memuat_attck_sumber_data_dan_dua_tanda_tangan(k):
     h = masuk(k)
     latih(k, h, "akses_ot")
     assert k.post("/api/simulasi", headers=h, json={"layanan_id": "listrik", "skenario": "sabotase_ot"}).status_code == 200
+    JAM["t"] += 3
+    assert k.post("/api/soar/jalankan", headers=h, json={"layanan_id": "listrik", "aksi": "isolasi"}).status_code == 200
+    JAM["t"] += 10                                                  # antrean pemutus SOAR jatuh tempo
     r = k.post("/api/lapsit", headers=h)
     assert r.status_code == 200 and r.content.startswith(b"%PDF")
     teks = teks_pdf(r.content)
     for kata in ("T0886", "T0855", "Unauthorized Command Message", "Peringatan terbaru", "peristiwa latihan sintetis",
                  ISTILAH["ttd_judul"], ISTILAH["ttd_pembuat"], ISTILAH["ttd_mengetahui"], *nama_manajemen(),
-                 "NUSANTARA SHIELD", ISTILAH["laporan"].upper(), "Laporan insiden (1 aktif)", "LAPSIT/NS/"):
+                 "NUSANTARA SHIELD", ISTILAH["laporan"].upper(), "Laporan insiden (1 aktif)", "LAPSIT/NS/",
+                 # LAPSIT formal: ringkasan naratif, dampak, IoC, tindakan bercap waktu dan beraktor, cara verifikasi
+                 "Ringkasan eksekutif", "terjadi insiden", "Dampak operasional", "genset TIDAK dimatikan",
+                 "Indikator kompromi (IoC)", "203.0.113.45:502", "Diblokir di firewall (simulasi)",
+                 "Write Multiple Registers", "Waktu penahanan (MTTC)", "otomatis lewat SOAR", "WIB",
+                 "Cara memverifikasi", "HMAC-SHA256", ISTILAH["buku_bukti"]):
         assert kata in teks, kata
+    assert re.search(r"T\+\d+ dtk", teks) and "BB-2026-" in teks              # tindakan bercap T+ dan nomor bukti
     assert re.search(r"Halaman 1 dari \d", teks)                   # kop dan kaki di setiap halaman
 
 
@@ -236,7 +245,8 @@ def test_lapsit_tanpa_peringatan_tetap_berpengesahan(k, monkeypatch, tmp_path):
     r = k.post("/api/lapsit", headers=masuk(k, "pengamat", "sandi-pengamat-uji-123"))
     teks = teks_pdf(r.content)
     assert r.status_code == 200 and "Tidak ada peringatan." in teks and ISTILAH["ttd_pembuat"] in teks
-    assert "Laporan rutin" in teks and "Halaman 1 dari 1" in teks
+    assert "Laporan rutin" in teks and re.search(r"Halaman 1 dari \d", teks)
+    assert "Pemeriksaan rutin" in teks and "Tidak ada insiden aktif." in teks and "Tidak ada indikator kompromi" in teks
     # logo kop digambar sebagai vektor dari static/logo.svg; bila berkasnya hilang, LAPSIT tetap terbit tanpa logo
     from reportlab.pdfgen.canvas import Canvas
     assert lapsit.gambar_logo(Canvas(str(tmp_path / "a.pdf")), 0, 0, 50)

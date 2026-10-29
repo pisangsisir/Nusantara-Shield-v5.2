@@ -45,6 +45,8 @@ AWALAN = "DET-"    # penanda sumber peluang dari Engine Deteksi Aturan (bandingk
 JALUR_OT_DIIZINKAN = {"192.0.2.140"}          # stasiun rekayasa OT (RFC 5737)
 JENDELA_PEMELIHARAAN = (22, 2)                # perintah tulis hanya wajar pukul 22.00–02.00 waktu setempat
 FUNGSI_TULIS_MODBUS = {5, 6, 15, 16}          # write coil/register; fungsi baca (1–4) tidak dihitung
+NAMA_FUNGSI_MODBUS = {5: "Write Single Coil", 6: "Write Single Register", 15: "Write Multiple Coils",
+                      16: "Write Multiple Registers"}
 
 
 def dalam_jendela_pemeliharaan(jam: int) -> bool:

@@ -8,6 +8,11 @@ Analogi: notulen rapat darurat yang dicetak otomatis. Isinya ringkasan
 status semua layanan, insiden yang sedang berjalan, dan bukti bahwa buku
 catatan audit masih utuh.
 
+Susunan mengikuti laporan insiden formal (gaya SANS/NIST SP 800-61): ringkasan eksekutif naratif, status dan
+dampak operasional, kronologi serta tindakan playbook bercap waktu dan beraktor, tabel indikator kompromi (IoC),
+peringatan dengan teknik ATT&CK, integritas log audit beserta cara memverifikasinya, lalu pengesahan. Semua isi
+diambil dari keadaan sistem saat dicetak; tidak ada angka atau kalimat dampak yang ditulis tetap di template.
+
 Kop laporan: logo Nusantara Shield digambar sebagai VEKTOR langsung dari static/logo.svg (satu sumber dengan dasbor),
 tanpa pustaka tambahan dan tanpa internet. Kop memakai identitas proyek sendiri; sengaja tidak meniru kop surat,
 lambang, atau stempel instansi mana pun. Setiap halaman memuat nomor laporan dan "Halaman x dari y".
@@ -17,7 +22,8 @@ from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+import os
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 
@@ -27,14 +33,67 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas as rl_canvas
 from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus.flowables import HRFlowable
 from xml.sax.saxutils import escape
 
+from .data_contoh import DAMPAK_OPERASIONAL, GANGGUAN_SKENARIO
 from .istilah import ISTILAH, nama_manajemen
 from .mitre import ringkas as ringkas_mitre
 
 WARNA_STATUS = {"hijau": colors.HexColor("#1f8a4c"),
                 "kuning": colors.HexColor("#b7791f"),
                 "merah": colors.HexColor("#c0392b")}
+
+
+ZONA_WAKTU = {"WIB": 7, "WITA": 8, "WIT": 9}
+LATAR = colors.HexColor("#F3F5F8")
+GARIS = colors.HexColor("#B8C0CC")
+
+
+def zona() -> tuple[str, timezone]:
+    """Zona waktu laporan: NS_ZONA_WAKTU = WIB (bawaan) | WITA | WIT, sesuai lokasi satuan."""
+    nama = os.getenv("NS_ZONA_WAKTU", "WIB").upper()
+    nama = nama if nama in ZONA_WAKTU else "WIB"
+    return nama, timezone(timedelta(hours=ZONA_WAKTU[nama]), nama)
+
+
+def waktu_lokal(iso: str | None, detik: bool = True) -> str:
+    """ISO-8601 (UTC) → 'YYYY-MM-DD HH:MM:SS WIB'. Teks yang bukan waktu dikembalikan apa adanya."""
+    if not iso:
+        return "—"
+    nama, tz = zona()
+    try:
+        w = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(tz)
+    except ValueError:
+        return iso
+    return w.strftime("%Y-%m-%d %H:%M:%S" if detik else "%Y-%m-%d %H:%M") + f" {nama}"
+
+
+def _kecil(teks: str) -> str:
+    """Huruf pertama dikecilkan agar enak disambung di tengah kalimat; singkatan (IOC, SIMRS) tetap utuh."""
+    return teks[:1].lower() + teks[1:] if teks[:2].isupper() is False else teks
+
+
+def _koma(x: float) -> str:
+    return f"{x:.1f}".replace(".", ",")
+
+
+def dampak_operasional(l: dict, ins_rinci: dict | None) -> str:
+    """Kalimat dampak terhadap misi layanan, dari status nyata + profil layanan (perkiraan, data contoh)."""
+    prof = DAMPAK_OPERASIONAL.get(l.get("id"), {})
+    misi, kontinjensi = prof.get("misi", "layanan"), prof.get("kontinjensi", "prosedur manual")
+    if l.get("insiden"):
+        if ins_rinci and ins_rinci.get("ir"):
+            if prof.get("saat_diisolasi"):
+                return f"Diisolasi: {prof['saat_diisolasi']}. Kontinjensi: {kontinjensi}."
+            return f"Diisolasi: {misi} dihentikan sementara dengan sengaja. Kontinjensi: {kontinjensi}."
+        gangguan = GANGGUAN_SKENARIO.get(l["insiden"]["skenario"], "{misi} terganggu").format(misi=misi)
+        return f"{gangguan[:1].upper()}{gangguan[1:]}. Kontinjensi siap: {kontinjensi}."
+    if l.get("status") == "kuning":
+        alasan = l.get("alasan", "")
+        return (f"Layanan berjalan. Risiko: {alasan[:1].lower()}{alasan[1:]}; pemulihan bisa lebih lama bila "
+                f"terjadi insiden.")
+    return "Layanan berjalan normal."
 
 
 LOGO_SVG = Path(__file__).resolve().parent.parent / "static" / "logo.svg"
@@ -191,7 +250,7 @@ def _penggambar_kop(nomor: str, waktu: str, jenis: str):
 def _blok_pengesahan(gaya) -> Table:
     """Dua kolom tanda tangan: Operator jaga yang membuat laporan, dan pejabat yang mengetahui."""
     mengetahui = " / ".join(reversed(nama_manajemen()))          # urutan dibalik: kepala seksi dulu, lalu komandan
-    sel = lambda judul: [Paragraph(escape(judul), gaya["Normal"]), Spacer(1, 18 * mm),
+    sel = lambda judul: [Paragraph(escape(judul), gaya["Normal"]), Spacer(1, 10 * mm),
                          Paragraph("( ........................................ )", gaya["Normal"]),
                          Paragraph("Nama, pangkat/NRP, tanggal", gaya["Normal"])]
     t = Table([[sel(ISTILAH["ttd_pembuat"]), sel(f"{ISTILAH['ttd_mengetahui']}, {mengetahui}")]],
@@ -203,92 +262,231 @@ def _blok_pengesahan(gaya) -> Table:
     return t
 
 
-def buat_pdf(layanan: list[dict], hasil_audit: dict, pembuat: str, peringatan: list[dict] | None = None) -> bytes:
-    gaya = getSampleStyleSheet()
+def _gaya():
+    g = getSampleStyleSheet()
+    dasar = g["Normal"].clone("dasar", fontName="Helvetica", fontSize=9.5, leading=13)
+    return {
+        "dasar": dasar,
+        "kecil": dasar.clone("kecil", fontSize=8, leading=10),
+        "catatan": dasar.clone("catatan", fontSize=7.5, leading=9.5, textColor=ABU, fontName="Helvetica-Oblique"),
+        "judul": dasar.clone("judul", fontName="Helvetica-Bold", fontSize=10.5, leading=13, textColor=NAVY,
+                             spaceBefore=8, spaceAfter=2),
+        "sub": dasar.clone("sub", fontName="Helvetica-Bold", fontSize=9.5, leading=12, textColor=NAVY,
+                           spaceBefore=6, spaceAfter=3),
+        "Normal": dasar,
+    }
+
+
+def _judul(teks: str, gaya: dict) -> list:
+    return [Paragraph(teks, gaya["judul"]), HRFlowable(width="100%", thickness=0.6, color=GARIS,
+                                                                spaceBefore=1, spaceAfter=4)]
+
+
+def _tabel(baris: list, lebar: list, ukuran: float = 8) -> Table:
+    t = Table(baris, colWidths=lebar, repeatRows=1)
+    t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1b2a3a")),
+                           ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                           ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                           ("GRID", (0, 0), (-1, -1), 0.4, GARIS),
+                           ("FONTSIZE", (0, 0), (-1, -1), ukuran),
+                           ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                           ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
+    return t
+
+
+def _kotak(isi: list, latar=LATAR) -> Table:
+    t = Table([[isi]], colWidths=[174 * mm])
+    t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), latar), ("BOX", (0, 0), (-1, -1), 0.5, GARIS),
+                           ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                           ("TOPPADDING", (0, 0), (-1, -1), 6), ("BOTTOMPADDING", (0, 0), (-1, -1), 6)]))
+    return t
+
+
+def _aktor(langkah: dict) -> str:
+    oleh, metode = langkah.get("oleh"), langkah.get("metode")
+    cara = "otomatis lewat SOAR" if metode == "soar" else "manual"
+    return f"{oleh} · {cara}" if oleh else f"sistem · {cara}"
+
+
+def ringkasan_eksekutif(layanan: list[dict], rincian: dict, peringatan: list[dict], hasil_audit: dict,
+                        waktu_cetak: str) -> list[str]:
+    """1–2 paragraf naratif: apa, kapan, bagaimana, dan dampaknya. Dirakit dari data, bukan teks tetap."""
+    paragraf = []
+    for l in layanan:
+        ins = l.get("insiden")
+        if not ins:
+            continue
+        r = rincian["insiden"].get(l["id"], {})
+        log = ins.get("log_peringatan", [])
+        kal = [f"Pada {waktu_lokal(ins['mulai'])} terjadi insiden <b>{escape(ins['judul'].lower())}</b> di "
+               f"<b>{escape(l['nama'])}</b> ({escape(l.get('cabang', ''))})."]
+        if log:
+            kal.append(f"Gejala paling awal tercatat {waktu_lokal(log[0]['waktu'])}: {escape(_kecil(log[0]['pesan']))}, "
+                       f"lalu berkembang hingga {escape(_kecil(log[-1]['pesan']))}.")
+        b, ir, dar = r.get("bukti"), r.get("ir"), r.get("darurat")
+        pelaku = next((x.get("oleh") for x in r.get("langkah", []) if x.get("selesai") and x.get("oleh")), None)
+        if dar:
+            kal.append(f"Bukti belum bisa diamankan, sehingga {escape(dar['petugas'])} menjalankan isolasi darurat "
+                       f"dengan alasan tertulis: \u201c{escape(dar['alasan'])}\u201d.")
+        elif b:
+            kal.append(f"Atas keputusan Operator (akun {escape(pelaku or b['petugas'])}), bukti {escape(b['nomor'])} disegel "
+                       f"SHA-256 lebih dulu (T+{b['detik']} detik) sebelum satu jalur pun diputus.")
+        if ir:
+            mttc = r.get("mttc")
+            kal.append(f"Aset terisolasi{f' pada T+{mttc} detik' if mttc is not None else ''} dan "
+                       f"{escape(ir['nomor'])} ({escape(ir['keparahan'])}) terkirim ke {escape(' dan '.join(ir['kepada']))}.")
+        elif not (b or dar):
+            kal.append("Belum ada tindakan penahanan; aset menunggu keputusan Operator.")
+        else:
+            kal.append("Tindakan pemutus sedang berjalan.")
+        dampak = dampak_operasional(l, r).replace("Diisolasi: ", "", 1)
+        kal.append(f"Dampak operasional: {escape(_kecil(dampak))}")
+        paragraf.append(" ".join(kal))
+    jml = {s: sum(1 for l in layanan if l.get("status") == s) for s in ("hijau", "kuning", "merah")}
+    terbuka = sum(1 for p in peringatan if p.get("kelas") == "terbuka")
+    utuh = "utuh" if hasil_audit.get("utuh", True) else "TIDAK utuh"
+    awal = "" if paragraf else f"Pemeriksaan rutin pada {waktu_cetak}: tidak ada insiden aktif. "
+    paragraf.append(
+        f"{awal}Dari {len(layanan)} layanan terpantau, {jml['hijau']} normal, {jml['kuning']} perlu perhatian, dan "
+        f"{jml['merah']} dalam insiden. Tercatat {len(peringatan)} peringatan terbaru, {terbuka} di antaranya masih "
+        f"perlu tindakan; temuan aturan deteksi dan AI hanya menaikkan aset ke WASPADA, tidak pernah memutus jaringan "
+        f"secara otomatis. Rantai log audit {utuh} ({hasil_audit.get('jumlah', 0)} entri).")
+    return paragraf
+
+
+def buat_pdf(layanan: list[dict], hasil_audit: dict, pembuat: str, peringatan: list[dict] | None = None,
+             rincian: dict | None = None) -> bytes:
+    gaya = _gaya()
+    rincian = rincian or {"insiden": {}, "ioc": []}
+    peringatan = peringatan or []
     buffer = BytesIO()
     sekarang = datetime.now(timezone.utc)
-    waktu = sekarang.strftime("%Y-%m-%d %H:%M UTC")
-    nomor = f"LAPSIT/NS/{sekarang:%Y%m%d-%H%M%S}"
+    nama_zona, tz = zona()
+    waktu = sekarang.astimezone(tz).strftime("%Y-%m-%d %H:%M ") + nama_zona
+    nomor = f"LAPSIT/NS/{sekarang.astimezone(tz):%Y%m%d-%H%M%S}"
     jumlah_insiden = sum(1 for l in layanan if l.get("insiden"))
     jenis = f"Laporan insiden ({jumlah_insiden} aktif)" if jumlah_insiden else "Laporan rutin"
     dok = SimpleDocTemplate(buffer, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
-                            topMargin=42 * mm, bottomMargin=20 * mm,
+                            topMargin=39 * mm, bottomMargin=16 * mm,
                             title=f"LAPSIT Nusantara Shield {nomor}", author="Nusantara Shield")
-    isi = [
-        Paragraph(f"Dibuat oleh akun: <b>{escape(pembuat)}</b>", gaya["Normal"]),
-        Paragraph("<i>Dokumen latihan. Seluruh data sintetis, tidak memuat data pribadi; perintah ke perangkat "
-                  "jaringan masih simulasi.</i>", gaya["Normal"]),
-        Spacer(1, 8),
-        Paragraph("1. Status layanan", gaya["Heading2"]),
-    ]
+    isi = [Paragraph(f"Dibuat oleh akun: <b>{escape(pembuat)}</b> · zona waktu {nama_zona} "
+                     f"(UTC+{ZONA_WAKTU[nama_zona]})", gaya["dasar"]),
+           Paragraph("Dokumen latihan. Seluruh data sintetis, tidak memuat data pribadi; perintah ke perangkat "
+                     "jaringan masih simulasi.", gaya["catatan"])]
 
-    # Tabel status layanan (semua teks di-escape agar aman)
-    baris = [["Layanan", "Status", "Backup terakhir", "Backup diuji"]]
+    # 1. Ringkasan eksekutif
+    isi += _judul("1. Ringkasan eksekutif", gaya)
+    isi.append(_kotak([Paragraph(p, gaya["dasar"].clone("paragraf", spaceAfter=4)) for p in
+                       ringkasan_eksekutif(layanan, rincian, peringatan, hasil_audit, waktu)]))
+
+    # 2. Status layanan dan dampak operasional
+    isi += _judul("2. Status layanan dan dampak operasional", gaya)
+    sel = gaya["kecil"]
+    baris = [["Layanan", "Status", "Backup", "Dampak operasional (perkiraan)"]]
     for l in layanan:
-        baris.append([Paragraph(escape(l["nama"]), gaya["Normal"].clone("sel", fontSize=9, leading=11)),
-                      l["status"].upper(),
-                      f"{l['jam_sejak_backup']} jam lalu",
-                      "Ya" if l["backup_teruji"] else "Belum"])
-    tabel = Table(baris, colWidths=[78 * mm, 22 * mm, 36 * mm, 27 * mm])
-    gaya_tabel = [
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1b2a3a")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ]
+        baris.append([Paragraph(escape(l["nama"]), sel), l["status"].upper(),
+                      Paragraph(f"{l['jam_sejak_backup']} jam lalu · {'diuji' if l['backup_teruji'] else 'belum diuji'}",
+                                sel),
+                      Paragraph(escape(dampak_operasional(l, rincian["insiden"].get(l.get("id")))), sel)])
+    tabel = _tabel(baris, [52 * mm, 17 * mm, 25 * mm, 80 * mm])
     for i, l in enumerate(layanan, start=1):
-        gaya_tabel.append(("TEXTCOLOR", (1, i), (1, i), WARNA_STATUS[l["status"]]))
-    tabel.setStyle(TableStyle(gaya_tabel))
-    isi += [tabel, Spacer(1, 10), Paragraph("2. Insiden aktif", gaya["Heading2"])]
+        tabel.setStyle(TableStyle([("TEXTCOLOR", (1, i), (1, i), WARNA_STATUS[l["status"]]),
+                                   ("FONTNAME", (1, i), (1, i), "Helvetica-Bold")]))
+    isi += [tabel, Paragraph("Dampak adalah perkiraan menurut profil misi layanan contoh, bukan hasil pengukuran.",
+                             gaya["catatan"])]
 
+    # 3. Insiden aktif: kronologi dan tindakan playbook bercap waktu dan beraktor
+    isi += _judul("3. Insiden aktif dan tindakan", gaya)
     insiden = [l for l in layanan if l.get("insiden")]
     if not insiden:
-        isi.append(Paragraph("Tidak ada insiden aktif.", gaya["Normal"]))
+        isi.append(Paragraph("Tidak ada insiden aktif.", gaya["dasar"]))
     for l in insiden:
-        ins = l["insiden"]
-        selesai = sum(ins["langkah_selesai"])
-        isi.append(Paragraph(
-            f"<b>{escape(l['nama'])}</b> — {escape(ins['judul'])} "
-            f"(sejak {escape(ins['mulai'])}; playbook {selesai}/{len(ins['langkah'])} langkah)",
-            gaya["Normal"]))
+        ins, r = l["insiden"], rincian["insiden"].get(l.get("id"), {})
         attck = ringkas_mitre(ins.get("skenario"))
-        if attck:
-            isi.append(Paragraph(f"&nbsp;&nbsp;Teknik MITRE ATT&amp;CK: {escape(attck)}", gaya["Normal"]))
-        for log in ins.get("log_peringatan", []):
-            isi.append(Paragraph(f"&nbsp;&nbsp;<font color='#ad4f46'>[{escape(log['tingkat'].upper())}]</font> "
-                                 f"{escape(log['waktu'])} — {escape(log['pesan'])}", gaya["Normal"]))
-        for langkah, beres in zip(ins["langkah"], ins["langkah_selesai"]):
-            tanda = "[x]" if beres else "[ ]"
-            isi.append(Paragraph(f"&nbsp;&nbsp;{tanda} {escape(langkah)}", gaya["Normal"]))
+        isi.append(Paragraph(f"{escape(l['nama'])} — {escape(ins['judul'])}", gaya["sub"]))
+        isi.append(Paragraph(f"Dimulai {waktu_lokal(ins['mulai'])}"
+                             + (f" · Teknik MITRE ATT&amp;CK: {escape(attck)}" if attck else ""), gaya["kecil"]))
+        if ins.get("log_peringatan"):
+            baris = [["Waktu", "Tingkat", "Kronologi gejala"]]
+            for g in ins["log_peringatan"]:
+                baris.append([waktu_lokal(g["waktu"]), g["tingkat"].upper(), Paragraph(escape(g["pesan"]), sel)])
+            isi += [Spacer(1, 3), _tabel(baris, [40 * mm, 18 * mm, 116 * mm])]
+        baris = [["Status", "Tindakan playbook", "Waktu eksekusi", "Sejak awal", "Aktor"]]
+        ir = r.get("ir")
+        for x in r.get("langkah", [{"teks": tk, "selesai": s} for tk, s in zip(ins["langkah"], ins["langkah_selesai"])]):
+            judul = x["teks"].split(":")[0]
+            w, detik, aktor = x.get("waktu"), x.get("detik"), _aktor(x) if x.get("metode") else "—"
+            if x["selesai"] and not w and ir and x["teks"].startswith("LAPOR"):
+                w, detik, aktor = ir["waktu"], ir["detik"], "sistem · otomatis setelah pemutusan"
+            status = "SELESAI" if x["selesai"] else "ANTRE" if x.get("antre") else "BELUM"
+            baris.append([status, Paragraph(escape(judul), sel), waktu_lokal(w) if x["selesai"] else "—",
+                          f"T+{detik} dtk" if x["selesai"] and detik is not None else "—", Paragraph(escape(aktor), sel)])
+        tabel_playbook = _tabel(baris, [17 * mm, 45 * mm, 40 * mm, 20 * mm, 52 * mm])
+        metrik = []
+        b, dar = r.get("bukti"), r.get("darurat")
+        if b:
+            metrik.append(f"<b>Bukti</b> {escape(b['nomor'])} · SHA-256 <font face='Courier' size='7'>{escape(b['sha256'])}"
+                          f"</font> · {len(b.get('barang', []))} berkas · disegel oleh {escape(b['petugas'])} "
+                          f"pada {waktu_lokal(b['waktu'])}")
+        if dar:
+            metrik.append(f"<b>Isolasi darurat</b> oleh {escape(dar['petugas'])} pada {waktu_lokal(dar['waktu'])}; "
+                          f"alasan: {escape(dar['alasan'])}")
+        if r.get("mttc") is not None:
+            metrik.append(f"<b>Waktu penahanan (MTTC)</b>: {r['mttc']} detik sejak insiden dimulai hingga jalur "
+                          f"penyerang terputus. Jeda antar-tindakan pemutus otomatis {_koma(r.get('jeda_runbook', 1.2))} "
+                          f"detik (simulasi purwarupa, bukan hasil ukur perangkat).")
+        if ir:
+            metrik.append(f"<b>{escape(ir['nomor'])}</b> ({escape(ir['keparahan'])}) terkirim ke "
+                          f"{escape(' dan '.join(ir['kepada']))} pada {waktu_lokal(ir['waktu'])} (simulasi: tidak ada "
+                          f"pesan yang keluar dari server).")
+        isi.append(KeepTogether([Spacer(1, 4), tabel_playbook, Spacer(1, 3)] + [Paragraph(m, sel) for m in metrik]))
 
-    isi += [Spacer(1, 10), Paragraph("3. Peringatan terbaru", gaya["Heading2"])]
-    if not peringatan:
-        isi.append(Paragraph("Tidak ada peringatan.", gaya["Normal"]))
+    # 4. Indikator kompromi
+    isi += _judul("4. Indikator kompromi (IoC)", gaya)
+    if not rincian["ioc"]:
+        isi.append(Paragraph("Tidak ada indikator kompromi aktif.", gaya["dasar"]))
     else:
-        kecil = gaya["Normal"].clone("kecil", fontSize=8, leading=10)
+        baris = [["Tipe", "Nilai", "Rujukan", "Aset / konteks", "Status"]]
+        for x in rincian["ioc"]:
+            baris.append([Paragraph(escape(x["tipe"]), sel),
+                          Paragraph(f"<font face='Courier'>{escape(x['nilai'])}</font>", sel),
+                          Paragraph(escape(x["rujukan"]), sel), Paragraph(escape(x["konteks"]), sel),
+                          Paragraph(escape(x["status"]), sel)])
+        isi += [_tabel(baris, [36 * mm, 44 * mm, 22 * mm, 34 * mm, 38 * mm]),
+                Paragraph("Alamat memakai blok dokumentasi RFC 5737 (sintetis). Sumber temuan aturan deteksi tidak "
+                          "diblokir otomatis: pemutusan hanya lewat keputusan Operator.", gaya["catatan"])]
+
+    # 5. Peringatan terbaru
+    isi += _judul("5. Peringatan terbaru", gaya)
+    if not peringatan:
+        isi.append(Paragraph("Tidak ada peringatan.", gaya["dasar"]))
+    else:
         baris = [["Keparahan", "Peringatan", "Teknik ATT&CK", "Status"]]
         for p in peringatan:
             teks = escape(p["judul"]) + (f"<br/><i>{escape(p['sumber_data'])}</i>" if p.get("sumber_data") else "")
-            baris.append([p["keparahan"].upper(), Paragraph(teks, kecil),
-                          Paragraph(escape(", ".join(m["id"] for m in p.get("mitre", [])) or "—"), kecil),
-                          Paragraph(escape(p["status"]), kecil)])
-        t = Table(baris, colWidths=[20 * mm, 78 * mm, 26 * mm, 40 * mm], repeatRows=1)
-        t.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1b2a3a")),
-                               ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                               ("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
-                               ("FONTSIZE", (0, 0), (-1, -1), 8), ("VALIGN", (0, 0), (-1, -1), "TOP")]))
-        isi += [t, Paragraph("<i>Teknik MITRE ATT&amp;CK® dipetakan tim sendiri sebagai rujukan, bukan sertifikasi. "
-                             "MITRE ATT&amp;CK® adalah merek dagang The MITRE Corporation.</i>", kecil)]
+            baris.append([p["keparahan"].upper(), Paragraph(teks, sel),
+                          Paragraph(escape(", ".join(m["id"] for m in p.get("mitre", [])) or "—"), sel),
+                          Paragraph(escape(p["status"]), sel)])
+        isi += [_tabel(baris, [20 * mm, 84 * mm, 26 * mm, 44 * mm]),
+                Paragraph("Teknik MITRE ATT&amp;CK® dipetakan tim sendiri sebagai rujukan, bukan sertifikasi. "
+                          "MITRE ATT&amp;CK® adalah merek dagang The MITRE Corporation.", gaya["catatan"])]
 
-    isi += [Spacer(1, 10), Paragraph("4. Integritas log audit", gaya["Heading2"]),
-            Paragraph(escape(hasil_audit["pesan"]) + f" ({hasil_audit['jumlah']} entri)",
-                      gaya["Normal"])]
+    # 6. Integritas log audit
+    isi += _judul("6. Integritas log audit", gaya)
+    isi.append(Paragraph(escape(hasil_audit["pesan"]) + f" ({hasil_audit['jumlah']} entri)", gaya["dasar"]))
     if hasil_audit.get("hash_terakhir"):
-        isi.append(Paragraph(f"Sidik jari terakhir: <font face='Courier' size='7'>"
-                             f"{escape(hasil_audit['hash_terakhir'])}</font>", gaya["Normal"]))
-    isi += [Spacer(1, 12), KeepTogether([Paragraph(f"5. {escape(ISTILAH['ttd_judul'])}", gaya["Heading2"]),
-                                         _blok_pengesahan(gaya)])]   # judul dan kotak tanda tangan tidak terpisah halaman
+        isi.append(Paragraph("Sidik jari terakhir (HMAC-SHA256): <font face='Courier' size='7'>"
+                             f"{escape(hasil_audit['hash_terakhir'])}</font>", gaya["dasar"]))
+    isi += [Spacer(1, 4), _kotak([Paragraph(
+        "<b>Cara memverifikasi.</b> Sidik jari di atas adalah HMAC-SHA256 entri terakhir log audit saat laporan "
+        "ini dicetak. Auditor mencocokkannya dengan hasil <b>Verifikasi rantai</b> di tab Audit &amp; LAPSIT "
+        "(atau <font face='Courier'>GET /api/audit/verifikasi</font>) pada sistem utama, lalu menelusuri nomor bukti "
+        f"di {escape(ISTILAH['buku_bukti'])}. Sidik jari ini menjamin keutuhan log audit, bukan keutuhan berkas PDF ini; "
+        f"salinan yang diteruskan harus disertai tanda tangan pada bagian {escape(ISTILAH['ttd_judul'])}.", sel)],
+        latar=colors.white)]
+
+    # 7. Blok tanda tangan
+    isi += [KeepTogether([*_judul(f"7. {ISTILAH['ttd_judul']}", gaya), _blok_pengesahan(gaya)])]
     kop = _penggambar_kop(nomor, waktu, jenis)
     dok.build(isi, canvasmaker=lambda *a, **kw: _KanvasBernomor(*a, kop=kop, **kw))
     return buffer.getvalue()

@@ -24,10 +24,10 @@ app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lo
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
 tests/          298 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
-docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), diagram alur, dan logo
+docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), contoh LAPSIT dan log, diagram alur, logo
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
 LICENSE         GNU GPL v3.0 (GPL-3.0-only)
-CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (20 Okt 2026)
+CHANGELOG.md    riwayat versi v1.0 (15 Okt 2026) sampai v5.1 (15–27 Okt 2026)
 ```
 
 > **Folder proyek dipindah lalu muncul `cannot execute: No such file or directory` atau `No module named 'numpy'`?**
@@ -266,6 +266,7 @@ sequenceDiagram
 | **Bukti sebelum pemutusan** | Setiap playbook diawali *Amankan bukti*: salinan (simulasi), SHA-256 tiap berkas, berita acara di Buku Rantai Bukti. Pemutusan tanpa bukti ditolak **409** di semua jalur |
 | **Isolasi darurat** | Bila bukti gagal diamankan: alasan tertulis (min. 15 karakter) + tahan **1,5 detik**. Alasan tercatat di Buku Rantai Bukti, log audit, dan LAPSIT |
 | **LAPSIT otomatis** | Terbit hanya setelah SEMUA tindakan pemutus tuntas; nomor `IR-2026-001` tidak pernah berulang (+ UUID) |
+| **LAPSIT kapan saja** | *Ekspor LAPSIT (PDF)* di tab Audit & LAPSIT bisa dipakai kapan pun, termasuk saat kondisi normal sebagai **laporan rutin**: status layanan, insiden aktif (bila ada), peringatan terbaru dengan teknik ATT&CK, integritas log audit, dan blok pengesahan dua tanda tangan. Contoh hasilnya ada di [`docs/contoh-lapsit/`](docs/contoh-lapsit/) |
 | **Pemulihan terkunci** | Pintu terpisah; terbuka hanya bila aset terisolasi, playbook dicentang, dan SHA-256 bukti **cocok ulang** |
 | **Isolasi OT** | Skenario *Sabotase OT*: bukti diamankan, lalu webhook (simulasi) ke sakelar terkelola memutus uplink kantor → zona kendali ± 1,2 detik. Genset **tidak dimatikan**; beralih ke kendali lokal (NIST SP 800-82) |
 | **Kamus istilah** | Semua label dari `app/istilah.py` (kini istilah satuan: Dansat, Kasi Siber, TTIS Satuan); mengganti terminologi tidak memecahkan uji |

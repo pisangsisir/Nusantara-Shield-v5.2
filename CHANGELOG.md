@@ -4,6 +4,10 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## v5.1 — 15–27 Oktober 2026
 
+### Contoh LAPSIT PDF — 29 Oktober 2026 (branch `docs/contoh-lapsit`)
+- `docs/contoh-lapsit/`: dua LAPSIT PDF yang diekspor dari aplikasi v5.1.3 (commit d1fbfdc) dengan data sintetis — kondisi normal (laporan rutin, 1 halaman) dan setelah latihan insiden (2 halaman) — beserta cara membuatnya ulang. Juri bisa melihat keluaran tanpa memasang aplikasi.
+- README: baris *LAPSIT kapan saja* di tabel doktrin.
+
 ### Panduan Belajar diperbarui untuk Fase 2–3 — 27 Oktober 2026 (branch `docs/panduan-fase2-3`)
 - `docs/03-Panduan-Belajar-Nusantara-Shield.pdf` (62 halaman): Bab 7 menambah *Aturan OT, label MITRE ATT&CK, dan label sumber data* (termasuk pengesahan dua tanda tangan LAPSIT) serta *Impor log luring*; Bab 9 menambah *Lisensi: GNU GPL v3.0*; jumlah uji diperbarui menjadi 298 dalam 15 kelompok.
 

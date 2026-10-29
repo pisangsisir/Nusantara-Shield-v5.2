@@ -19,7 +19,7 @@ import zlib
 import pytest
 from fastapi.testclient import TestClient
 
-from app import main
+from app import lapsit, main
 from app.data_contoh import SKENARIO
 from app.deteksi import (ATURAN, FUNGSI_TULIS_MODBUS, IP_PENYUSUP, IP_REKAYASA_OT, JALUR_OT_DIIZINKAN,
                          JENDELA_PEMELIHARAAN, MesinDeteksi, dalam_jendela_pemeliharaan)
@@ -226,11 +226,20 @@ def test_lapsit_memuat_attck_sumber_data_dan_dua_tanda_tangan(k):
     assert r.status_code == 200 and r.content.startswith(b"%PDF")
     teks = teks_pdf(r.content)
     for kata in ("T0886", "T0855", "Unauthorized Command Message", "Peringatan terbaru", "peristiwa latihan sintetis",
-                 ISTILAH["ttd_judul"], ISTILAH["ttd_pembuat"], ISTILAH["ttd_mengetahui"], *nama_manajemen()):
+                 ISTILAH["ttd_judul"], ISTILAH["ttd_pembuat"], ISTILAH["ttd_mengetahui"], *nama_manajemen(),
+                 "NUSANTARA SHIELD", ISTILAH["laporan"].upper(), "Laporan insiden (1 aktif)", "LAPSIT/NS/"):
         assert kata in teks, kata
+    assert re.search(r"Halaman 1 dari \d", teks)                   # kop dan kaki di setiap halaman
 
 
-def test_lapsit_tanpa_peringatan_tetap_berpengesahan(k):
+def test_lapsit_tanpa_peringatan_tetap_berpengesahan(k, monkeypatch, tmp_path):
     r = k.post("/api/lapsit", headers=masuk(k, "pengamat", "sandi-pengamat-uji-123"))
     teks = teks_pdf(r.content)
     assert r.status_code == 200 and "Tidak ada peringatan." in teks and ISTILAH["ttd_pembuat"] in teks
+    assert "Laporan rutin" in teks and "Halaman 1 dari 1" in teks
+    # logo kop digambar sebagai vektor dari static/logo.svg; bila berkasnya hilang, LAPSIT tetap terbit tanpa logo
+    from reportlab.pdfgen.canvas import Canvas
+    assert lapsit.gambar_logo(Canvas(str(tmp_path / "a.pdf")), 0, 0, 50)
+    monkeypatch.setattr(lapsit, "LOGO_SVG", tmp_path / "tidak-ada.svg")
+    assert not lapsit.gambar_logo(Canvas(str(tmp_path / "b.pdf")), 0, 0, 50)
+    assert k.post("/api/lapsit", headers=masuk(k)).content.startswith(b"%PDF")

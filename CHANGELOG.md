@@ -2,7 +2,23 @@
 
 Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi di Proposal §6.1 (Rulebook bagian G). Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
-## v5.1 — 15–27 Oktober 2026
+## v5.1 — 15–29 Oktober 2026
+
+### Verifikasi audit tanpa server — 29 Oktober 2026 (branch `feature/verifikasi-audit-cli`)
+- **`tools/verifikasi_audit.py`**: alat baris perintah untuk auditor yang memeriksa `data/audit_log.jsonl` dan `data/rantai_bukti.jsonl` **tanpa menyalakan server**. Hanya memakai pustaka bawaan Python, tidak mengimpor kode aplikasi, dan tidak membuka jaringan.
+- Setiap entri dihitung ulang: nomor urut, mata rantai (`hash_sebelumnya`), dan HMAC-SHA256. Kerusakan pertama disebut letaknya.
+- `--cocokkan <sidik jari>` memastikan sidik jari yang tercetak di LAPSIT ada di rantai, sehingga log yang dipotong di ujung (tidak terlihat oleh rantai saja) ikut ketahuan. Ada juga keluaran `--json`.
+- Kode keluar 0/1/2. Kunci dibaca dari `NS_AUDIT_KEY` atau `--kunci-berkas`; tidak diterima sebagai argumen dan tidak pernah dicetak.
+- Instruksi verifikasi di LAPSIT kini menyebut alat ini.
+- **310 uji** (sebelumnya 298): 12 uji baru di `tests/test_verifikasi_audit.py`, kelompok ke-16. Ketiga pemeriksaan masing-masing terbukti diperlukan oleh uji mutasi: tiap pemeriksaan dimatikan bergantian, dan sedikitnya satu uji gagal.
+- Dokumen ikut diperbarui ke 310 uji dalam 16 kelompok:
+  - README (bagian *Verifikasi log audit tanpa menyalakan server*);
+  - Proposal;
+  - Dokumentasi Teknis, yang blok terminalnya dibuat ulang dari keluaran `./run_tests.sh` yang asli;
+  - dek presentasi (slide 4 kini memuat 16 kelompok);
+  - poster dan Panduan Belajar PDF.
+- Contoh LAPSIT di `docs/contoh-lapsit/` dibuat ulang.
+- Diuji ujung ke ujung dengan *server* berkunci sungguhan: sidik jari dari LAPSIT ditemukan di entri #6 (`EKSPOR_LAPSIT`). Setelah satu entri disunting, alat menunjuk entri #2 dan keluar dengan kode 1.
 
 ### LAPSIT formal — 29 Oktober 2026 (branch `feature/lapsit-formal`)
 - LAPSIT PDF disusun ulang seperti laporan insiden formal (gaya SANS/NIST SP 800-61), tujuh bagian, semuanya dari keadaan sistem saat dicetak:

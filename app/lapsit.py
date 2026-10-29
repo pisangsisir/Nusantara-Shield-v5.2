@@ -479,10 +479,12 @@ def buat_pdf(layanan: list[dict], hasil_audit: dict, pembuat: str, peringatan: l
                              f"{escape(hasil_audit['hash_terakhir'])}</font>", gaya["dasar"]))
     isi += [Spacer(1, 4), _kotak([Paragraph(
         "<b>Cara memverifikasi.</b> Sidik jari di atas adalah HMAC-SHA256 entri terakhir log audit saat laporan "
-        "ini dicetak. Auditor mencocokkannya dengan hasil <b>Verifikasi rantai</b> di tab Audit &amp; LAPSIT "
-        "(atau <font face='Courier'>GET /api/audit/verifikasi</font>) pada sistem utama, lalu menelusuri nomor bukti "
-        f"di {escape(ISTILAH['buku_bukti'])}. Sidik jari ini menjamin keutuhan log audit, bukan keutuhan berkas PDF ini; "
-        f"salinan yang diteruskan harus disertai tanda tangan pada bagian {escape(ISTILAH['ttd_judul'])}.", sel)],
+        "ini dicetak. Cocokkan dengan <b>Verifikasi rantai</b> (tab Audit &amp; LAPSIT atau "
+        "<font face='Courier'>GET /api/audit/verifikasi</font>), atau tanpa <i>server</i>: "
+        "<font face='Courier'>python3 tools/verifikasi_audit.py --cocokkan &lt;sidik jari&gt;</font>. "
+        f"Telusuri nomor bukti di {escape(ISTILAH['buku_bukti'])}. Sidik jari ini menjamin keutuhan log audit, bukan "
+        f"keutuhan berkas PDF; salinan yang diteruskan wajib bertanda tangan di bagian {escape(ISTILAH['ttd_judul'])}.",
+        sel)],
         latar=colors.white)]
 
     # 7. Blok tanda tangan

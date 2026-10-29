@@ -9,7 +9,7 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 (bukti → isolasi → LAPSIT, otomatis setelah satu keputusan Operator; perintah ke perangkat masih simulasi).
 *Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
-Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **298 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
+Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **310 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
 
 - **Isolasi tidak pernah otomatis.** Isolasi otomatis terdengar cepat, sampai ia memutus segmen OT karena alarm keliru. Di sini isolasi selalu didahului bukti tersegel dan keputusan Operator; yang diputus jalurnya, genset tetap menyala.
 - **"Tanpa awan" berlaku sampai ke demonya.** Aplikasi dipasang dari paket bersidik jari tanpa internet, lalu seluruh uji dijalankan di mesin itu juga.
@@ -22,8 +22,8 @@ Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bu
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          298 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
-tools/          alat bantu: pengemasan rilis, paket pasang luring, perbaikan .venv
+tests/          310 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tools/          alat bantu: pengemasan rilis, paket pasang luring, verifikasi audit tanpa server, perbaikan .venv
 docs/           Proposal, Dokumentasi Teknis, Panduan Belajar (PDF), contoh LAPSIT dan log, diagram alur, logo
 presentation/   dek presentasi: index.html (satu berkas mandiri, bisa dibuka luring)
 LICENSE         GNU GPL v3.0 (GPL-3.0-only)
@@ -95,6 +95,21 @@ terminal saat *server* menyala. Dua opsi pada perintah uvicorn sengaja dipakai:
 Salin `.env.example` menjadi `.env`, isi nilainya, lalu jalankan uvicorn dengan `--env-file .env`
 (perlu `pip install python-dotenv`). Dengan `NS_AUDIT_KEY` terisi, log audit, buku rantai bukti, akun
 terdaftar, dan nomor laporan tersimpan di folder `data/` dan selamat dari restart.
+
+### Verifikasi log audit tanpa menyalakan server
+
+Auditor dapat memeriksa `data/audit_log.jsonl` dan `data/rantai_bukti.jsonl` dengan alat baris perintah yang
+berdiri sendiri (hanya pustaka bawaan Python, tidak mengimpor kode aplikasi, tidak membuka jaringan):
+
+```bash
+NS_AUDIT_KEY=... python3 tools/verifikasi_audit.py                       # kedua buku di data/
+python3 tools/verifikasi_audit.py --kunci-berkas kunci.txt --cocokkan <sidik jari dari LAPSIT>
+```
+
+Setiap entri dihitung ulang: nomor urut, mata rantai (`hash_sebelumnya`), dan HMAC-SHA256. Kerusakan pertama
+disebut letaknya (misalnya "Sidik jari entri #2 tidak cocok"). `--cocokkan` memastikan sidik jari yang tercetak
+di LAPSIT ada di rantai, sehingga log yang dipotong di ujungnya juga ketahuan. Kode keluar: 0 utuh, 1 rusak
+atau tidak cocok, 2 tidak bisa memeriksa. Kunci tidak diterima sebagai argumen dan tidak pernah dicetak.
 
 ### Mengemas zip untuk juri / repositori
 
@@ -288,7 +303,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 298 uji** dalam 15 kelompok.
+**Total: 310 uji** dalam 16 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -366,6 +381,12 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - Dua kunci utuh: hanya WASPADA, tanpa insiden, bukti, atau isolasi; log audit hanya mencatat nama berkas dan jumlah
 - Hanya jalur impor yang boleh ±2 MB, dan hanya bila membawa token; jalur lain tetap 16 KB; dibatasi 6 kali per menit
 
+**Verifikasi audit tanpa server** — `tests/test_verifikasi_audit.py` (12 uji)
+- Log yang ditulis kelas server dinyatakan utuh, dan sidik jari terakhirnya sama dengan yang dicetak LAPSIT
+- Isi entri diubah, entri dihapus di tengah, entri sah dari log lain disisipkan, baris rusak, kunci salah → tertangkap beserta letaknya
+- `--cocokkan` menangkap log yang dipotong di ujung, yang tidak bisa dilihat rantai saja; Buku Rantai Bukti ikut diperiksa
+- Tanpa kunci → kode 2 tanpa menebak; kunci tidak pernah dicetak; alat tidak mengimpor kode aplikasi dan tidak membuka jaringan
+
 **Linimasa & KPI** — `tests/test_linimasa.py` (6 uji)
 - 60 menit data latihan berbenih tetap tanpa kejadian karangan; tiap 60 dtk satu titik posko; menit insiden ditandai
 - Pita anomali AI menyebut aset dan alasan, lalu berakhir; KPI MTTC dan insiden dihitung dari kejadian nyata
@@ -421,7 +442,7 @@ dibatasi lajunya dan dicatat di log audit.
 | Header keamanan | CSP ketat, nosniff, anti-iframe, no-referrer, HSTS bila HTTPS | `app/keamanan.py` |
 | Validasi input | Pydantic `extra="forbid"`, daftar nilai tetap, batas panjang | `app/main.py` |
 | Anti-XSS | Semua teks dipasang via `textContent` | `static/app.js` |
-| Jejak audit | Dua buku berantai HMAC-SHA256 (log audit & Buku Rantai Bukti) | `app/audit.py`, `app/bukti.py` |
+| Jejak audit | Dua buku berantai HMAC-SHA256 (log audit & Buku Rantai Bukti); dapat diverifikasi auditor tanpa server | `app/audit.py`, `app/bukti.py`, `tools/verifikasi_audit.py` |
 | Siaran aman | Token di header (bukan URL), diperiksa ulang tiap 2 detik; maks 4 siaran/akun | `app/main.py` |
 
 Batas yang perlu diketahui: *server* berjalan sebagai **satu proses** (Hub siaran ada di memori proses itu).
@@ -452,8 +473,9 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                298 uji otomatis (lihat bagian 6)
+tests/                310 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
+tools/verifikasi_audit.py  verifikasi rantai HMAC log audit & Buku Rantai Bukti tanpa server
 tools/buat_peta.mjs   pembuat titik peta dunia (sekali pakai)
 run_tests.sh / .bat   menjalankan uji dengan umpan balik per uji
 pytest.ini            pengaturan tampilan pytest

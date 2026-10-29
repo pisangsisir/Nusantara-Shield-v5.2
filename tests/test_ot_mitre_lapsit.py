@@ -235,7 +235,7 @@ def test_lapsit_memuat_attck_sumber_data_dan_dua_tanda_tangan(k):
                  "Ringkasan eksekutif", "terjadi insiden", "Dampak operasional", "genset TIDAK dimatikan",
                  "Indikator kompromi (IoC)", "203.0.113.45:502", "Diblokir di firewall (simulasi)",
                  "Write Multiple Registers", "Waktu penahanan (MTTC)", "otomatis lewat SOAR", "WIB",
-                 "Cara memverifikasi", "HMAC-SHA256", ISTILAH["buku_bukti"]):
+                 "Cara memverifikasi", "HMAC-SHA256", ISTILAH["buku_bukti"], "tools/verifikasi_audit.py --cocokkan"):
         assert kata in teks, kata
     assert re.search(r"T\+\d+ dtk", teks) and "BB-2026-" in teks              # tindakan bercap T+ dan nomor bukti
     assert re.search(r"Halaman 1 dari \d", teks)                   # kop dan kaki di setiap halaman

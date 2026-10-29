@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Nusantara Shield — layanan systemd untuk Ubuntu 24.04 LTS (dipasang oleh pasang.sh).
+# Berjalan sebagai pengguna sistem tanpa login "nshield". Program di /opt/nusantara-shield/kini hanya-baca;
+# satu-satunya folder yang boleh ditulis adalah /var/lib/nusantara-shield (log audit dan Buku Rantai Bukti).
+# Rahasia (NS_AUDIT_KEY, sandi) dibaca dari /etc/nusantara-shield/env (0640 root:nshield), tidak ditulis di sini.
+# Mengubah alamat/port: sunting NS_DENGAR_ALAMAT/NS_DENGAR_PORT di env, lalu systemctl restart nusantara-shield.
+
+[Unit]
+Description=Nusantara Shield - dasbor SOC defensif (luring)
+Documentation=file:///opt/nusantara-shield/kini/README.md
+After=network.target
+Wants=network.target
+
+[Service]
+Type=exec
+User=nshield
+Group=nshield
+EnvironmentFile=/etc/nusantara-shield/env
+WorkingDirectory=/var/lib/nusantara-shield
+Environment=PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+ExecStart=/opt/nusantara-shield/kini/.venv/bin/python -m uvicorn app.main:app --app-dir /opt/nusantara-shield/kini --host ${NS_DENGAR_ALAMAT} --port ${NS_DENGAR_PORT} --no-access-log --no-server-header --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+
+# Pengerasan (hardening): hak seminimal mungkin.
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ReadWritePaths=/var/lib/nusantara-shield
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+ProcSubset=pid
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RemoveIPC=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

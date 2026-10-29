@@ -1,0 +1,60 @@
+NUSANTARA SHIELD @@VERSI@@ — PAKET PASANG LURING UNTUK UBUNTU 24.04 LTS (x86_64)
+====================================================================================
+
+Paket ini memasang Nusantara Shield TANPA internet. Semua pustaka Python ada di dalam paket dan
+dikunci per SHA-256. Python TIDAK dibawa: yang dipakai adalah Python 3.12 bawaan Ubuntu 24.04
+(/usr/bin/python3.12).
+
+Sidik jari kunci rilis yang tertanam di paket ini:
+    @@SIDIK_JARI_KUNCI@@
+Angka ini HARUS sama dengan yang tercatat di berita acara serah terima (diterima lewat jalur terpisah,
+mis. dokumen bercap). Bila beda, hentikan: paket bukan dari pembuat rilis.
+
+LANGKAH DI KOMPUTER UBUNTU (pengguna dengan hak sudo)
+-----------------------------------------------------
+Sebelum diekstrak, cocokkan dulu SHA-256 berkas .tar dengan berita acara:
+    sha256sum @@NAMA@@.tar
+    tar -xf @@NAMA@@.tar && cd @@NAMA@@
+
+Periksa keaslian SECARA MANUAL (pasang.sh tidak bisa membuktikan keaslian dirinya sendiri):
+    openssl pkey -pubin -in kunci-publik-rilis.pem -outform DER | sha256sum
+        → harus sama dengan sidik jari kunci rilis di berita acara
+    openssl pkeyutl -verify -pubin -inkey kunci-publik-rilis.pem -rawin -in SHA256SUMS -sigfile SHA256SUMS.sig
+        → harus mencetak: Signature Verified Successfully
+    sha256sum -c SHA256SUMS
+        → semua baris OK
+
+Pasang:
+    sudo sh pasang.sh              (tambahkan --uji untuk menjalankan seluruh uji otomatis sebelum layanan dinyalakan)
+
+pasang.sh mengulang ketiga pemeriksaan di atas, lalu memeriksa setiap anggota payload terhadap
+manifest.json SEBELUM mengekstrak, mengekstrak ke folder sementara, dan mencocokkan SHA-256 setiap
+berkas. Satu saja berbeda, pemasangan dibatalkan dan tidak ada yang dipasang.
+
+HASIL PEMASANGAN
+----------------
+  /opt/nusantara-shield/rilis/@@VERSI@@     program + venv (hanya-baca bagi layanan)
+  /opt/nusantara-shield/kini                tautan ke rilis aktif
+  /etc/nusantara-shield/env                 kunci audit dan sandi awal (0640, dibuat SEKALI, tidak pernah ditimpa)
+  /var/lib/nusantara-shield/data/           log audit dan Buku Rantai Bukti (berantai HMAC)
+  /var/log/nusantara-shield/pemasangan.log  catatan setiap pemasangan (versi, commit, sidik jari)
+  nusantara-shield.service                  layanan systemd, pengguna tanpa login "nshield", 127.0.0.1:8000
+  /usr/local/bin/ns-verifikasi-audit        verifikasi log audit tanpa server
+
+Perintah sesudahnya:
+  sudo grep _PASSWORD /etc/nusantara-shield/env     sandi awal operator dan pengamat
+  systemctl status nusantara-shield                 status layanan
+  sudo ns-verifikasi-audit --cocokkan <sidik jari>  cocokkan log audit dengan sidik jari di LAPSIT
+  sudo sh pasang.sh --kembali                       kembali ke rilis sebelumnya
+  sudo sh pasang.sh --hapus                         hapus program (env dan data dipertahankan)
+
+KODE KELUAR pasang.sh
+---------------------
+  0 berhasil · 2 argumen salah · 10 tanda tangan/sidik jari paket tidak sah · 11 isi payload terlarang
+  12 berkas payload tidak cocok dengan manifest · 13 venv/pustaka/uji asap gagal · 14 versi/pemasangan
+  20 prasyarat tidak terpenuhi (bukan Ubuntu 24.04 x86_64, tanpa python3.12/OpenSSL 3, bukan root)
+Pada kode 2, 10, 11, 12, dan 20 tidak ada yang diubah di sistem.
+
+Layanan hanya mendengar di 127.0.0.1. Untuk dibuka ke jaringan internal, pasang reverse proxy TLS
+(mis. nginx dari repositori lokal) di depannya, atau ubah NS_DENGAR_ALAMAT, NS_ALLOWED_HOSTS, dan
+NS_ALLOWED_ORIGINS di /etc/nusantara-shield/env dengan sadar risikonya.

@@ -9,7 +9,7 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 (bukti → isolasi → LAPSIT, otomatis setelah satu keputusan Operator; perintah ke perangkat masih simulasi).
 *Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
-Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **333 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
+Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **334 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
 
 - **Isolasi tidak pernah otomatis.** Isolasi otomatis terdengar cepat, sampai ia memutus segmen OT karena alarm keliru. Di sini isolasi selalu didahului bukti tersegel dan keputusan Operator; yang diputus jalurnya, genset tetap menyala.
 - **"Tanpa awan" berlaku sampai ke demonya.** Aplikasi dipasang dari paket bersidik jari tanpa internet, lalu seluruh uji dijalankan di mesin itu juga.
@@ -22,7 +22,7 @@ Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bu
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          333 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tests/          334 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, paket Ubuntu bertanda tangan, verifikasi audit tanpa server
 installer/      pasang.sh, layanan systemd, dan pembungkus verifikasi audit untuk Ubuntu 24.04
 kunci/          kunci PUBLIK rilis (kunci privat tidak pernah ada di repo)
@@ -336,7 +336,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 333 uji** dalam 17 kelompok.
+**Total: 334 uji** dalam 17 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -420,12 +420,13 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - `--cocokkan` menangkap log yang dipotong di ujung, yang tidak bisa dilihat rantai saja; Buku Rantai Bukti ikut diperiksa
 - Tanpa kunci → kode 2 tanpa menebak; kunci tidak pernah dicetak; alat tidak mengimpor kode aplikasi dan tidak membuka jaringan
 
-**Paket pasang Ubuntu 24.04** — `tests/test_paket_ubuntu.py` (23 uji)
+**Paket pasang Ubuntu 24.04** — `tests/test_paket_ubuntu.py` (24 uji)
 - Payload deterministik, tanpa `.env`/`data/`; setiap wheel dipaku versi dan SHA-256; pembuat paket menolak kunci privat
 - Kunci rilis: terenkripsi, izin 600, tidak pernah ditimpa, tidak boleh di dalam repo; sandi salah atau kunci bukan pasangan → tidak ada tanda tangan
 - Payload diubah 1 bita, `SHA256SUMS` disunting, kunci lain, kunci publik ditukar, `pasang.sh` disunting → kode 10
 - Anggota `../`, tautan simbolik, berkas tak tercatat → 11; berkas hilang atau isi beda → 12; tidak ada yang terpasang
 - Versi sama/turun ditolak (14), naik dan `--kembali` berjalan; `--hapus` mempertahankan env dan data; bukan Ubuntu 24.04 → 20
+- Langkah yang terlewat (paket belum disusun) memberi pesan jelas; kata sandi tidak ditanyakan untuk berkas yang tidak ada
 
 **Linimasa & KPI** — `tests/test_linimasa.py` (6 uji)
 - 60 menit data latihan berbenih tetap tanpa kejadian karangan; tiap 60 dtk satu titik posko; menit insiden ditandai
@@ -513,7 +514,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                333 uji otomatis (lihat bagian 6)
+tests/                334 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/verifikasi_audit.py  verifikasi rantai HMAC log audit & Buku Rantai Bukti tanpa server
 tools/kunci_rilis.py  kunci rilis Ed25519 (dibuat dan dipakai di komputer pembuat rilis)

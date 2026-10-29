@@ -223,6 +223,10 @@ def periksa_tanda_tangan(folder: Path) -> dict:
     from cryptography.exceptions import InvalidSignature
     from cryptography.hazmat.primitives import serialization
     from kunci_rilis import sidik_jari_kunci
+    hilang = [n for n in (*BERKAS_PAKET, "SHA256SUMS") if not (folder / n).is_file()]
+    if hilang:
+        raise GagalKemas(f"folder paket {folder} belum lengkap ({', '.join(hilang)} tidak ada): "
+                         "jalankan dulu 'python3 tools/kemas_installer.py susun' sampai berhasil")
     manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     pem = (folder / "kunci-publik-rilis.pem").read_bytes()
     if sidik_jari_kunci(pem) != manifest["kunci_publik_sha256"]:
@@ -329,6 +333,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"✓ Tanda tangan sah. {tar_luar} · SHA-256 {sha256(tar_luar)}")
             print(f"✓ {catatan}")
     except GagalKemas as e:
+        print(f"GAGAL: {e}", file=sys.stderr)
+        return 1
+    except OSError as e:
         print(f"GAGAL: {e}", file=sys.stderr)
         return 1
     except subprocess.CalledProcessError as e:

@@ -197,7 +197,7 @@ def test_laporan_hanya_terbit_setelah_semua_pemutus_selesai(klien):
     assert r["ir"] is None and r["ir_menunggu"] is True
     assert komando(klien, h, "kesehatan")["ir"] is None           # baru bukti; pemutus masih antre
     JAM["t"] += 1.3
-    assert komando(klien, h, "kesehatan")["ir"] is None           # "Amankan backup" masih antre
+    assert komando(klien, h, "kesehatan")["ir"] is None           # "Amankan cadangan" masih antre
     JAM["t"] += 1.3
     ir = komando(klien, h, "kesehatan")["ir"]
     assert [(x["id"], x["status"], x["metode"], x["detik"]) for x in ir["rincian"]] == [

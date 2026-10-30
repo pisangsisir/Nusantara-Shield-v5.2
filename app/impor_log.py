@@ -3,7 +3,7 @@
 # Dilisensikan di bawah GNU General Public License v3.0; lihat berkas LICENSE.
 """
 impor_log.py — Membaca berkas log ASLI yang dibawa Operator (luring), lalu mengubahnya menjadi peristiwa mentah
-untuk Engine Deteksi Aturan (app/deteksi.py). Tidak ada aturan baru di sini: aturan yang sama menilai log latihan
+untuk mesin deteksi aturan (app/deteksi.py). Tidak ada aturan baru di sini: aturan yang sama menilai log latihan
 maupun log asli.
 
 Analogi: petugas jaga menyerahkan buku tamu pos lain. Kita tidak menulis ulang bukunya; kita hanya menyalin baris

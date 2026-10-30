@@ -65,6 +65,11 @@ ISTILAH: dict = {
     "tombol_tutup_peringatan": "Tutup peringatan",
     "kesiapan": "Kesiapan Siber",
 
+    # --- nama resmi komponen (penyebutan pertama di dokumen disertai istilah aslinya dalam kurung) ---
+    "mesin_aturan": "Mesin Deteksi Aturan",     # rule-based detection engine (app/deteksi.py)
+    "mesin_anomali": "Mesin Deteksi Anomali",   # anomaly detection engine, AI lokal (app/ai_anomali.py)
+    "kepatuhan_pencadangan": "Kepatuhan Pencadangan",   # backup compliance (pelajaran PDNS 2024)
+
     # --- LAPSIT: blok pengesahan dua tanda tangan (dua kunci juga di atas kertas) ---------------
     "ttd_judul": "Pengesahan",
     "ttd_pembuat": "Operator jaga (pembuat laporan)",

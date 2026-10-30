@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Nusantara Shield Team. Dikembangkan untuk Kartika Cyber Hackathon 2026.
 # Dilisensikan di bawah GNU General Public License v3.0; lihat berkas LICENSE.
 """
-ai_anomali.py — Engine Deteksi Anomali lokal (AI) untuk Nusantara Shield.
+ai_anomali.py — mesin deteksi anomali lokal (AI) untuk Nusantara Shield.
 
 Analogi: satpam lama yang hafal "suasana normal" gedung. Ia tidak perlu daftar buronan
 (signature) untuk curiga; cukup melihat ada yang tidak biasa: pintu gudang dibuka 60 kali

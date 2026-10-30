@@ -382,7 +382,7 @@ def buat_pdf(layanan: list[dict], hasil_audit: dict, pembuat: str, peringatan: l
     # 2. Status layanan dan dampak operasional
     isi += _judul("2. Status layanan dan dampak operasional", gaya)
     sel = gaya["kecil"]
-    baris = [["Layanan", "Status", "Backup", "Dampak operasional (perkiraan)"]]
+    baris = [["Layanan", "Status", "Cadangan", "Dampak operasional (perkiraan)"]]
     for l in layanan:
         baris.append([Paragraph(escape(l["nama"]), sel), l["status"].upper(),
                       Paragraph(f"{l['jam_sejak_backup']} jam lalu · {'diuji' if l['backup_teruji'] else 'belum diuji'}",

@@ -143,7 +143,7 @@
                 <div class="kpi"><div class="k">Aset sehat</div><div class="v" id="kpi-sehat">–</div></div>
                 <div class="kpi"><div class="k">Host terpantau</div><div class="v" id="kpi-host">–</div></div>
                 <div class="kpi"><div class="k">Anomali aktif</div><div class="v" id="kpi-anomali">–</div></div>
-                <div class="kpi"><div class="k">Kepatuhan backup</div><div class="v" id="kpi-backup">–</div></div>
+                <div class="kpi"><div class="k" data-istilah="kepatuhan_pencadangan"></div><div class="v" id="kpi-backup">–</div></div>
                 <div class="kpi" title="Rata-rata waktu dari insiden dimulai sampai langkah penahanan playbook selesai, untuk semua insiden sejak posko aktif"><div class="k">Waktu respons (MTTC)</div><div class="v" id="kpi-mttc">–</div></div>
                 <div class="kpi" title="Jumlah insiden latihan yang dimulai sejak posko dibuka (atau sejak demo diatur ulang)"><div class="k">Insiden sejak posko aktif</div><div class="v" id="kpi-insiden">–</div></div>
               </div>
@@ -186,7 +186,7 @@
               <div class="topo-kotak">
                 <!-- Peta disusun JavaScript: daftar perangkat & kabel dari backend, tata letak dari frontend -->
                 <svg id="topo" class="topo" viewBox="0 0 1000 400" role="img"
-                     aria-label="Peta topologi jaringan sintetis: internet, gerbang, DMZ, sakelar inti, server internal, server backup"></svg>
+                     aria-label="Peta topologi jaringan sintetis: internet, gerbang, DMZ, sakelar inti, server internal, server cadangan"></svg>
               </div>
               <div class="legenda">
                 <span><i class="bulat normal"></i>Normal</span>
@@ -275,7 +275,7 @@
         </div>
         <div class="kolom">
           <section class="panel" aria-labelledby="judul-triase">
-            <h2 id="judul-triase">Aset <small>backup &lt; <span id="batas-jam-2">24</span> j</small></h2>
+            <h2 id="judul-triase">Aset <small>cadangan &lt; <span id="batas-jam-2">24</span> j</small></h2>
             <div id="grid-layanan" class="grid-layanan"></div>
             <p class="edu"><b>Papan triase IGD.</b> Hijau sehat, kuning perlu diperiksa, merah sedang insiden. Klik kartu (atau titik di topologi) untuk profil aset: status, PIC teknis cabang, dan tombol panggil cepat ke PIC tersebut.</p>
           </section>
@@ -339,7 +339,7 @@
               <div class="skenario" id="daftar-skenario">
                 <button type="button" class="opsi-skenario" data-skenario="ransomware" data-ubah title="Server dikunci penyerang"><b>Ransomware</b></button>
                 <button type="button" class="opsi-skenario" data-skenario="ddos" data-ubah title="Banjir trafik ke portal"><b>DDoS</b></button>
-                <button type="button" class="opsi-skenario" data-skenario="backup_dimatikan" data-ubah title="Tanda awal ransomware"><b>Backup mati</b></button>
+                <button type="button" class="opsi-skenario" data-skenario="backup_dimatikan" data-ubah title="Tanda awal ransomware"><b>Cadangan mati</b></button>
                 <button type="button" class="opsi-skenario" data-skenario="sabotase_ot" data-ubah title="Perintah Modbus asing ke pengendali genset (pilih target Genset RS Kesdam)"><b>Sabotase OT</b></button>
               </div>
             </div>
@@ -362,7 +362,7 @@
       <section class="panel alat" aria-label="Alat operator">
         <nav class="tab-nav" role="tablist" aria-label="Alat operator">
           <button role="tab" class="tab" id="tab-indikator" aria-controls="panel-indikator" aria-selected="true">Cek indikator</button>
-          <button role="tab" class="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" tabindex="-1">Kepatuhan backup</button>
+          <button role="tab" class="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" tabindex="-1" data-istilah="kepatuhan_pencadangan"></button>
           <button role="tab" class="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" tabindex="-1">Audit &amp; LAPSIT</button>
           <button role="tab" class="tab" id="tab-akun" aria-controls="panel-akun" aria-selected="false" tabindex="-1" hidden>Akun</button>
         </nav>
@@ -397,13 +397,13 @@
           </div>
         </div>
 
-        <!-- Kepatuhan backup -->
+        <!-- kepatuhan pencadangan -->
         <div role="tabpanel" id="panel-backup" aria-labelledby="tab-backup" hidden>
-          <p class="redup">Pelajaran utama PDNS 2024: hanya sekitar 2% data punya backup. Setiap layanan wajib punya backup berumur kurang dari <b id="batas-jam">24</b> jam <i>dan</i> pernah diuji pemulihannya.</p>
+          <p class="redup">Pelajaran utama PDNS 2024: hanya sekitar 2% data punya cadangan. Setiap layanan wajib punya cadangan berumur kurang dari <b id="batas-jam">24</b> jam <i>dan</i> pernah diuji pemulihannya.</p>
           <div class="kartu tanpa-isi">
             <div class="gulir">
               <table class="tabel">
-                <thead><tr><th scope="col">Layanan</th><th scope="col">Umur backup</th><th scope="col">Uji pulih</th><th scope="col">Status</th><th scope="col"><span class="sr">Tindakan</span></th></tr></thead>
+                <thead><tr><th scope="col">Layanan</th><th scope="col">Umur cadangan</th><th scope="col">Uji pulih</th><th scope="col">Status</th><th scope="col"><span class="sr">Tindakan</span></th></tr></thead>
                 <tbody id="isi-backup"></tbody>
               </table>
             </div>
@@ -411,7 +411,7 @@
           <div class="kartu baris-aksi">
             <div>
               <h3>Mesin waktu demo</h3>
-              <p class="redup kecil">Majukan jam untuk memperlihatkan backup yang "menua" berubah dari hijau ke kuning.</p>
+              <p class="redup kecil">Majukan jam untuk memperlihatkan cadangan yang "menua" berubah dari hijau ke kuning.</p>
             </div>
             <div class="aksi">
               <button type="button" class="tombol halus majukan" data-jam="6" data-ubah>+6 jam</button>

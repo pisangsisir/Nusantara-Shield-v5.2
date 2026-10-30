@@ -115,7 +115,7 @@ const IKON = {
   rantai: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   server: "M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01",
   radio: "M5 19a10 10 0 0 1 0-14M19 5a10 10 0 0 1 0 14M8.5 15.5a5 5 0 0 1 0-7M15.5 8.5a5 5 0 0 1 0 7M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
-  masuk: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3",   // Engine Deteksi Aturan: upaya login
+  masuk: "M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3",   // mesin deteksi aturan: upaya login
 };
 function ikon(nama) {
   const s = sv("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "ikon" });
@@ -466,7 +466,7 @@ function gambarKesiapan(k) {
     kelas: "chip-huruf", "data-huruf": l.huruf,
     title: `${l.singkat}: ${l.huruf} (${l.nilai}) · Kerawanan ${l.kerawanan} · Insiden ${l.insiden}`
       + (l.rincian.peringatan_terbuka ? ` · ${l.rincian.peringatan_terbuka} peringatan terbuka` : "")
-      + (l.rincian.backup_bermasalah ? " · backup bermasalah" : "") + (l.rincian.temuan ? " · temuan konfigurasi" : ""),
+      + (l.rincian.backup_bermasalah ? " · cadangan bermasalah" : "") + (l.rincian.temuan ? " · temuan konfigurasi" : ""),
     teks: l.huruf })));
   const t = k.triase, p = $("#ringkas-triase");
   S.minAlasanTutup = t.min_alasan;
@@ -681,7 +681,7 @@ function gambarTriase() {
       "aria-label": `${l.nama}: ${LABEL_STATUS[l.status]}. ${l.alasan}. Buka profil aset.`, title: l.alasan, onclick: () => bukaLaci(l.id) },
       el("span", { kelas: "nama", teks: l.singkat || l.nama }),
       lencana(l.status),
-      el("span", { kelas: "meta", teks: `${l.cabang} · backup ${l.jam_sejak_backup} j ${l.backup_teruji ? "✓" : "✗"}` }))));
+      el("span", { kelas: "meta", teks: `${l.cabang} · cadangan ${l.jam_sejak_backup} j ${l.backup_teruji ? "✓" : "✗"}` }))));
 }
 
 // ==========================================================================
@@ -773,7 +773,7 @@ async function picuLatihan(skenario, tombol) {
 // v5.1: ACTION CENTER — satu titik keputusan per insiden.
 // Teks panjang playbook diringkas jadi lencana 1–2 kata (teks lengkap di tooltip).
 // ==========================================================================
-const SKENARIO_PENDEK = { ransomware: "RANSOMWARE", ddos: "DDoS", backup_dimatikan: "BACKUP MATI", sabotase_ot: "SABOTASE OT" };
+const SKENARIO_PENDEK = { ransomware: "RANSOMWARE", ddos: "DDoS", backup_dimatikan: "CADANGAN MATI", sabotase_ot: "SABOTASE OT" };
 
 function gambarPlaybook() {
   const wadah = $("#daftar-playbook");
@@ -1110,7 +1110,7 @@ async function latihanAI(tombol, aset_id) {
   setelahAksi();
 }
 
-// Engine Deteksi Aturan: putar peristiwa mentah sintetis; temuan lahir dari aturan di server (app/deteksi.py)
+// mesin deteksi aturan: putar peristiwa mentah sintetis; temuan lahir dari aturan di server (app/deteksi.py)
 async function latihanDeteksi(tombol, jenis) {
   const j = await coba(() => sibuk(tombol, () => api("/api/deteksi/latihan", { metode: "POST", data: { jenis } })));
   if (!j) return;
@@ -1321,7 +1321,7 @@ function gambarRiwayat() {
     lencana(r.kelas === "aman" ? "hijau" : r.kelas === "uji" ? "kuning" : "merah"))));
 }
 
-// ---------------------------------------------------------------- Alat: kepatuhan backup
+// ---------------------------------------------------------------- Alat: kepatuhan pencadangan
 function gambarBackup() {
   $("#batas-jam").textContent = S.batasJam;
   $("#isi-backup").replaceChildren(...S.layanan.map((l) => {
@@ -1332,14 +1332,14 @@ function gambarBackup() {
       el("td", { teks: l.backup_teruji ? "Sudah diuji" : "Belum pernah" }),
       el("td", {}, lencana(l.status)),
       el("td", {}, el("div", { kelas: "aksi" },
-        el("button", { type: "button", kelas: "tombol kecil", "data-ubah": "", "data-kunci": `bak-${l.id}-1`, teks: "Backup + uji", onclick: (e) => catatBackup(l.id, true, e.currentTarget) }),
-        el("button", { type: "button", kelas: "tombol halus kecil", "data-ubah": "", "data-kunci": `bak-${l.id}-0`, teks: "Backup saja", onclick: (e) => catatBackup(l.id, false, e.currentTarget) }))));
+        el("button", { type: "button", kelas: "tombol kecil", "data-ubah": "", "data-kunci": `bak-${l.id}-1`, teks: "Cadangkan + uji", onclick: (e) => catatBackup(l.id, true, e.currentTarget) }),
+        el("button", { type: "button", kelas: "tombol halus kecil", "data-ubah": "", "data-kunci": `bak-${l.id}-0`, teks: "Cadangkan saja", onclick: (e) => catatBackup(l.id, false, e.currentTarget) }))));
   }));
 }
 async function catatBackup(id, uji_pulih, tombol) {
   const j = await coba(() => sibuk(tombol, () => api("/api/backup/catat", { metode: "POST", data: { layanan_id: id, uji_pulih } })));
   if (!j) return;
-  toast(uji_pulih ? `Backup ${j.nama} dicatat dan sudah diuji pulih.` : `Backup ${j.nama} dicatat. Jangan lupa uji pemulihannya.`, uji_pulih ? "info" : "peringatan");
+  toast(uji_pulih ? `Cadangan ${j.nama} dicatat dan sudah diuji pulih.` : `Cadangan ${j.nama} dicatat. Jangan lupa uji pemulihannya.`, uji_pulih ? "info" : "peringatan");
   setelahAksi();
 }
 async function majukanWaktu(ev) {

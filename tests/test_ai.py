@@ -1,5 +1,5 @@
 """
-Uji AI lokal — Engine Deteksi Anomali (Isolation Forest, scikit-learn) di app/ai_anomali.py.
+Uji AI lokal — Mesin Deteksi Anomali (Isolation Forest, scikit-learn) di app/ai_anomali.py.
 
 Prinsip yang dikunci:
 - Model dilatih DI SERVER INI dari profil normal sintetis, dengan benih tetap (hasil dapat diaudit),

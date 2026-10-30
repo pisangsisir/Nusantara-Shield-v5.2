@@ -48,7 +48,7 @@ ARTEFAK: dict[str, list[tuple[str, str, str]]] = {
         ("konfigurasi_pengendali_genset.bin", "Salinan konfigurasi & jadwal pengendali genset", "2 MB"),
     ],
     "backup_dimatikan": [
-        ("riwayat_konfigurasi_backup.json", "Riwayat perubahan jadwal backup", "1 MB"),
+        ("riwayat_konfigurasi_backup.json", "Riwayat perubahan jadwal pencadangan", "1 MB"),
         ("jejak_login_admin.log", "Jejak login admin (SSH)", "34 MB"),
         ("potret_akun_dan_hak_akses.json", "Daftar akun & hak akses saat kejadian", "2 MB"),
     ],

@@ -29,7 +29,7 @@ TEKNIK: dict[str, tuple[str, str]] = {
     "T0886": ("Remote Services", ICS),
 }
 
-# kunci = id aturan Engine Deteksi Aturan (app/deteksi.py) atau id skenario latihan (app/data_contoh.py)
+# kunci = id aturan mesin deteksi aturan (app/deteksi.py) atau id skenario latihan (app/data_contoh.py)
 PEMETAAN: dict[str, tuple[str, ...]] = {
     # aturan deteksi
     "login_gagal": ("T1110",),

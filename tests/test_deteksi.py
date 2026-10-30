@@ -1,5 +1,5 @@
 """
-Uji Engine Deteksi Aturan (app/deteksi.py): login gagal berulang, login tembus, dan pemindaian port.
+Uji Mesin Deteksi Aturan (app/deteksi.py): login gagal berulang, login tembus, dan pemindaian port.
 
 Prinsip yang dikunci:
 - Temuan lahir dari HITUNGAN peristiwa mentah dengan ambang terbuka, bukan dari baris log yang disuntikkan.

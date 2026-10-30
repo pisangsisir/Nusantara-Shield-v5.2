@@ -2,6 +2,25 @@
 
 Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program Kartika Cyber Hackathon 2026 (12 Oktober 2026), sesuai Deklarasi di Proposal §6.1 (Rulebook bagian G). Repositori Git ini dimulai pada **20 Oktober 2026**; riwayat sebelumnya disusun dari folder versi dan folder cadangan per fase yang tersimpan di laptop pengembang (beserta catatan `BACA-SAYA.txt`), bukan dari commit.
 
+## Belum dirilis
+
+### Penyeragaman istilah — 30 Oktober 2026 (branch `feature/penyeragaman-istilah`)
+- Pedoman gaya baru: istilah Indonesia didahulukan; istilah asli disebut sekali dalam kurung dan dicetak miring.
+- **Engine Deteksi Aturan → Mesin Deteksi Aturan** (*rule-based detection engine*), **Engine Deteksi Anomali → Mesin Deteksi Anomali** (*anomaly detection engine*), dan Engine Asisten Narasi → Mesin Asisten Narasi.
+  - Nama resmi masuk Kamus Istilah (`app/istilah.py`: `mesin_aturan`, `mesin_anomali`) sehingga terkunci oleh `test_istilah`.
+- **Kepatuhan backup → Kepatuhan Pencadangan**. Label tab dan KPI dasbor kini dibaca dari kamus (`kepatuhan_pencadangan`).
+- Teks *backup* yang tampil di layar, LAPSIT, *playbook*, dan log diganti *cadangan*/*pencadangan*. Contoh: tombol **Cadangkan + uji**, skenario **Cadangan mati**, kolom LAPSIT **Cadangan**, aset **Server cadangan**, langkah SOAR **Amankan cadangan**.
+  - Kata *offline* pada baris yang sama menjadi *luring*.
+  - Nama variabel, kunci data, dan alamat API (`jam_sejak_backup`, `/api/backup/catat`) tidak diubah supaya kompatibel.
+- **337 uji** (sebelumnya 334): 3 label baru di uji kamus istilah.
+- Saat contoh LAPSIT dibuat ulang, laporan rutin sempat melebar ke 2 halaman karena kata *cadangan* sedikit lebih panjang dari *backup*.
+  - Alasan status dipadatkan: **Umur cadangan 52 jam (batas 24 jam)** dan **Cadangan ada, tetapi belum pernah diuji pulih**.
+  - Uji laporan rutin kini mewajibkan "Halaman 1 dari 1", sehingga laporan yang melebar langsung tertangkap. Uji ini terbukti gagal sebelum perbaikan.
+- Contoh LAPSIT (`docs/contoh-lapsit/`), poster, dan dek dibuat ulang.
+- Tautan repo di dek dan poster diperbarui ke nama baru `Nusantara-Shield-v5.2.0`.
+- Dokumen ikut diperbarui: README, Proposal, Dokumentasi Teknis (blok terminal dari `./run_tests.sh` asli), dek presentasi, dan poster.
+- Catatan riwayat versi lama di bawah ini sengaja tidak diubah.
+
 ## v5.2.0 — 29 Oktober 2026
 
 ### Paket pasang luring bertanda tangan untuk Ubuntu 24.04 LTS (branch `feature/installer-ubuntu-ed25519`)

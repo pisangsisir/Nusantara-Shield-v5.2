@@ -7,7 +7,7 @@
 | **Kompetisi** | Kartika Cyber Hackathon 2026 · Pusat Siber Angkatan Darat (Pussiberad) × CODEPOLITAN |
 | **Kategori** | 02 · **Penangkalan (_Defensive Shield_)** — *Threat Intelligence Platform* dan *Automated Incident Response* |
 | **Tim** | Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah |
-| **Status purwarupa** | **Berfungsi penuh** · 334 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
+| **Status purwarupa** | **Berfungsi penuh** · 337 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
 | **Tanggal** | 27 Oktober 2026 |
 
 ---
@@ -48,7 +48,7 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 | Beban Central Processing Unit (CPU) _server_ untuk **300 layar** pemantau serentak, versi akhir | **±1,5%** siaga · **±1,7%** saat serangan |
 | Lalu lintas jaringan ke 300 layar saat serangan intensif, berkat siaran ralat (uji beban 17 Okt 2026) | **−80%** (8,4 → 1,7 MB/s) |
 | Waktu AI lokal menilai lalu lintas 9 aset (_Isolation Forest_, tanpa internet) | **±10 milidetik** |
-| Perilaku sistem yang dikunci uji otomatis | **334 uji** |
+| Perilaku sistem yang dikunci uji otomatis | **337 uji** |
 
 <p class="sumber-kecil">Angka CPU diukur ulang 26 Okt 2026 dengan tools/ukur_beban.py (Linux 2 inti, 300 siaran SSE sungguhan). Angka 2,8% pada versi dokumen sebelumnya diukur dengan alat dan mesin lain, sehingga tidak dibandingkan langsung. Asal setiap angka dan pemetaan ke lima kriteria penilaian ada di §7.</p>
 
@@ -62,7 +62,7 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 
 | Kejadian | Yang terjadi | Tahap Observe–Orient–Decide–Act (OODA) yang tertinggal |
 | --- | --- | --- |
-| **_Ransomware_ Brain Cipher di Pusat Data Nasional Sementara (PDNS) Surabaya, Juni 2024** | Aktivitas penyusup sudah terekam **dua hari** sebelum enkripsi, tetapi tidak berbuah tindakan. Direktori _backup_ dimatikan **tiga menit** sebelum _ransomware_ dijalankan, dan hanya **±2% data** punya cadangan. Layanan imigrasi lumpuh, layanan banyak instansi pusat dan daerah terganggu berhari-hari, dan pelaku meminta tebusan USD 8 juta. | **Amati dan Orientasi:** tanda bahaya ada, tetapi tidak dikenali dan tidak diputuskan tepat waktu |
+| **_Ransomware_ Brain Cipher di Pusat Data Nasional Sementara (PDNS) Surabaya, Juni 2024** | Aktivitas penyusup sudah terekam **dua hari** sebelum enkripsi, tetapi tidak berbuah tindakan. Direktori cadangan dimatikan **tiga menit** sebelum _ransomware_ dijalankan, dan hanya **±2% data** punya cadangan. Layanan imigrasi lumpuh, layanan banyak instansi pusat dan daerah terganggu berhari-hari, dan pelaku meminta tebusan USD 8 juta. | **Amati dan Orientasi:** tanda bahaya ada, tetapi tidak dikenali dan tidak diputuskan tepat waktu |
 | **Dugaan _ransomware_ LockBit 3.0 di Bank Syariah Indonesia (BSI), Mei 2023** | Layanan ATM dan _mobile banking_ terganggu **8–11 Mei**. Analis menduga penyusupan dimulai sejak **libur Lebaran**, dan pelaku mengklaim mencuri **1,5 TB data**. Saat layanan dipulihkan, hasil investigasi forensik resmi masih ditunggu. | **Amati** terlambat; **Bertindak** harus memilih antara memulihkan layanan secepatnya atau menjaga jejak forensik |
 
 <div class="ilustrasi" id="ilustrasi-kliping">
@@ -161,7 +161,7 @@ Rumah sakit adalah arena tempat konvergensi Information Technology (IT) dan OT p
 - **Tidak menggantungkan pertahanan pada pusat data di luar kendali satuan.** Saat PDNS lumpuh, layanan banyak instansi yang dititipkan di sana ikut berhenti, dan hanya sekitar 2% data yang punya cadangan. Pelajarannya: inti pertahanan satuan (deteksi, keputusan isolasi, bukti, dan laporan) harus tetap berjalan di _server_ posko sendiri, tanpa awan dan tanpa internet (lihat 5.1).
 - **Batas yang jujur:** di purwarupa, rumah sakit dan genset adalah data contoh, dan perintah ke sakelar masih berupa **simulasi webhook**. Sensor protokol industri dan sambungan ke sakelar fisik adalah peta jalan.
 
-<p class="sumber-kecil">Sumber: <a href="https://inet.detik.com/security/d-7407568/kronologi-serangan-ransomware-bikin-pusat-data-kolaps-berhari-hari/amp">detikINET (PDNS)</a> · <a href="https://www.cnbcindonesia.com/tech/20240628080944-37-550082/alasan-backup-pusat-data-nasional-hanya-2-akhirnya-terungkap">CNBC Indonesia (<i>backup</i> 2%)</a> · <a href="https://teknologi.bisnis.com/read/20230514/84/1655787/cissrec-tim-it-bsi-cepat-dan-responsif">Bisnis (pemulihan BSI)</a> · <a href="https://finansial.bisnis.com/read/20230514/90/1655733/kronologi-bsi-diserang-ransomware-oleh-hacker-lockbit-30-diduga-beraksi-sejak-libur-lebaran-2023">Bisnis (kronologi BSI)</a> · <a href="https://www.cnnindonesia.com/teknologi/20210521115652-185-645201/kominfo-telusuri-279-juta-data-bocor-diduga-kuat-dari-bpjs">CNN Indonesia (279 juta data)</a> · <a href="https://www.nozominetworks.com/blog/when-ransomware-turns-off-the-hvac-lessons-from-the-winnipeg-hospital-incident">Nozomi Networks (Winnipeg HSC)</a></p>
+<p class="sumber-kecil">Sumber: <a href="https://inet.detik.com/security/d-7407568/kronologi-serangan-ransomware-bikin-pusat-data-kolaps-berhari-hari/amp">detikINET (PDNS)</a> · <a href="https://www.cnbcindonesia.com/tech/20240628080944-37-550082/alasan-backup-pusat-data-nasional-hanya-2-akhirnya-terungkap">CNBC Indonesia (cadangan 2%)</a> · <a href="https://teknologi.bisnis.com/read/20230514/84/1655787/cissrec-tim-it-bsi-cepat-dan-responsif">Bisnis (pemulihan BSI)</a> · <a href="https://finansial.bisnis.com/read/20230514/90/1655733/kronologi-bsi-diserang-ransomware-oleh-hacker-lockbit-30-diduga-beraksi-sejak-libur-lebaran-2023">Bisnis (kronologi BSI)</a> · <a href="https://www.cnnindonesia.com/teknologi/20210521115652-185-645201/kominfo-telusuri-279-juta-data-bocor-diduga-kuat-dari-bpjs">CNN Indonesia (279 juta data)</a> · <a href="https://www.nozominetworks.com/blog/when-ransomware-turns-off-the-hvac-lessons-from-the-winnipeg-hospital-incident">Nozomi Networks (Winnipeg HSC)</a></p>
 
 ### 2.4 Tiga Kelemahan Pola Respons Manual
 
@@ -248,8 +248,8 @@ Dalam bahasa _incident response_ militer, tahap Bertindak setara dengan siklus *
 
 1. **Penangkalan dini (lapis pertama)**
     - Kabar ancaman dikorelasikan dengan _port_ dan sektor aset milik satuan, **termasuk aset OT**: kabar celah protokol industri Modbus langsung menaikkan pengendali genset ke WASPADA.
-    - **AI lokal (Engine Deteksi Anomali):** model _Isolation Forest_ (scikit-learn) dilatih di _server_ satuan dari profil lalu lintas normal, lalu menilai enam ciri lalu lintas tiap aset dalam milidetik. Lalu lintas tidak wajar menambah peluang serangan dan disertai alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal" (_explainability_).
-    - **Engine Deteksi Aturan:** menghitung peristiwa mentah (_login_ dan koneksi masuk) dengan ambang terbuka: _login_ gagal berulang (8 dalam 60 detik), _login_ tembus sesudah rentetan gagal (≤ 120 detik), dan pemindaian _port_ (15 kombinasi aset:_port_ dalam 10 detik). Peringatannya ikut aturan yang sama dengan CTI dan AI: hanya menaikkan WASPADA, dapat diperketat, dan dapat ditutup lewat triase.
+    - **AI lokal — Mesin Deteksi Anomali (_anomaly detection engine_):** model _Isolation Forest_ (scikit-learn) dilatih di _server_ satuan dari profil lalu lintas normal, lalu menilai enam ciri lalu lintas tiap aset dalam milidetik. Lalu lintas tidak wajar menambah peluang serangan dan disertai alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal" (_explainability_).
+    - **Mesin Deteksi Aturan (_rule-based detection engine_):** menghitung peristiwa mentah (_login_ dan koneksi masuk) dengan ambang terbuka: _login_ gagal berulang (8 dalam 60 detik), _login_ tembus sesudah rentetan gagal (≤ 120 detik), dan pemindaian _port_ (15 kombinasi aset:_port_ dalam 10 detik). Peringatannya ikut aturan yang sama dengan CTI dan AI: hanya menaikkan WASPADA, dapat diperketat, dan dapat ditutup lewat triase.
     - Satu klik **Perketat** menurunkan peluang serangan sebelum ancaman tiba.
 2. **Respons berdoktrin (lapis kedua, bila ancaman tetap tembus)**
     - **Isolasi standar:** bukti diamankan lebih dulu, lalu ±1,2 detik kemudian jaringan diputus.
@@ -294,7 +294,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 | --- | --- | --- |
 | **_Govern_** (tata kelola) | Dua peran dan dua kunci konfirmasi; Nilai Kesiapan Siber A–E untuk Dansat | — |
 | **_Identify_** (kenali) | Inventaris aset IT dan OT; korelasi kabar ancaman × aset; peluang serangan per aset | Inventaris dari sistem satuan yang sebenarnya |
-| **_Protect_** (lindungi) | Perketat (simulasi pengerasan); kepatuhan backup < 24 jam dan uji pulih; akses posko berlapis | Pengerasan langsung di perangkat nyata |
+| **_Protect_** (lindungi) | Perketat (simulasi pengerasan); kepatuhan pencadangan < 24 jam dan uji pulih; akses posko berlapis | Pengerasan langsung di perangkat nyata |
 | **_Detect_** (deteksi) | AI lokal (_Isolation Forest_); aturan deteksi _login_ gagal berulang dan pemindaian _port_, dan aturan OT (atas peristiwa sintetis maupun **log asli yang diimpor Operator**); radar anomali; triase peringatan | Sensor nyata; peristiwa identitas dari Active Directory (perubahan hak akses, akun baru) |
 | **_Respond_** (tanggapi) | Bukti dulu → isolasi ±1,2 detik → LAPSIT; isolasi darurat beralasan; MTTC tercatat | Pengiriman LAPSIT berjenjang otomatis ke Sansidam dan Kartika CSIRT; respons bertingkat menurut kritikalitas aset |
 | **_Recover_** (pulihkan) | Pemulihan terkunci sampai sidik jari bukti cocok ulang | — |
@@ -386,15 +386,15 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 - **Mode Hybrid (rancangan lanjutan, belum ada di purwarupa).** Satu-satunya data yang direncanakan melintasi batas jaringan adalah **umpan indikator ancaman resmi** (BSSN/MISP). Umpan masuk satu arah lewat gerbang yang dikendalikan satuan, atau diimpor sebagai berkas lewat media yang diperiksa. Aplikasi inti tetap luring. Pada purwarupa, umpan CTI memakai data latihan sintetis.
 - **Batas purwarupa.** Pengambilan bukti dan pemutusan jaringan **disimulasikan** atas aset latihan. Yang berjalan nyata: penguncian urutan di _server_, perhitungan sidik jari SHA-256, buku berantai HMAC, LAPSIT, korelasi CTI, dan penilaian AI lokal (atas ciri lalu lintas sintetis).
 - **Dua jenis AI, dengan status yang berbeda:**
-    - **(a) Engine Deteksi Anomali — sudah beroperasi penuh di purwarupa.** Model _machine learning_ ringan (_Isolation Forest_, scikit-learn) dilatih dan dijalankan 100% luring di _backend_, lalu memberi skor anomali lalu lintas IT dan OT setiap detik. Ini **_local inference_**: tidak ada unduhan model, tidak ada pemanggilan Application Programming Interface (API) luar, dan setelah pemasangan tidak butuh internet sama sekali. Karena itu ia siap untuk **penerapan _air-gapped_**: paket pustakanya cukup dibawa lewat media yang diperiksa. Ciri lalu lintasnya di purwarupa masih sintetis.
-    - **(b) Engine Asisten Narasi — peta jalan, belum ada di purwarupa.** Model bahasa lokal (_Local LLM_) **Llama 3 8B lewat Ollama** untuk menyusun draf LAPSIT. Rencananya juga _local inference_: model dihitung di _server_ satuan, dan untuk satuan _air-gapped_ berkas modelnya diunduh sekali lalu dibawa lewat media yang diperiksa. Model berat ini sengaja **tidak** dimasukkan ke _server_ inti agar beban CPU tetap hemat.
+    - **(a) Mesin Deteksi Anomali — sudah beroperasi penuh di purwarupa.** Model _machine learning_ ringan (_Isolation Forest_, scikit-learn) dilatih dan dijalankan 100% luring di _backend_, lalu memberi skor anomali lalu lintas IT dan OT setiap detik. Ini **_local inference_**: tidak ada unduhan model, tidak ada pemanggilan Application Programming Interface (API) luar, dan setelah pemasangan tidak butuh internet sama sekali. Karena itu ia siap untuk **penerapan _air-gapped_**: paket pustakanya cukup dibawa lewat media yang diperiksa. Ciri lalu lintasnya di purwarupa masih sintetis.
+    - **(b) Mesin Asisten Narasi — peta jalan, belum ada di purwarupa.** Model bahasa lokal (_Local LLM_) **Llama 3 8B lewat Ollama** untuk menyusun draf LAPSIT. Rencananya juga _local inference_: model dihitung di _server_ satuan, dan untuk satuan _air-gapped_ berkas modelnya diunduh sekali lalu dibawa lewat media yang diperiksa. Model berat ini sengaja **tidak** dimasukkan ke _server_ inti agar beban CPU tetap hemat.
     - Dalam kedua jenis, AI hanya menyarankan dan menaikkan status; memutus jaringan tetap keputusan operator.
 - **AI sebagai alat pengembang.** Selain itu, asisten AI dipakai untuk membantu menulis kode dan dokumentasi, sebagaimana diizinkan panitia (lihat 6.2).
 
 ### 5.2 Kesiapan Penerapan
 
 - **Ringan:** satu laptop atau _server_ kecil; satu proses Python. Untuk 300 layar serentak, CPU _server_ ±1,5% saat siaga dan ±1,7% saat serangan, dengan memori ±207 MB termasuk pustaka AI (scikit-learn dan numpy), jauh di bawah 512 MB; diukur ulang 26 Okt 2026 dengan `tools/ukur_beban.py` (Linux 2 inti, 300 siaran SSE sungguhan). AI menambah kerja _server_ hanya ±0,05 milidetik per detik karena model baru dijalankan saat keadaan lalu lintas berubah.
-- **Teruji:** 334 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
+- **Teruji:** 337 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
 - **Cakupan OT saat ini:** purwarupa memantau **pengendali genset rumah sakit** (Modbus/TCP, _port_ 502) di **zona kendali** topologi. Kabar ancaman Modbus menaikkannya ke **WASPADA (±66%)** sebelum ada serangan. Pada skenario **Sabotase OT**, bukti diamankan, lalu jalur kantor → zona kendali diputus lewat _webhook_ (simulasi) ke sakelar terkelola ±1,2 detik kemudian; genset tetap menyala dengan kendali lokal. Pemulihan jalur kendali terkunci sampai sidik jari bukti cocok.
 - **Langkah lanjutan** (semuanya sumber terbuka dan dapat berjalan _air-gapped_ atau _on-premise_):
     - telemetri nyata dari sensor dan SIEM satuan (Wazuh, Suricata, Zeek) serta sensor protokol industri Modbus/DNP3;
@@ -404,7 +404,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
     - **respons bertingkat menurut kritikalitas aset**: aset vital (SIMRS, pengendali genset, _server_ inti) tetap memakai dua kunci; _endpoint_ kantor berisiko rendah dapat diisolasi otomatis berdasarkan _playbook_ praotorisasi yang ditetapkan Kasi Siber, tetap dengan bukti diamankan lebih dulu dan tercatat di LAPSIT;
     - saat tersambung ke perangkat nyata: brankas kredensial, hak minimum per _playbook_, _playbook_ bertanda tangan digital, dan persetujuan dua orang untuk mengubah _playbook_;
     - akuisisi bukti nyata (misalnya Velociraptor), dan penerusan kasus ke _case management_ (TheHive) beserta label MITRE ATT&CK yang sudah ada;
-    - AI: ciri lalu lintas nyata dari sensor satuan untuk Engine Deteksi Anomali, dan Engine Asisten Narasi (Llama 3 8B lewat Ollama) untuk draf LAPSIT, dengan _human-in-the-loop_;
+    - AI: ciri lalu lintas nyata dari sensor satuan untuk Mesin Deteksi Anomali, dan Mesin Asisten Narasi (Llama 3 8B lewat Ollama) untuk draf LAPSIT, dengan _human-in-the-loop_;
     - paket pemasangan luring siap pakai, SSO instansi dengan verifikasi dua langkah, dan operasi multiproses.
 
 ### 5.3 Konsep Penempatan dan Pengguna (Usulan)
@@ -427,14 +427,14 @@ Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar 
 | --- | --- |
 | Operasi luring penuh di satu satuan/rumah sakit (*on-premise*) | **(1) Pengiriman LAPSIT otomatis berjenjang** ke Sandi dan Siber Kodam (Sansidam) dan Kartika CSIRT (Pussiberad) |
 | Dua peran: Pengamat dan Operator | **(2) Akses dan tampilan lintas satuan** untuk pemantauan serentak di Mabes |
-| Isolasi dengan tombol yang ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal Llama 3 8B lewat Ollama untuk draf LAPSIT |
+| Isolasi dengan tombol yang ditahan 0,6 detik | Mesin Asisten Narasi: LLM lokal Llama 3 8B lewat Ollama untuk draf LAPSIT |
 | Rantai bukti HMAC-SHA256 | Umpan indikator resmi (BSSN/MISP) lewat gerbang satu arah |
-| Korelasi CTI dan Engine Deteksi Anomali (_Isolation Forest_, luring) | Sensor nyata (Wazuh, Suricata, Zeek) dan sakelar terkelola sungguhan |
+| Korelasi CTI dan Mesin Deteksi Anomali (_Isolation Forest_, luring) | Sensor nyata (Wazuh, Suricata, Zeek) dan sakelar terkelola sungguhan |
 | Simulasi OT genset (Modbus, _port_ 502) | Peristiwa identitas nyata dari Active Directory (perubahan hak akses, akun baru) |
 | Pembuatan LAPSIT dan ekspor PDF | Pengamanan integrasi nyata: brankas kredensial, hak minimum per _playbook_, _playbook_ bertanda tangan |
 | Paket pasang luring bersidik jari SHA-256 (tanpa internet sama sekali) | **Respons bertingkat menurut kritikalitas aset:** aset vital tetap dua kunci; _endpoint_ kantor berisiko rendah diisolasi otomatis dengan praotorisasi |
-| Engine Deteksi Aturan: _login_ gagal berulang, _login_ tembus, pemindaian _port_, koneksi IT ke zona kendali OT tanpa izin, dan perintah tulis Modbus di luar jendela pemeliharaan (ambang terbuka; atas peristiwa sintetis) | |
-| **Impor log luring** (auth.log OpenSSH, log firewall UFW/iptables, CSV; maks. ±2 MB) dinilai Engine Deteksi Aturan yang sama; temuan berlabel sumber berkasnya | |
+| Mesin Deteksi Aturan: _login_ gagal berulang, _login_ tembus, pemindaian _port_, koneksi IT ke zona kendali OT tanpa izin, dan perintah tulis Modbus di luar jendela pemeliharaan (ambang terbuka; atas peristiwa sintetis) | |
+| **Impor log luring** (auth.log OpenSSH, log firewall UFW/iptables, CSV; maks. ±2 MB) dinilai Mesin Deteksi Aturan yang sama; temuan berlabel sumber berkasnya | |
 | Label teknik MITRE ATT&CK (termasuk ATT&CK for ICS) di peringatan, log, dan LAPSIT; label sumber data di setiap peringatan; pengesahan dua tanda tangan di LAPSIT PDF | |
 | Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI Waktu respons (MTTC) dan Insiden sejak posko aktif | |
 | Nilai Kesiapan Siber A–E (dua sub-skor: Kerawanan dan Insiden) dan triase peringatan: Selesai ditangani atau Positif Palsu (_False Positive_), beralasan dan tercatat di Buku Rantai Bukti | |
@@ -458,7 +458,7 @@ Sesuai Rulebook bagian G (Ketentuan Karya), berikut pustaka dan alat pihak ketig
 | **ReportLab** | Ekspor LAPSIT ke PDF | BSD |
 | **pytest** dan **HTTPX** | Uji otomatis | MIT dan BSD-3-Clause |
 | **Mermaid** dan **Playwright (Chromium)** | Hanya untuk menggambar diagram dan mencetak dokumen ini; tidak dipakai aplikasi | MIT, Apache-2.0, dan BSD-3-Clause |
-| **scikit-learn** dan **NumPy** | Engine Deteksi Anomali (_Isolation Forest_), berjalan lokal | BSD-3-Clause |
+| **scikit-learn** dan **NumPy** | Mesin Deteksi Anomali (_Isolation Forest_), berjalan lokal | BSD-3-Clause |
 | **Lucide** (v0.460.0) | Ikon pada poster, disematkan sebagai SVG sebaris; tidak dipakai aplikasi | ISC |
 | **Claude (Anthropic)** | Asisten AI untuk membantu menulis kode dan dokumentasi; tidak dipanggil oleh aplikasi | Layanan komersial |
 | **MITRE ATT&CK®** (Enterprise dan ICS) | Label teknik pada peringatan dan LAPSIT; tabel statis di `app/mitre.py`, pemetaan oleh tim sendiri | Merek dagang The MITRE Corporation; dipakai sebagai rujukan |
@@ -490,7 +490,7 @@ Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria R
 | --- | --- | --- |
 | **Relevansi dan Manfaat** (25%) | Menjaga aset IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan) dengan LAPSIT untuk Dansat; usulan alur laporan ke Sansidam dan Kartika CSIRT (§5.3); label satuan diatur dari satu kamus istilah | §2 dan §5.3 dokumen ini; Dokumentasi Teknis §3 (SOP respons insiden) |
 | **Inovasi Teknis** (25%) | "Bukti dulu, baru putus" dikunci _server_ (isolasi tanpa bukti ditolak 409); rantai HMAC-SHA256 untuk log audit dan Buku Rantai Bukti; dua kunci (mesin hanya menaikkan WASPADA, manusia memutus); AI _Isolation Forest_ luring yang menjelaskan alasannya; korelasi kabar ancaman × aset sebelum serangan; aturan OT deterministik (jalur IT ke OT tanpa izin, perintah tulis Modbus di luar jendela pemeliharaan) yang hanya menaikkan WASPADA; label MITRE ATT&CK; isolasi OT dengan memutus **jalur**, bukan mematikan genset; siaran ralat (_delta_) yang menekan beban _server_ | Uji `test_rantai_bukti` (36), `test_ai` (10), `test_ot` (6), `test_deteksi` (24), `test_ot_mitre_lapsit` (23); Dokumentasi Teknis §2.3–2.8 |
-| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; **impor log asli** (auth.log OpenSSH, log firewall, CSV) dinilai aturan yang sama; 334 uji otomatis lulus; paket luring dipasang dan diuji tanpa internet di Mac dan di Ubuntu 24.04 (paket bertanda tangan). **Batas yang kami akui:** telemetri langsung dan kabar ancaman masih sintetis (log asli baru masuk lewat impor berkas, belum sensor terus-menerus), dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
+| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; **impor log asli** (auth.log OpenSSH, log firewall, CSV) dinilai aturan yang sama; 337 uji otomatis lulus; paket luring dipasang dan diuji tanpa internet di Mac dan di Ubuntu 24.04 (paket bertanda tangan). **Batas yang kami akui:** telemetri langsung dan kabar ancaman masih sintetis (log asli baru masuk lewat impor berkas, belum sensor terus-menerus), dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
 | **Kelayakan Implementasi** (15%) | Satu proses Python di laptop atau _server_ kecil; ±1,5% CPU untuk 300 layar; berjalan dan dipasang tanpa internet dengan sidik jari SHA-256, dan untuk Ubuntu 24.04 dengan paket bertanda tangan Ed25519 serta layanan systemd yang dikeraskan; peran Operator dan Pengamat; peta jalan ke sensor sumber terbuka (Wazuh, Suricata, Zeek) dan MISP | §5 dokumen ini; Dokumentasi Teknis §4.4 (pemasangan luring) |
 | **Kualitas Dokumentasi** (10%) | Proposal ini, Dokumentasi Teknis, Panduan Belajar (PDF), dek presentasi, poster A4, README, CHANGELOG per perubahan, dan deklarasi serta atribusi (§6) | Folder `docs/` dan `presentation/` di repositori |
 
@@ -506,7 +506,7 @@ Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria R
 | **±1,5% siaga · ±1,7% serangan**, **±207 MB**, **0,28–0,40 MB/s** | CPU, memori, dan lalu lintas _server_ untuk 300 layar | `tools/ukur_beban.py`, 26 Okt 2026, Linux 2 inti, 300 siaran SSE sungguhan; Dokumentasi Teknis §2.3 | Bisa diulang siapa pun dengan alat yang sama |
 | **−80% (8,4 → 1,7 MB/s)** | Efek optimasi siaran ralat | Uji beban 15–17 Okt 2026; Dokumentasi Teknis §2.3 | Riwayat optimasi dengan mesin dan alat ukur awal yang tidak disertakan di repositori; tidak dibandingkan langsung dengan angka versi akhir |
 | **±10 milidetik** | Waktu AI menilai 9 aset | `skor_ms` di `app/ai_anomali.py`; dikunci `test_ai` (di bawah 100 ms) | Ukuran di mesin pengembang; uji sengaja memberi batas longgar |
-| **334 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 334 lulus pada 29 Okt 2026 (Linux ±46 detik) | Termasuk saat paket Ubuntu 24.04 bertanda tangan dipasang sebagai root dengan jaringan diputus |
+| **337 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 337 lulus pada 30 Okt 2026 (Linux ±46 detik) | Rilis v5.2.0 (334 uji saat itu) juga lulus semua setelah paket Ubuntu 24.04 bertanda tangan dipasang sebagai root dengan jaringan diputus |
 | **200.000 putaran**, **5 percobaan/menit**, **16 KB** | PBKDF2-SHA256 untuk kata sandi, batas _login_, batas kiriman | `app/keamanan.py`; dikunci `test_keamanan` (`test_tebak_sandi_dibatasi`, uji batas kiriman) | — |
 
 ## Lampiran: Kamus Istilah

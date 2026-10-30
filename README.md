@@ -9,7 +9,7 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 (bukti → isolasi → LAPSIT, otomatis setelah satu keputusan Operator; perintah ke perangkat masih simulasi).
 *Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
-Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **334 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
+Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **337 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
 
 - **Isolasi tidak pernah otomatis.** Isolasi otomatis terdengar cepat, sampai ia memutus segmen OT karena alarm keliru. Di sini isolasi selalu didahului bukti tersegel dan keputusan Operator; yang diputus jalurnya, genset tetap menyala.
 - **"Tanpa awan" berlaku sampai ke demonya.** Aplikasi dipasang dari paket bersidik jari tanpa internet, lalu seluruh uji dijalankan di mesin itu juga.
@@ -22,7 +22,7 @@ Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bu
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          334 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tests/          337 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, paket Ubuntu bertanda tangan, verifikasi audit tanpa server
 installer/      pasang.sh, layanan systemd, dan pembungkus verifikasi audit untuk Ubuntu 24.04
 kunci/          kunci PUBLIK rilis (kunci privat tidak pernah ada di repo)
@@ -302,7 +302,7 @@ sequenceDiagram
 | Latihan | Satu bilah alat: target, 4 skenario, latihan deteksi (*login* gagal, pindai *port*, akses OT tanpa izin), **Impor log…** (log asli: auth.log, firewall, CSV; contoh di `docs/contoh-log/`), latih kegagalan forensik | Simulator latihan |
 | Aset (triase) | Status 6 layanan contoh; klik untuk laci PIC & Quick Call | Papan triase IGD |
 | Log | Peristiwa dari *server* (ringkas 2 baris ⇄ semua) | Rekam gejala pasien |
-| Alat operator | Cek indikator, kepatuhan backup, Audit & LAPSIT PDF, **Akun** (khusus operator) | Pos satpam & buku piket |
+| Alat operator | Cek indikator, kepatuhan pencadangan, Audit & LAPSIT PDF, **Akun** (khusus operator) | Pos satpam & buku piket |
 
 ---
 
@@ -336,7 +336,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 334 uji** dalam 17 kelompok.
+**Total: 337 uji** dalam 17 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -392,10 +392,10 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - Isolasi darurat menolak alasan kosong; alasannya terikat ke buku bukti, log audit, dan LAPSIT
 - Bukti atau berita acara yang dirusak → pemulihan dikunci di semua pintu
 
-**Kamus istilah** — `tests/test_istilah.py` (36 uji)
+**Kamus istilah** — `tests/test_istilah.py` (39 uji)
 - Tidak ada label yang tertanam di luar `app/istilah.py`; playbook dirakit dari kamus
 
-**Engine Deteksi Aturan** — `tests/test_deteksi.py` (24 uji)
+**Mesin Deteksi Aturan** (_rule-based detection engine_) — `tests/test_deteksi.py` (24 uji)
 - Ambang terbuka dikunci: 8 _login_ gagal dalam 60 dtk (ke-7 belum, ke-8 terdeteksi), _login_ tembus ≤ 120 dtk, 15 kombinasi aset:port dalam 10 dtk
 - Di bawah ambang, di luar jendela, atau port yang sama berulang: tidak ada temuan; rentetan berlanjut tidak menggandakan temuan
 - Temuan hanya menaikkan WASPADA (tanpa isolasi/SOAR); Perketat, triase, kedaluwarsa 300 dtk; label isolasi = Operator + nomor bukti sebenarnya
@@ -514,7 +514,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                334 uji otomatis (lihat bagian 6)
+tests/                337 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/verifikasi_audit.py  verifikasi rantai HMAC log audit & Buku Rantai Bukti tanpa server
 tools/kunci_rilis.py  kunci rilis Ed25519 (dibuat dan dipakai di komputer pembuat rilis)
@@ -541,10 +541,10 @@ pytest.ini            pengaturan tampilan pytest
 | --- | --- |
 | Operasi luring penuh di 1 satuan/RS (*on-premise*) | Pengiriman LAPSIT otomatis berjenjang ke Sansidam (Kodam) dan Kartika CSIRT (Pussiberad) |
 | Peran Pengamat dan Operator | Akses dan tampilan lintas satuan untuk pemantauan serentak di Mabes |
-| Isolasi dengan tombol ditahan 0,6 detik | Engine Asisten Narasi: LLM lokal (Llama 3 8B lewat Ollama) untuk draf LAPSIT |
+| Isolasi dengan tombol ditahan 0,6 detik | Mesin Asisten Narasi: LLM lokal (Llama 3 8B lewat Ollama) untuk draf LAPSIT |
 | Rantai bukti HMAC-SHA256 | |
-| Korelasi CTI dan Engine Deteksi Anomali (Isolation Forest, luring) | **Respons bertingkat menurut kritikalitas aset:** aset vital tetap dua kunci; endpoint kantor berisiko rendah diisolasi otomatis dengan praotorisasi |
-| Engine Deteksi Aturan: login gagal berulang, login tembus, pemindaian port, aturan OT (atas peristiwa sintetis), dan **impor log asli** (auth.log, firewall, CSV) | Sensor yang terus-menerus (Wazuh, Suricata, Zeek) dan peristiwa identitas dari Active Directory |
+| Korelasi CTI dan Mesin Deteksi Anomali (_anomaly detection engine_; Isolation Forest, luring) | **Respons bertingkat menurut kritikalitas aset:** aset vital tetap dua kunci; endpoint kantor berisiko rendah diisolasi otomatis dengan praotorisasi |
+| Mesin Deteksi Aturan: login gagal berulang, login tembus, pemindaian port, aturan OT (atas peristiwa sintetis), dan **impor log asli** (auth.log, firewall, CSV) | Sensor yang terus-menerus (Wazuh, Suricata, Zeek) dan peristiwa identitas dari Active Directory |
 | Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI MTTC dan insiden | |
 | Simulasi OT genset (Modbus 502) | |
 | Pembuatan LAPSIT dan ekspor PDF | |
@@ -555,7 +555,7 @@ pytest.ini            pengaturan tampilan pytest
 2. Simpan status di basis data; Hub siaran di perantara pesan bersama agar bisa lebih dari satu proses.
 3. Login lewat sistem identitas instansi (SSO) dengan verifikasi dua langkah.
 4. Jalankan di belakang HTTPS (`NS_HTTPS=1`).
-5. **Engine Deteksi Anomali (AI lokal) sudah berjalan** (`app/ai_anomali.py`). Yang masih **rencana**: Engine Asisten
+5. **Mesin Deteksi Anomali (AI lokal) sudah berjalan** (`app/ai_anomali.py`). Yang masih **rencana**: Mesin Asisten
    Narasi (LLM lokal Llama 3 8B lewat Ollama) untuk draf LAPSIT, serta otomasi alur kerja (n8n).
    Ciri lalu lintas AI di purwarupa masih sintetis; penerapan nyata mengambilnya dari sensor satuan (Wazuh, Suricata, Zeek).
 6. Perluasan OT: sensor protokol industri (Modbus/DNP3) dan webhook ke sakelar terkelola **sungguhan**

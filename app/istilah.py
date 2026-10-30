@@ -18,9 +18,16 @@ Semua nama orang FIKTIF.
 
 from __future__ import annotations
 
+from .versi import VERSI
+
 ISTILAH: dict = {
     # --- identitas aplikasi -------------------------------------------------------------
     "produk": "Dasbor Pertahanan Siber Satuan",
+    "nama_versi": f"Nusantara Shield v{VERSI}",   # nomor dari app/versi.py; jangan ditulis langsung
+
+    # --- nama peran akun (nilai teknis "operator"/"pengamat" tetap huruf kecil di API) -----
+    "peran_operator": "Operator",
+    "peran_pengamat": "Pengamat",
     "tim_insiden": "TTIS Satuan",              # Tim Tanggap Insiden Siber (Perpres 82/2022)
 
     # --- laporan otomatis ke manajemen (Automated IR Blast) ------------------------------

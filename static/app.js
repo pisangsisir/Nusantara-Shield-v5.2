@@ -61,7 +61,7 @@ async function muatIstilah() {
     if (r.ok) S.istilah = await r.json();
   } catch { /* server belum siap: label jatuh ke kunci, aplikasi tetap jalan */ }
   $$("[data-istilah]").forEach((e) => { e.textContent = T(e.dataset.istilah); });
-  document.title = `Nusantara Shield v5.1 — ${T("produk")}`;
+  document.title = `${T("nama_versi")} — ${T("produk")}`;
 }
 
 // ---------------------------------------------------------------- pembantu DOM
@@ -141,6 +141,8 @@ function relatif(m) {
   return "T−" + (a >= 1440 ? `${a / 1440} hari` : a >= 60 ? `${a / 60} jam` : `${a} mnt`);
 }
 const bolehUbah = () => S.peran === "operator";
+/** Nilai peran di API tetap huruf kecil ("operator"); yang tampil diambil dari kamus istilah ("Operator"). */
+const namaPeran = (p) => (S.istilah && S.istilah[`peran_${p}`]) || p;
 
 /** Gambar ulang tanpa kehilangan fokus keyboard (penting saat siaran memperbarui panel). */
 function denganFokus(gambar) {
@@ -451,7 +453,7 @@ function gambarPostur(postur, kpi, waktu) {
   $("#kpi-insiden").replaceChildren(document.createTextNode(kpi.insiden_sejak),
     el("small", { teks: ` sejak ${jamMenit(kpi.posko_sejak)}` }));
   $("#cap-waktu").textContent = `server ${jamLokal(waktu)} · versi ${S.versi}`;
-  document.title = kpi.insiden_aktif ? `(${kpi.insiden_aktif}) Insiden · ${T("produk")}` : `Nusantara Shield v5.1 — ${T("produk")}`;
+  document.title = kpi.insiden_aktif ? `(${kpi.insiden_aktif}) Insiden · ${T("produk")}` : `${T("nama_versi")} — ${T("produk")}`;
 }
 
 /** Nilai kesiapan siber: huruf posko + dua sub-skor + huruf per layanan. Rumus di server (telemetri.py). */
@@ -1425,7 +1427,7 @@ function navigasiTab(ev) {
 // Fase 5 (audit #7): PENDAFTARAN AKUN & DASBOR AKUN OPERATOR
 // ==========================================================================
 const POLA_NAMA = /^[a-z][a-z0-9_]{2,19}$/, MIN_SANDI = 12;
-const LABEL_ASAL = { bawaan: "Bawaan server", mandiri: "Daftar mandiri", kode_undangan: "Kode undangan", operator: "Dibuat operator" };
+const LABEL_ASAL = { bawaan: "Bawaan server", mandiri: "Daftar mandiri", kode_undangan: "Kode undangan", operator: "Dibuat Operator" };
 
 function gantiForm(keDaftar) {
   $("#form-login").hidden = keDaftar;
@@ -1446,7 +1448,7 @@ async function daftarAkun(ev) {
     : sandi.length < MIN_SANDI ? ["#daftar-sandi", `Kata sandi minimal ${MIN_SANDI} karakter.`]
     : sandi.toLowerCase().includes(nama) ? ["#daftar-sandi", "Kata sandi tidak boleh memuat nama akun."]
     : sandi !== sandi2 ? ["#daftar-sandi2", "Ulangan kata sandi tidak sama."]
-    : peran === "operator" && !kode ? ["#daftar-kode", "Akun operator memerlukan kode undangan."] : null;
+    : peran === "operator" && !kode ? ["#daftar-kode", "Akun Operator memerlukan kode undangan."] : null;
   $$("#form-daftar input").forEach((i) => i.removeAttribute("aria-invalid"));
   if (salah) { $(salah[0]).setAttribute("aria-invalid", "true"); $(salah[0]).focus(); pesan.textContent = salah[1]; return; }
   await sibuk($("#tombol-daftar"), async () => {
@@ -1457,7 +1459,7 @@ async function daftarAkun(ev) {
       gantiForm(false);
       $("#login-nama").value = j.nama;
       $("#login-sandi").focus();
-      toast(`Akun ${j.nama} (${j.peran}) dibuat. Silakan masuk.`, "sukses");
+      toast(`Akun ${j.nama} (${namaPeran(j.peran)}) dibuat. Silakan masuk.`, "sukses");
     } catch (e) { pesan.textContent = e.message; }
   });
 }
@@ -1480,13 +1482,13 @@ async function muatAkun(diam = false) {
   $("#akun-pengamat-memantau").textContent = p.memantau;
   $("#akun-operator").textContent = `${o.terdaftar} · ${o.aktif}`;
   $("#info-akun").textContent = `Diperbarui ${new Date().toLocaleTimeString("id-ID")} · otomatis tiap 5 detik. `
-    + `Pendaftaran pengamat ${j.pendaftaran.pengamat_terbuka ? "terbuka" : "ditutup"}; `
-    + `operator mandiri ${j.pendaftaran.operator_dengan_kode ? "dengan kode undangan" : "ditutup (kode undangan belum diatur)"}.`;
+    + `Pendaftaran Pengamat ${j.pendaftaran.pengamat_terbuka ? "terbuka" : "ditutup"}; `
+    + `Operator mandiri ${j.pendaftaran.operator_dengan_kode ? "dengan kode undangan" : "ditutup (kode undangan belum diatur)"}.`;
   $("#isi-akun").replaceChildren(...j.akun.map((a) => {
     const [kelas, teks] = a.siaran ? ["memantau", "● Memantau"] : a.sesi ? ["login", "● Login"] : ["mati", "○ Tidak aktif"];
     return el("tr", {},
       el("td", {}, el("b", { teks: a.nama }), a.nama === S.akun ? el("span", { kelas: "redup kecil", teks: " (Anda)" }) : null),
-      el("td", {}, el("span", { kelas: `chip-peran ${a.peran}`, teks: a.peran })),
+      el("td", {}, el("span", { kelas: `chip-peran ${a.peran}`, teks: namaPeran(a.peran) })),
       el("td", { teks: LABEL_ASAL[a.asal] || a.asal }),
       el("td", {}, el("span", { kelas: `status-akun ${kelas}`, teks: teks })));
   }));
@@ -1502,7 +1504,7 @@ async function tambahAkun(ev) {
     api("/api/akun", { metode: "POST", data: { nama, sandi, peran: $("#baru-peran").value } })));
   if (!j) return;
   $("#form-akun-baru").reset();
-  toast(`Akun ${j.nama} (${j.peran}) ditambahkan.`, "sukses");
+  toast(`Akun ${j.nama} (${namaPeran(j.peran)}) ditambahkan.`, "sukses");
   muatAkun();
 }
 
@@ -1574,7 +1576,7 @@ function bukaAplikasi() {
   $("#aplikasi").hidden = false;
   $("#info-sesi").hidden = false;
   $("#nama-sesi").textContent = S.akun;
-  $("#peran-sesi").textContent = `· ${S.peran}`;
+  $("#peran-sesi").textContent = `· ${namaPeran(S.peran)}`;
   $("#avatar-sesi").textContent = S.akun.slice(0, 1);
   S.insidenSebelumnya = null; S.seqTampil = 0; S.versi = -1; S.irTerlihat = null; S.idDasar = null; S.menungguPotret = false;
   $("#log-jaringan").replaceChildren();

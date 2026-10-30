@@ -3,7 +3,7 @@
 # Copyright (c) 2026 Nusantara Shield Team. Dikembangkan untuk Kartika Cyber Hackathon 2026.
 # Dilisensikan di bawah GNU General Public License v3.0; lihat berkas LICENSE.
 # ---------------------------------------------------------------------------
-# Menjalankan seluruh uji otomatis Nusantara Shield v5.1 dengan umpan balik PER UJI.
+# Menjalankan seluruh uji otomatis Nusantara Shield (versi dari app/versi.py) dengan umpan balik PER UJI.
 #   ./run_tests.sh                 semua uji
 #   ./run_tests.sh -k akun         hanya uji yang namanya memuat "akun"
 #   ./run_tests.sh tests/test_rantai_bukti.py
@@ -26,5 +26,6 @@ if ! "$PY" -m pytest --version >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "▶ Menjalankan uji otomatis Nusantara Shield v5.1 — setiap uji tampil satu baris beserta hasilnya"
+VERSI=$(sed -n 's/^VERSI = "\(.*\)"$/\1/p' app/versi.py)
+echo "▶ Menjalankan uji otomatis Nusantara Shield v${VERSI} — setiap uji tampil satu baris beserta hasilnya"
 "$PY" -m pytest "$@"

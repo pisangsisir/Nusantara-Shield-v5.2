@@ -9,7 +9,7 @@ Python yang dirakit khusus untuk komputer Anda; di komputer lain ia rusak dan ha
 membengkak (versi lama: ±28 MB, ±4.200 berkas). Juri cukup menjalankan `pip install -r requirements.txt`.
 
 Pemakaian (dari folder proyek, di Mac/Linux/Windows):
-    python tools/kemas_rilis.py            → dist/nusantara-shield-v5.1.zip
+    python tools/kemas_rilis.py            → dist/nusantara-shield-v<versi>.zip (versi dari app/versi.py)
     python tools/kemas_rilis.py --periksa  → hanya menampilkan daftar berkas, tanpa membuat zip
 Aturan pengecualian sama dengan .gitignore.
 """
@@ -17,12 +17,24 @@ Aturan pengecualian sama dengan .gitignore.
 from __future__ import annotations
 
 import fnmatch
+import re
 import sys
 import zipfile
 from pathlib import Path
 
 AKAR = Path(__file__).resolve().parent.parent
-NAMA = "nusantara-shield-v5.1"
+
+
+def baca_versi(akar: Path = AKAR) -> str:
+    """Nomor versi dari app/versi.py, dibaca sebagai teks (alat ini tidak mengimpor paket app)."""
+    cocok = re.search(r'^VERSI = "(\d+\.\d+\.\d+)"$', (akar / "app" / "versi.py").read_text(encoding="utf-8"), re.M)
+    if not cocok:
+        raise SystemExit("app/versi.py tidak berisi baris VERSI = \"x.y.z\"")
+    return cocok.group(1)
+
+
+VERSI = baca_versi()
+NAMA = f"nusantara-shield-v{VERSI}"
 FOLDER_DIBUANG = {".venv", "venv", "env", "data", "__pycache__", ".pytest_cache", "__MACOSX", "dist", ".git", ".idea",
                   ".vscode"}
 BERKAS_DIBUANG = [".env", "*.pyc", "*.pyo", ".DS_Store", "Thumbs.db", "*.zip", "*.tmp"]

@@ -1,4 +1,4 @@
-# Proposal Solusi — Nusantara Shield v5.1
+# Proposal Solusi — Nusantara Shield v5.2.1
 
 **Posko Pertahanan Siber Luring: Peringatan Dini, Isolasi Cepat, dan Rantai Bukti Forensik**
 
@@ -7,7 +7,7 @@
 | **Kompetisi** | Kartika Cyber Hackathon 2026 · Pusat Siber Angkatan Darat (Pussiberad) × CODEPOLITAN |
 | **Kategori** | 02 · **Penangkalan (_Defensive Shield_)** — *Threat Intelligence Platform* dan *Automated Incident Response* |
 | **Tim** | Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah |
-| **Status purwarupa** | **Berfungsi penuh** · 346 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
+| **Status purwarupa** | **Berfungsi penuh** · 352 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
 | **Tanggal** | 27 Oktober 2026 |
 
 ---
@@ -18,18 +18,18 @@
 
 > **Serangan siber tidak menunggu rapat staf.** _Ransomware_ mengenkripsi satu _server_ per menit, sementara posko siber masih memilah ratusan peringatan, menunggu izin berjenjang, dan menyusun laporan dengan tangan. Saat jaringan akhirnya diputus atau dipulihkan, jejak penyerang sering sudah terhapus.
 
-**Nusantara Shield** adalah perisai pertahanan siber (kategori **Penangkalan, _Defensive Shield_**) dan **sistem pendukung keputusan (SPK)** bagi posko satuan, ibarat **Perwira Staf Siber Digital**. Ia bekerja dengan tiga kata kerja: **mendeteksi** ancaman (aturan deteksi, AI lokal, dan kabar ancaman), **mencegah** aset berisiko diserang (WASPADA dan Perketat), dan **membantu merespons** dengan urutan baku yang berjalan otomatis setelah satu keputusan Operator. Ia menjaga **jaringan perkantoran (IT)** dan **sistem kendali fasilitas (OT)** dalam satu layar. Ia mengamati tanpa henti, mencocokkan setiap kabar ancaman dengan aset milik satuan sendiri, dan menyajikan langkah penindakan yang sudah dibakukan dalam doktrin. **Keputusan tetap di tangan manusia.** Begitu operator menahan tombol, sistem menjalankan urutan baku secara otomatis (di purwarupa, perintah ke perangkat jaringan masih simulasi):
+**Nusantara Shield** adalah perisai pertahanan siber (kategori **Penangkalan, _Defensive Shield_**) dan **sistem pendukung keputusan (SPK)** bagi posko satuan, ibarat **Perwira Staf Siber Digital**. Ia bekerja dengan tiga kata kerja: **mendeteksi** ancaman (aturan deteksi, AI lokal, dan kabar ancaman), **mencegah** aset berisiko diserang (WASPADA dan Perketat), dan **membantu merespons** dengan urutan baku yang berjalan otomatis setelah satu keputusan Operator. Ia menjaga **jaringan perkantoran (IT)** dan **sistem kendali fasilitas (OT)** dalam satu layar. Ia mengamati tanpa henti, mencocokkan setiap kabar ancaman dengan aset milik satuan sendiri, dan menyajikan langkah penindakan yang sudah dibakukan dalam doktrin. **Keputusan tetap di tangan manusia.** Begitu Operator menahan tombol, sistem menjalankan urutan baku secara otomatis (di purwarupa, perintah ke perangkat jaringan masih simulasi):
 
 Nusantara Shield bekerja dalam **dua lapis**:
 
 1. **Lapis pertama: deteksi dan tangkal lebih dulu.** Kabar ancaman (CTI), AI lokal, dan aturan deteksi (_login_ gagal berulang, pemindaian _port_) menaikkan aset IT maupun OT yang berisiko ke **WASPADA** sebelum diserang. Satu klik **Perketat** menurunkan paparannya. Contoh terukur: kabar celah Modbus menaikkan pengendali genset ke peluang ±66%, dan Perketat menurunkannya ke ±20%.
-2. **Lapis kedua: bila ancaman tetap tembus, bukti dulu, baru putus.** Begitu operator memutuskan, _server_ menjalankan alur baku di bawah dalam urutan yang tidak bisa dilompati.
+2. **Lapis kedua: bila ancaman tetap tembus, bukti dulu, baru putus.** Begitu Operator memutuskan, _server_ menjalankan alur baku di bawah dalam urutan yang tidak bisa dilompati.
 
 > **Dua kunci konfirmasi sebelum jaringan diputus.** Kunci pertama dipegang mesin: kabar ancaman (CTI) dicocokkan dengan aset satuan, AI lokal menilai lalu lintasnya, dan aturan deteksi menghitung peristiwa _login_ serta koneksi masuk, tetapi hasilnya hanya menaikkan status ke WASPADA. Kunci kedua dipegang manusia: hanya akun Operator yang dapat memerintahkan isolasi, dengan menahan tombol 0,6 detik; permintaan dari akun Pengamat ditolak _server_. **Tidak ada satu sinyal pun yang memutus jaringan vital secara otomatis penuh (_autonomous_) tanpa keputusan akhir manusia.**
 
 <div class="ilustrasi" id="ilustrasi-alur">
-<svg viewBox="0 0 1000 190" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alur baku Nusantara Shield: amankan bukti, isolasi IT dan OT, laporkan, pulihkan; urutan dikunci server"><rect width="1000" height="190" rx="10" fill="#0d1729"/><text x="24" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" letter-spacing="2" fill="#3ef0a1">ALUR BAKU · DIKUNCI DI SERVER</text><text x="976" y="30" text-anchor="end" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" fill="#8798b1">operator cukup menahan satu tombol 0,6 detik</text><rect x="24" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#7aa2d6" stroke-width="2"/><text x="40" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#7aa2d6">01</text><text x="70" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">AMANKAN BUKTI</text><text x="40" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">Memori, log, trafik</text><text x="40" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">disegel SHA-256</text><path d="M248 98 L270 98" stroke="#8798b1" stroke-width="2"/><path d="M270 92 L276 98 L270 104 Z" fill="#8798b1"/><rect x="274" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#ff5c74" stroke-width="2"/><text x="290" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#ff5c74">02</text><text x="320" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">ISOLASI IT · OT</text><text x="290" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">±1,2 dtk setelah bukti aman</text><text x="290" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">genset tetap menyala</text><path d="M498 98 L520 98" stroke="#8798b1" stroke-width="2"/><path d="M520 92 L526 98 L520 104 Z" fill="#8798b1"/><rect x="524" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#f5c451" stroke-width="2"/><text x="540" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#f5c451">03</text><text x="570" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">LAPORKAN</text><text x="540" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">LAPSIT otomatis</text><text x="540" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">ke pimpinan</text><path d="M748 98 L770 98" stroke="#8798b1" stroke-width="2"/><path d="M770 92 L776 98 L770 104 Z" fill="#8798b1"/><rect x="774" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#3ef0a1" stroke-width="2"/><text x="790" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#3ef0a1">04</text><text x="820" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">PULIHKAN</text><text x="790" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">Terkunci sampai</text><text x="790" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2"><tspan font-style="italic">hash</tspan> cocok ulang</text><rect x="24" y="160" width="952" height="0" /><text x="24" y="172" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12.5" fill="#ff8a9c">✕ Isolasi tanpa bukti atau pemulihan sebelum <tspan font-style="italic">hash</tspan> cocok: ditolak <tspan font-style="italic">server</tspan> (409). Setiap langkah tercatat di buku berantai HMAC.</text></svg>
-<p class="keterangan"><em>Alur baku Nusantara Shield. Begitu operator memutuskan, server menjalankan empat langkah ini dalam urutan yang tidak bisa dilompati.</em></p>
+<svg viewBox="0 0 1000 190" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alur baku Nusantara Shield: amankan bukti, isolasi IT dan OT, laporkan, pulihkan; urutan dikunci server"><rect width="1000" height="190" rx="10" fill="#0d1729"/><text x="24" y="30" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" letter-spacing="2" fill="#3ef0a1">ALUR BAKU · DIKUNCI DI SERVER</text><text x="976" y="30" text-anchor="end" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" fill="#8798b1">Operator cukup menahan satu tombol 0,6 detik</text><rect x="24" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#7aa2d6" stroke-width="2"/><text x="40" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#7aa2d6">01</text><text x="70" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">AMANKAN BUKTI</text><text x="40" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">Memori, log, trafik</text><text x="40" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">disegel SHA-256</text><path d="M248 98 L270 98" stroke="#8798b1" stroke-width="2"/><path d="M270 92 L276 98 L270 104 Z" fill="#8798b1"/><rect x="274" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#ff5c74" stroke-width="2"/><text x="290" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#ff5c74">02</text><text x="320" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">ISOLASI IT · OT</text><text x="290" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">±1,2 dtk setelah bukti aman</text><text x="290" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">genset tetap menyala</text><path d="M498 98 L520 98" stroke="#8798b1" stroke-width="2"/><path d="M520 92 L526 98 L520 104 Z" fill="#8798b1"/><rect x="524" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#f5c451" stroke-width="2"/><text x="540" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#f5c451">03</text><text x="570" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">LAPORKAN</text><text x="540" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">LAPSIT otomatis</text><text x="540" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">ke pimpinan</text><path d="M748 98 L770 98" stroke="#8798b1" stroke-width="2"/><path d="M770 92 L776 98 L770 104 Z" fill="#8798b1"/><rect x="774" y="50" width="220" height="96" rx="9" fill="#111d33" stroke="#3ef0a1" stroke-width="2"/><text x="790" y="78" font-family="ui-monospace,Menlo,Consolas,monospace" font-size="13" font-weight="700" fill="#3ef0a1">04</text><text x="820" y="78" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" fill="#ffffff">PULIHKAN</text><text x="790" y="106" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2">Terkunci sampai</text><text x="790" y="126" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="13" fill="#d7e3f2"><tspan font-style="italic">hash</tspan> cocok ulang</text><rect x="24" y="160" width="952" height="0" /><text x="24" y="172" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="12.5" fill="#ff8a9c">✕ Isolasi tanpa bukti atau pemulihan sebelum <tspan font-style="italic">hash</tspan> cocok: ditolak <tspan font-style="italic">server</tspan> (409). Setiap langkah tercatat di buku berantai HMAC.</text></svg>
+<p class="keterangan"><em>Alur baku Nusantara Shield. Begitu Operator memutuskan, server menjalankan empat langkah ini dalam urutan yang tidak bisa dilompati.</em></p>
 </div>
 
 Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authentication Code (HMAC) yang tidak bisa diubah diam-diam.
@@ -43,12 +43,12 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 | Indikator (terukur pada purwarupa) | Hasil |
 | --- | --- |
 | Peringatan dini: peluang serangan genset setelah kabar celah Modbus, sebelum dan sesudah Perketat (belum ada serangan) | **±66% → ±20%** |
-| Waktu dari keputusan operator sampai jaringan terputus, bukti sudah aman | **±1,2 detik** |
+| Waktu dari keputusan Operator sampai jaringan terputus, bukti sudah aman | **±1,2 detik** |
 | Deteksi _login_ gagal berulang dari satu alamat (ambang terbuka di kode, dikunci uji) | **8 kali dalam 60 detik** |
 | Beban Central Processing Unit (CPU) _server_ untuk **300 layar** pemantau serentak, versi akhir | **±1,5%** siaga · **±1,7%** saat serangan |
 | Lalu lintas jaringan ke 300 layar saat serangan intensif, berkat siaran ralat (uji beban 17 Okt 2026) | **−80%** (8,4 → 1,7 MB/s) |
 | Waktu AI lokal menilai lalu lintas 9 aset (_Isolation Forest_, tanpa internet) | **±10 milidetik** |
-| Perilaku sistem yang dikunci uji otomatis | **346 uji** |
+| Perilaku sistem yang dikunci uji otomatis | **352 uji** |
 
 <p class="sumber-kecil">Angka CPU diukur ulang 26 Okt 2026 dengan tools/ukur_beban.py (Linux 2 inti, 300 siaran SSE sungguhan). Angka 2,8% pada versi dokumen sebelumnya diukur dengan alat dan mesin lain, sehingga tidak dibandingkan langsung. Asal setiap angka dan pemetaan ke lima kriteria penilaian ada di §7.</p>
 
@@ -169,7 +169,7 @@ Tiga kelemahan berikut lazim ditemui pada pola respons insiden manual:
 
 | # | Masalah | Gejala di lapangan | Akibat bagi satuan |
 | --- | --- | --- | --- |
-| **1** | **Banjir peringatan** (*alert fatigue*) | Ratusan peringatan per hari, sebagian besar tidak menyangkut aset satuan | Ancaman nyata tenggelam; operator lelah dan terlambat bereaksi |
+| **1** | **Banjir peringatan** (*alert fatigue*) | Ratusan peringatan per hari, sebagian besar tidak menyangkut aset satuan | Ancaman nyata tenggelam; Operator lelah dan terlambat bereaksi |
 | **2** | **Penahanan (*containment*) yang lambat dan ragu** | Izin berjenjang, tombol bermakna ganda, laporan disusun manual di tengah krisis | Penyerang leluasa menyebar selama keputusan tertunda |
 | **3** | **Rusaknya bukti forensik saat pemulihan darurat** | _Server_ di-*restart* atau dipulihkan dari cadangan sebelum bukti disalin | Pelaku tidak bisa diidentifikasi; rantai barang bukti (*chain of custody*) tidak dapat dipertanggungjawabkan |
 
@@ -253,7 +253,7 @@ Dalam bahasa _incident response_ militer, tahap Bertindak setara dengan siklus *
     - Satu klik **Perketat** menurunkan peluang serangan sebelum ancaman tiba.
 2. **Respons berdoktrin (lapis kedua, bila ancaman tetap tembus)**
     - **Isolasi standar:** bukti diamankan lebih dulu, lalu ±1,2 detik kemudian jaringan diputus.
-    - **Isolasi Darurat (*Emergency Override*):** bila alat forensik gagal, operator tetap bisa memutus jaringan, tetapi **wajib menulis alasan** (minimal 15 karakter) dan menahan tombol **1,5 detik**.
+    - **Isolasi Darurat (*Emergency Override*):** bila alat forensik gagal, Operator tetap bisa memutus jaringan, tetapi **wajib menulis alasan** (minimal 15 karakter) dan menahan tombol **1,5 detik**.
     - Setiap jalan pintas ditolak _server_ (kode **409**).
 3. **Akuntabilitas tak terbantahkan**
     - **Buku Rantai Bukti:** sidik jari SHA-256 tiap barang bukti, petugas, waktu, dan lokasi simpan.
@@ -275,14 +275,14 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 
 | Prinsip | Penerapan di Nusantara Shield |
 | --- | --- |
-| **_Human-in-the-loop_** — komandan memegang keputusan | Tidak ada tindakan pemutusan tanpa operator menahan tombol. Pemulihan terkunci sampai syaratnya terpenuhi. Pengecualian darurat wajib beralasan tertulis. |
+| **_Human-in-the-loop_** — komandan memegang keputusan | Tidak ada tindakan pemutusan tanpa Operator menahan tombol. Pemulihan terkunci sampai syaratnya terpenuhi. Pengecualian darurat wajib beralasan tertulis. |
 | **Sistem pendukung keputusan, bukan pengganti keputusan** | Sengaja **tidak** otonom penuh. Di jaringan vital, respons otomatis penuh membuka tiga risiko: peringatan keliru yang memutus layanan sendiri, respons yang dapat dipancing pihak luar, dan pemutusan tanpa pejabat yang bertanggung jawab. Kecepatan tetap terjaga: isolasi praotorisasi cukup ditahan 0,6 detik, dan pemutusan selesai ±1,2 detik dengan bukti disegel lebih dulu. |
 | **Mode Berdaulat** — tanpa ketergantungan pihak luar | Berjalan **luring penuh**: tanpa Content Delivery Network (CDN), fon, atau layanan awan. Cocok untuk **jaringan tertutup** satuan. Data latihan sintetis (RFC 5737). |
 | **Doktrin forensik** — *chain of custody* | Bukti diamankan **sebelum** isolasi. Berita acara berantai HMAC. Sidik jari SHA-256 **dicocokkan ulang sebelum pemulihan**; bila tidak cocok, pemulihan dikunci. |
 | **Kecepatan OODA** — bertindak lebih cepat dari lawan | Peringatan dini sebelum serangan; bukti + isolasi ±1,2 detik dari keputusan |
-| **AI tepat guna** — deteksi tanpa _signature_ | _Isolation Forest_ lokal menilai lalu lintas dalam milidetik, menjelaskan alasannya, dan hanya menaikkan status; keputusan memutus tetap di tangan operator (_human-in-the-loop_). Dikunci 10 uji khusus AI. |
+| **AI tepat guna** — deteksi tanpa _signature_ | _Isolation Forest_ lokal menilai lalu lintas dalam milidetik, menjelaskan alasannya, dan hanya menaikkan status; keputusan memutus tetap di tangan Operator (_human-in-the-loop_). Dikunci 10 uji khusus AI. |
 | **Pertanggungjawaban komando** | Setiap keputusan (siapa, apa, kapan, alasan) tercatat di dua buku HMAC. LAPSIT terkirim otomatis ke pimpinan. |
-| **Pemisahan wewenang** | Peran **Pengamat** (melihat) dan **Operator** (bertindak). Akun operator hanya lewat kode undangan atau dibuat operator lain. |
+| **Pemisahan wewenang** | Peran **Pengamat** (melihat) dan **Operator** (bertindak). Akun Operator hanya lewat kode undangan atau dibuat Operator lain. |
 | **Posko yang dijaga berlapis** | Alat yang memegang tombol isolasi harus paling terlindungi. Kata sandi disimpan dengan PBKDF2-SHA256 (200.000 putaran), sesi memakai token acak yang kedaluwarsa, _login_ dibatasi 5 percobaan per menit, kiriman dibatasi 16 KB, dan antarmuka dikunci kebijakan keamanan konten (_Content Security Policy_, CSP). Dikunci uji keamanan; rincian dan batasnya di Dokumentasi Teknis §2.7. |
 | **Selaras NIST CSF 2.0** | Fitur dipetakan ke enam fungsi _Cybersecurity Framework_ (CSF) 2.0 (tabel di bawah). Pemetaan mandiri oleh tim, bukan sertifikasi. |
 | **Sinergi IT/OT** | Aset rumah sakit (SIMRS) dan aset kendali (**pengendali genset**, Modbus/TCP _port_ 502) berada dalam satu inventaris dan satu layar. Kabar ancaman protokol industri langsung dikorelasikan, dan skenario **Sabotase OT** memutus jalur kantor → zona kendali ±1,2 detik setelah bukti aman. Dikunci 6 uji khusus OT. |
@@ -378,7 +378,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 
 ### 5.1 Kedaulatan Sistem dan Mode Hybrid/Luring
 
-> **"Berjalan luring penuh" merujuk pada Aplikasi Inti (Nusantara Shield Core v5.1)**, yaitu purwarupa yang diserahkan dan didemonstrasikan dalam lomba ini.
+> **"Berjalan luring penuh" merujuk pada Aplikasi Inti (Nusantara Shield Core v5.2.1)**, yaitu purwarupa yang diserahkan dan didemonstrasikan dalam lomba ini.
 
 - **Tidak membutuhkan awan atau _server_ luar untuk beroperasi.** Seluruh pemrosesan berjalan di _server_ atau laptop milik satuan (*on-premise*): layanan web, penyimpanan akun dan data (berkas lokal), sidik jari SHA-256 barang bukti, log audit HMAC, tombol isolasi, LAPSIT, dan AI deteksi anomali. Kode _server_ tidak memuat satu pun pemanggilan ke alamat luar.
 - **Tanpa ketergantungan eksternal di layar.** Antarmuka tidak memanggil skrip CDN, Google Fonts, atau sumber daring apa pun. Bila internet diputus, dasbor dan _playbook_ respons insiden tetap berjalan penuh. Bahkan bila kabel LAN dicabut, _server_ dan dasbor di laptop yang sama tetap bekerja.
@@ -388,13 +388,13 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 - **Dua jenis AI, dengan status yang berbeda:**
     - **(a) Mesin Deteksi Anomali — sudah beroperasi penuh di purwarupa.** Model _machine learning_ ringan (_Isolation Forest_, scikit-learn) dilatih dan dijalankan 100% luring di _backend_, lalu memberi skor anomali lalu lintas IT dan OT setiap detik. Ini **_local inference_**: tidak ada unduhan model, tidak ada pemanggilan Application Programming Interface (API) luar, dan setelah pemasangan tidak butuh internet sama sekali. Karena itu ia siap untuk **penerapan _air-gapped_**: paket pustakanya cukup dibawa lewat media yang diperiksa. Ciri lalu lintasnya di purwarupa masih sintetis.
     - **(b) Mesin Asisten Narasi — peta jalan, belum ada di purwarupa.** Model bahasa lokal (_Local LLM_) **Llama 3 8B lewat Ollama** untuk menyusun draf LAPSIT. Rencananya juga _local inference_: model dihitung di _server_ satuan, dan untuk satuan _air-gapped_ berkas modelnya diunduh sekali lalu dibawa lewat media yang diperiksa. Model berat ini sengaja **tidak** dimasukkan ke _server_ inti agar beban CPU tetap hemat.
-    - Dalam kedua jenis, AI hanya menyarankan dan menaikkan status; memutus jaringan tetap keputusan operator.
+    - Dalam kedua jenis, AI hanya menyarankan dan menaikkan status; memutus jaringan tetap keputusan Operator.
 - **AI sebagai alat pengembang.** Selain itu, asisten AI dipakai untuk membantu menulis kode dan dokumentasi, sebagaimana diizinkan panitia (lihat 6.2).
 
 ### 5.2 Kesiapan Penerapan
 
 - **Ringan:** satu laptop atau _server_ kecil; satu proses Python. Untuk 300 layar serentak, CPU _server_ ±1,5% saat siaga dan ±1,7% saat serangan, dengan memori ±207 MB termasuk pustaka AI (scikit-learn dan numpy), jauh di bawah 512 MB; diukur ulang 26 Okt 2026 dengan `tools/ukur_beban.py` (Linux 2 inti, 300 siaran SSE sungguhan). AI menambah kerja _server_ hanya ±0,05 milidetik per detik karena model baru dijalankan saat keadaan lalu lintas berubah.
-- **Teruji:** 346 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
+- **Teruji:** 352 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
 - **Cakupan OT saat ini:** purwarupa memantau **pengendali genset rumah sakit** (Modbus/TCP, _port_ 502) di **zona kendali** topologi. Kabar ancaman Modbus menaikkannya ke **WASPADA (±66%)** sebelum ada serangan. Pada skenario **Sabotase OT**, bukti diamankan, lalu jalur kantor → zona kendali diputus lewat _webhook_ (simulasi) ke sakelar terkelola ±1,2 detik kemudian; genset tetap menyala dengan kendali lokal. Pemulihan jalur kendali terkunci sampai sidik jari bukti cocok.
 - **Langkah lanjutan** (semuanya sumber terbuka dan dapat berjalan _air-gapped_ atau _on-premise_):
     - telemetri nyata dari sensor dan SIEM satuan (Wazuh, Suricata, Zeek) serta sensor protokol industri Modbus/DNP3;
@@ -414,7 +414,7 @@ Nusantara Shield dirancang dipasang **di posko siber atau _Security Operations C
 | Tingkat | Unsur | Peran terhadap Nusantara Shield |
 | --- | --- | --- |
 | **Satuan** (rumah sakit TNI AD; lapis taktis) | Operator jaga (petugas TI rumah sakit atau Bintara Siber), Kasi Siber, Komandan Satuan (Dansat) | Operator memantau dan menahan tombol isolasi; Kasi Siber menetapkan _playbook_ praotorisasi; Dansat menerima LAPSIT sebagai Pengamat. |
-| **Komando Daerah Militer (Kodam)** | Sandi dan Siber Kodam (Sansidam), melalui Tim Penangkalan Siber | Pendamping dan cadangan operator; meneruskan laporan ke pusat. |
+| **Komando Daerah Militer (Kodam)** | Sandi dan Siber Kodam (Sansidam), melalui Tim Penangkalan Siber | Pendamping dan cadangan Operator; meneruskan laporan ke pusat. |
 | **Pusat** (lapis operasional) | Satuan pelaksana penangkalan Pussiberad dan Kartika CSIRT | Menerima LAPSIT dan berita acara bukti; menganalisis bukti; menyebarkan kabar ancaman ke satuan. |
 
 - **SOC dan ruang komando:** SOC memakai seluruh dasbor setiap hari. Saat krisis, ruang komando cukup menampilkan Executive Overview, Peta Global, dan LAPSIT dengan akun Pengamat.
@@ -423,7 +423,7 @@ Nusantara Shield dirancang dipasang **di posko siber atau _Security Operations C
 
 Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar didemonstrasikan.
 
-| Sudah berjalan di purwarupa v5.1 | Belum dibangun (peta jalan: Mode Hybrid dan eskalasi) |
+| Sudah berjalan di purwarupa v5.2.1 | Belum dibangun (peta jalan: Mode Hybrid dan eskalasi) |
 | --- | --- |
 | Operasi luring penuh di satu satuan/rumah sakit (*on-premise*) | **(1) Pengiriman LAPSIT otomatis berjenjang** ke Sandi dan Siber Kodam (Sansidam) dan Kartika CSIRT (Pussiberad) |
 | Dua peran: Pengamat dan Operator | **(2) Akses dan tampilan lintas satuan** untuk pemantauan serentak di Mabes |
@@ -505,7 +505,7 @@ Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria R
 | --- | --- | --- |
 | **Relevansi dan Manfaat** (25%) | Menjaga aset IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan) dengan LAPSIT untuk Dansat; usulan alur laporan ke Sansidam dan Kartika CSIRT (§5.3); label satuan diatur dari satu kamus istilah | §2 dan §5.3 dokumen ini; Dokumentasi Teknis §3 (SOP respons insiden) |
 | **Inovasi Teknis** (25%) | "Bukti dulu, baru putus" dikunci _server_ (isolasi tanpa bukti ditolak 409); rantai HMAC-SHA256 untuk log audit dan Buku Rantai Bukti; dua kunci (mesin hanya menaikkan WASPADA, manusia memutus); AI _Isolation Forest_ luring yang menjelaskan alasannya; korelasi kabar ancaman × aset sebelum serangan; aturan OT deterministik (jalur IT ke OT tanpa izin, perintah tulis Modbus di luar jendela pemeliharaan) yang hanya menaikkan WASPADA; label MITRE ATT&CK; isolasi OT dengan memutus **jalur**, bukan mematikan genset; siaran ralat (_delta_) yang menekan beban _server_ | Uji `test_rantai_bukti` (36), `test_ai` (10), `test_ot` (6), `test_deteksi` (24), `test_ot_mitre_lapsit` (23); Dokumentasi Teknis §2.3–2.8 |
-| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; **impor log asli** (auth.log OpenSSH, log firewall, CSV) dinilai aturan yang sama; 346 uji otomatis lulus; paket luring dipasang dan diuji tanpa internet di Mac dan di Ubuntu 24.04 (paket bertanda tangan). **Batas yang kami akui:** telemetri langsung dan kabar ancaman masih sintetis (log asli baru masuk lewat impor berkas, belum sensor terus-menerus), dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
+| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; **impor log asli** (auth.log OpenSSH, log firewall, CSV) dinilai aturan yang sama; 352 uji otomatis lulus; paket luring dipasang dan diuji tanpa internet di Mac dan di Ubuntu 24.04 (paket bertanda tangan). **Batas yang kami akui:** telemetri langsung dan kabar ancaman masih sintetis (log asli baru masuk lewat impor berkas, belum sensor terus-menerus), dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
 | **Kelayakan Implementasi** (15%) | Satu proses Python di laptop atau _server_ kecil; ±1,5% CPU untuk 300 layar; berjalan dan dipasang tanpa internet dengan sidik jari SHA-256, dan untuk Ubuntu 24.04 dengan paket bertanda tangan Ed25519 serta layanan systemd yang dikeraskan; peran Operator dan Pengamat; peta jalan ke sensor sumber terbuka (Wazuh, Suricata, Zeek) dan MISP | §5 dokumen ini; Dokumentasi Teknis §4.4 (pemasangan luring) |
 | **Kualitas Dokumentasi** (10%) | Proposal ini, Dokumentasi Teknis, Panduan Belajar (PDF), dek presentasi, poster A4, README, CHANGELOG per perubahan, dan deklarasi serta atribusi (§6) | Folder `docs/` dan `presentation/` di repositori |
 
@@ -521,7 +521,7 @@ Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria R
 | **±1,5% siaga · ±1,7% serangan**, **±207 MB**, **0,28–0,40 MB/s** | CPU, memori, dan lalu lintas _server_ untuk 300 layar | `tools/ukur_beban.py`, 26 Okt 2026, Linux 2 inti, 300 siaran SSE sungguhan; Dokumentasi Teknis §2.3 | Bisa diulang siapa pun dengan alat yang sama |
 | **−80% (8,4 → 1,7 MB/s)** | Efek optimasi siaran ralat | Uji beban 15–17 Okt 2026; Dokumentasi Teknis §2.3 | Riwayat optimasi dengan mesin dan alat ukur awal yang tidak disertakan di repositori; tidak dibandingkan langsung dengan angka versi akhir |
 | **±10 milidetik** | Waktu AI menilai 9 aset | `skor_ms` di `app/ai_anomali.py`; dikunci `test_ai` (di bawah 100 ms) | Ukuran di mesin pengembang; uji sengaja memberi batas longgar |
-| **346 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 346 lulus pada 30 Okt 2026 (Linux ±46 detik) | Rilis v5.2.0 (334 uji saat itu) juga lulus semua setelah paket Ubuntu 24.04 bertanda tangan dipasang sebagai root dengan jaringan diputus |
+| **352 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 352 lulus pada 30 Okt 2026 (Linux ±46 detik) | Rilis v5.2.0 (334 uji saat itu) juga lulus semua setelah paket Ubuntu 24.04 bertanda tangan dipasang sebagai root dengan jaringan diputus |
 | **200.000 putaran**, **5 percobaan/menit**, **16 KB** | PBKDF2-SHA256 untuk kata sandi, batas _login_, batas kiriman | `app/keamanan.py`; dikunci `test_keamanan` (`test_tebak_sandi_dibatasi`, uji batas kiriman) | — |
 
 ## Lampiran: Kamus Istilah
@@ -531,13 +531,13 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | Istilah | Kepanjangan atau arti | Penjelasan sederhana |
 | --- | --- | --- |
 | **AAR** | _After-Action Review_ (tinjauan pascatindakan) | Rapat evaluasi setelah insiden: apa yang terjadi, apa penyebabnya, dan apa yang diperbaiki. |
-| **Action Center** | Pusat tindakan | Panel di dasbor tempat operator melihat insiden dan menekan tombol isolasi. |
+| **Action Center** | Pusat tindakan | Panel di dasbor tempat Operator melihat insiden dan menekan tombol isolasi. |
 | **AI lokal** | Kecerdasan buatan yang berjalan di komputer sendiri | Model yang dilatih dan dihitung di _server_ satuan, tanpa mengirim data ke internet. |
 | **_Air-gapped_** | Jaringan terpisah dari internet | Jaringan yang secara fisik tidak tersambung ke internet sama sekali. |
 | **Alamat IP** | Alamat _Internet Protocol_ | Nomor unik setiap perangkat di jaringan, seperti nomor rumah. |
 | **API** | _Application Programming Interface_ | "Loket" tempat layar dan _server_ saling meminta data. |
 | **Aset** | Barang yang dilindungi | Perangkat atau sistem penting: komputer, _server_, basis data, genset. |
-| **Bintara Siber** | Prajurit TNI AD berpangkat bintara di bidang siber | Calon operator harian sistem ini di satuan. |
+| **Bintara Siber** | Prajurit TNI AD berpangkat bintara di bidang siber | Calon Operator harian sistem ini di satuan. |
 | **BSSN** | Badan Siber dan Sandi Negara | Lembaga keamanan siber nasional. |
 | **CDN** | _Content Delivery Network_ | Layanan luar untuk memuat huruf atau skrip situs web. Nusantara Shield tidak memakainya. |
 | **CDOC** | Cyber Defense Operation Center | Pusat operasi pertahanan siber di tingkat satuan. |
@@ -546,7 +546,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **CSIRT** | _Computer Security Incident Response Team_ | Tim tanggap insiden siber. Kartika CSIRT adalah milik TNI AD. |
 | **CSP** | _Content Security Policy_ (kebijakan keamanan konten) | Aturan yang hanya mengizinkan skrip dan gaya milik aplikasi sendiri berjalan di layar. |
 | **CTI** | _Cyber Threat Intelligence_ (intelijen ancaman siber) | Kabar dari luar tentang ancaman yang sedang beredar, misalnya celah baru pada suatu perangkat. |
-| **Dansat** | Komandan Satuan | Pimpinan unit; di sistem ini berperan sebagai pengamat yang menerima laporan. |
+| **Dansat** | Komandan Satuan | Pimpinan unit; di sistem ini berperan sebagai Pengamat yang menerima laporan. |
 | **Deteksi anomali** | Pengenalan perilaku tidak wajar | Menandai lalu lintas yang menyimpang dari kebiasaan, tanpa perlu daftar serangan yang sudah dikenal. |
 | **DDoS** | _Distributed Denial of Service_ | Serangan banjir permintaan agar layanan lumpuh karena kewalahan. |
 | **DMZ** | Demilitarized Zone | Zona penyangga antara internet dan jaringan dalam, seperti lobi. |
@@ -558,7 +558,7 @@ Kamus ini untuk pembaca yang tidak berlatar militer atau teknis. Istilah diurutk
 | **HMAC** | _Hash-based Message Authentication Code_ | Segel digital berkunci. Setiap catatan log disegel dan terhubung ke catatan sebelumnya, sehingga perubahan diam-diam langsung ketahuan. |
 | **HSTS** | HTTP Strict Transport Security | Aturan agar peramban selalu memakai sambungan terenkripsi. |
 | **HTTPS** | Hypertext Transfer Protocol Secure | Sambungan web yang dienkripsi. |
-| **_Human-in-the-loop_** | Manusia tetap memegang keputusan | Mesin hanya menyarankan; tindakan memutus jaringan harus disetujui operator. |
+| **_Human-in-the-loop_** | Manusia tetap memegang keputusan | Mesin hanya menyarankan; tindakan memutus jaringan harus disetujui Operator. |
 | **IP** | Internet Protocol | Alamat IP: "nomor kamar" setiap perangkat di jaringan. |
 | **ISO/IEC 27037** | International Organization for Standardization/International Electrotechnical Commission, standar 27037:2012 | Pedoman internasional mengidentifikasi, mengumpulkan, mengambil, dan melestarikan bukti digital. Nusantara Shield mengikuti prinsipnya; belum diaudit terhadapnya. |
 | **Isolasi** | Pemutusan jaringan | Memutus jalur perangkat yang diserang agar serangan tidak menyebar. |

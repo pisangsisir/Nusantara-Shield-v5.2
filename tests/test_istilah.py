@@ -28,7 +28,10 @@ def _label(nilai):
             yield from _label(v)
 
 
-LABEL = sorted({t for t in _label(ISTILAH) if len(t) >= 6 and "{" not in t})
+# Nama peran ("Operator", "Pengamat") juga kata biasa dalam kalimat ("keputusan Operator"); yang dijaga kamus
+# hanyalah label chip/header peran, dan itu diuji di test_versi.py::test_nama_peran_berhuruf_kapital.
+LABEL = sorted({t for k, v in ISTILAH.items() if not k.startswith("peran_")
+                for t in _label(v) if len(t) >= 6 and "{" not in t})
 BERKAS = [p for p in [*AKAR.glob("app/*.py"), *AKAR.glob("static/*.js"), AKAR / "static/index.html"]
           if p.name != "istilah.py"]
 

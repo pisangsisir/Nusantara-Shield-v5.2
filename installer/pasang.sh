@@ -419,6 +419,7 @@ else
 		echo "NS_AUDIT_KEY=$(openssl rand -hex 32)"
 		echo "NS_OPERATOR_PASSWORD=$(acak 24)"
 		echo "NS_VIEWER_PASSWORD=$(acak 24)"
+		echo "NS_WAJIB_GANTI_SANDI=1"
 		echo "NS_ALLOWED_HOSTS=$host"
 		echo "NS_ALLOWED_ORIGINS=$asal"
 		echo "NS_ZONA_WAKTU=WIB"
@@ -474,7 +475,7 @@ printf '\nSELESAI: Nusantara Shield %s terpasang.\n' "$VERSI"
 if [ -z "$AWALAN" ]; then
 	cat <<EOF
   Buka di komputer ini   : http://127.0.0.1:$(port_aktif)
-  Sandi awal             : sudo grep _PASSWORD /etc/nusantara-shield/env   (segera simpan di tempat aman)
+  Sandi awal             : sudo grep _PASSWORD /etc/nusantara-shield/env   (wajib diganti saat login pertama)
   Status layanan         : systemctl status nusantara-shield
   Verifikasi log audit   : sudo ns-verifikasi-audit [--cocokkan <sidik jari dari LAPSIT>]
   Kembali ke versi lalu  : sudo sh pasang.sh --kembali

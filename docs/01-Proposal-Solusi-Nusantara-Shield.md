@@ -7,7 +7,7 @@
 | **Kompetisi** | Kartika Cyber Hackathon 2026 · Pusat Siber Angkatan Darat (Pussiberad) × CODEPOLITAN |
 | **Kategori** | 02 · **Penangkalan (_Defensive Shield_)** — *Threat Intelligence Platform* dan *Automated Incident Response* |
 | **Tim** | Muhammad Isa Ananta · Hasan Basri · Melia Fajar Hasanah |
-| **Status purwarupa** | **Berfungsi penuh** · 337 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
+| **Status purwarupa** | **Berfungsi penuh** · 346 uji otomatis lulus · AI deteksi anomali dan aturan deteksi berjalan lokal · luring tanpa internet |
 | **Tanggal** | 27 Oktober 2026 |
 
 ---
@@ -48,7 +48,7 @@ Setiap langkah tercatat permanen dalam buku berantai Hash-based Message Authenti
 | Beban Central Processing Unit (CPU) _server_ untuk **300 layar** pemantau serentak, versi akhir | **±1,5%** siaga · **±1,7%** saat serangan |
 | Lalu lintas jaringan ke 300 layar saat serangan intensif, berkat siaran ralat (uji beban 17 Okt 2026) | **−80%** (8,4 → 1,7 MB/s) |
 | Waktu AI lokal menilai lalu lintas 9 aset (_Isolation Forest_, tanpa internet) | **±10 milidetik** |
-| Perilaku sistem yang dikunci uji otomatis | **337 uji** |
+| Perilaku sistem yang dikunci uji otomatis | **346 uji** |
 
 <p class="sumber-kecil">Angka CPU diukur ulang 26 Okt 2026 dengan tools/ukur_beban.py (Linux 2 inti, 300 siaran SSE sungguhan). Angka 2,8% pada versi dokumen sebelumnya diukur dengan alat dan mesin lain, sehingga tidak dibandingkan langsung. Asal setiap angka dan pemetaan ke lima kriteria penilaian ada di §7.</p>
 
@@ -394,7 +394,7 @@ Seluruh keunggulan berikut **sudah berjalan** di purwarupa dan dapat didemonstra
 ### 5.2 Kesiapan Penerapan
 
 - **Ringan:** satu laptop atau _server_ kecil; satu proses Python. Untuk 300 layar serentak, CPU _server_ ±1,5% saat siaga dan ±1,7% saat serangan, dengan memori ±207 MB termasuk pustaka AI (scikit-learn dan numpy), jauh di bawah 512 MB; diukur ulang 26 Okt 2026 dengan `tools/ukur_beban.py` (Linux 2 inti, 300 siaran SSE sungguhan). AI menambah kerja _server_ hanya ±0,05 milidetik per detik karena model baru dijalankan saat keadaan lalu lintas berubah.
-- **Teruji:** 337 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
+- **Teruji:** 346 uji otomatis mengunci setiap aturan, termasuk ambang deteksi yang tertulis di dokumen ini, dan dapat dijalankan ulang oleh siapa pun dalam kurang dari satu menit (±30 detik di Mac, ±55 detik di Linux ruang kerja awan).
 - **Cakupan OT saat ini:** purwarupa memantau **pengendali genset rumah sakit** (Modbus/TCP, _port_ 502) di **zona kendali** topologi. Kabar ancaman Modbus menaikkannya ke **WASPADA (±66%)** sebelum ada serangan. Pada skenario **Sabotase OT**, bukti diamankan, lalu jalur kantor → zona kendali diputus lewat _webhook_ (simulasi) ke sakelar terkelola ±1,2 detik kemudian; genset tetap menyala dengan kendali lokal. Pemulihan jalur kendali terkunci sampai sidik jari bukti cocok.
 - **Langkah lanjutan** (semuanya sumber terbuka dan dapat berjalan _air-gapped_ atau _on-premise_):
     - telemetri nyata dari sensor dan SIEM satuan (Wazuh, Suricata, Zeek) serta sensor protokol industri Modbus/DNP3;
@@ -439,6 +439,19 @@ Pembedaan ini sengaja dibuat tegas agar juri dapat menilai apa yang benar-benar 
 | Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI Waktu respons (MTTC) dan Insiden sejak posko aktif | |
 | Nilai Kesiapan Siber A–E (dua sub-skor: Kerawanan dan Insiden) dan triase peringatan: Selesai ditangani atau Positif Palsu (_False Positive_), beralasan dan tercatat di Buku Rantai Bukti | |
 
+### 5.5 Peta Jalan Penguatan dari Studi Banding Arsitektur
+
+Pada 30 Oktober 2026, keempat pilar Nusantara Shield dibandingkan dengan proyek sumber terbuka dan makalah yang relevan. Hasilnya empat penguatan berikut, **semuanya belum dibangun**:
+
+| Gagasan (belum dibangun) | Pilar | Masalah yang dijawab | Rujukan studi banding |
+| --- | --- | --- | --- |
+| **Evolusi kunci audit dan titik periksa bertanda tangan Ed25519** | Integritas bukti | HMAC memakai satu kunci rahasia untuk membuat sekaligus memeriksa. Bila _server_ dibobol, penyerang yang memegang `NS_AUDIT_KEY` bisa menulis ulang riwayat dengan sidik jari yang sah. Kunci yang berevolusi per periode (kunci lama dihapus) membuat catatan masa lalu tidak bisa dipalsukan (_forward security_); titik periksa Ed25519 berkala memungkinkan auditor memeriksa hanya dengan kunci publik | Makalah Nitro (ACM CCS 2025); Trillian dan immudb (log terverifikasi) |
+| **Batas waktu _fail-safe_ dan aturan dua orang** untuk tindakan pemutus | Doktrin Dua Kunci | Setiap tindakan pemutus menjadi Permintaan Otorisasi bernomor yang terikat ke SHA-256 bukti. Kedaluwarsa berarti **tidak dieksekusi** dan tercatat sebagai KEDALUWARSA; untuk aset vital, penyetuju harus akun yang berbeda dari pengusul | StackStorm _Inquiries_ (validasi jawaban, TTL); Shuffle (pemicu _User Input_ dengan pilihan lanjutkan/batalkan) |
+| **Garis dasar Modbus** | Konvergensi IT/OT | Peristiwa OT dinormalkan ke format pesan bersama berbasis aktivitas (tanya, jawab, **perintah**), sehingga aturan berlaku lintas protokol (Modbus kini, DNP3 kelak). Pola _polling_ dipelajari per pasangan sumber–unit dengan rerata dan simpangan yang diperbarui per peristiwa (algoritma Welford), lalu jeda yang terlalu pendek (skor-Z tinggi) menaikkan WASPADA; ditambah peta rentang register yang sah. Garis dasar baru berlaku setelah **disahkan Operator** | IPAL (RAID 2022); _ics-anomaly-detection_ (profil frekuensi _polling_) |
+| **Paket intelijen bertanda tangan** | Luring | Indikator CTI dan ambang aturan dikirim sebagai berkas terpisah yang diverifikasi kunci rilis yang sama (Ed25519) sebelum diimpor, sehingga intelijen bisa diperbarui lewat media yang diperiksa tanpa internet | Security Onion (pembaruan aturan lewat ISO pada mode _air-gap_) |
+
+Semua gagasan di atas akan ditulis dari nol; yang diambil dari proyek rujukan hanya konsepnya. Evolusi kunci dan titik periksa Ed25519 dijadwalkan lebih dulu, karena menutup kelemahan nyata pada pilar integritas bukti.
+
 ---
 
 ## 6. Deklarasi Karya dan Atribusi
@@ -476,6 +489,8 @@ Kode Nusantara Shield dilisensikan di bawah **GNU General Public License v3.0** 
 - Peraturan Presiden Nomor 82 Tahun 2022 tentang Pelindungan Infrastruktur Informasi Vital.
 - National Institute of Standards and Technology (NIST) SP 800-82, panduan keamanan sistem kendali industri (OT).
 - International Organization for Standardization/International Electrotechnical Commission (ISO/IEC) 27037:2012, pedoman identifikasi, pengumpulan, akuisisi, dan pelestarian bukti digital. Alur "bukti dulu, baru putus" dan buku berantai HMAC disusun **mengikuti prinsipnya**; purwarupa belum diaudit terhadap standar ini.
+- Wolsing, K., Wagner, E., Saillard, A., dan Henze, M. (2022). _IPAL: Breaking up Silos of Protocol-dependent and Domain-specific Industrial Intrusion Detection Systems_. RAID 2022. Rujukan format pesan OT lintas protokol (§5.5, peta jalan).
+- Zhao, R., Shoaib, M., Hoang, V. T., dan Hassan, W. U. (2025). _Rethinking Tamper-Evident Logging: A High-Performance, Co-Designed Auditing System_ (Nitro). ACM CCS 2025. Rujukan _forward security_ untuk log audit (§5.5, peta jalan).
 - National Institute of Standards and Technology (2024). _The NIST Cybersecurity Framework (CSF) 2.0_ (NIST CSWP 29). Enam fungsi dan kategorinya dipakai untuk **memetakan** fitur (Dokumentasi Teknis §2.6); pemetaan dilakukan tim sendiri, bukan sertifikasi.
 
 ---
@@ -490,7 +505,7 @@ Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria R
 | --- | --- | --- |
 | **Relevansi dan Manfaat** (25%) | Menjaga aset IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan) dengan LAPSIT untuk Dansat; usulan alur laporan ke Sansidam dan Kartika CSIRT (§5.3); label satuan diatur dari satu kamus istilah | §2 dan §5.3 dokumen ini; Dokumentasi Teknis §3 (SOP respons insiden) |
 | **Inovasi Teknis** (25%) | "Bukti dulu, baru putus" dikunci _server_ (isolasi tanpa bukti ditolak 409); rantai HMAC-SHA256 untuk log audit dan Buku Rantai Bukti; dua kunci (mesin hanya menaikkan WASPADA, manusia memutus); AI _Isolation Forest_ luring yang menjelaskan alasannya; korelasi kabar ancaman × aset sebelum serangan; aturan OT deterministik (jalur IT ke OT tanpa izin, perintah tulis Modbus di luar jendela pemeliharaan) yang hanya menaikkan WASPADA; label MITRE ATT&CK; isolasi OT dengan memutus **jalur**, bukan mematikan genset; siaran ralat (_delta_) yang menekan beban _server_ | Uji `test_rantai_bukti` (36), `test_ai` (10), `test_ot` (6), `test_deteksi` (24), `test_ot_mitre_lapsit` (23); Dokumentasi Teknis §2.3–2.8 |
-| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; **impor log asli** (auth.log OpenSSH, log firewall, CSV) dinilai aturan yang sama; 337 uji otomatis lulus; paket luring dipasang dan diuji tanpa internet di Mac dan di Ubuntu 24.04 (paket bertanda tangan). **Batas yang kami akui:** telemetri langsung dan kabar ancaman masih sintetis (log asli baru masuk lewat impor berkas, belum sensor terus-menerus), dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
+| **Fungsionalitas Purwarupa** (25%) | Aplikasi berjalan penuh dari satu perintah; 4 skenario latihan dan latihan deteksi di dasbor; **impor log asli** (auth.log OpenSSH, log firewall, CSV) dinilai aturan yang sama; 346 uji otomatis lulus; paket luring dipasang dan diuji tanpa internet di Mac dan di Ubuntu 24.04 (paket bertanda tangan). **Batas yang kami akui:** telemetri langsung dan kabar ancaman masih sintetis (log asli baru masuk lewat impor berkas, belum sensor terus-menerus), dan perintah ke sakelar jaringan masih simulasi | `./run_tests.sh`; halaman rilis v5.1.2 beserta sidik jari paket; video demo |
 | **Kelayakan Implementasi** (15%) | Satu proses Python di laptop atau _server_ kecil; ±1,5% CPU untuk 300 layar; berjalan dan dipasang tanpa internet dengan sidik jari SHA-256, dan untuk Ubuntu 24.04 dengan paket bertanda tangan Ed25519 serta layanan systemd yang dikeraskan; peran Operator dan Pengamat; peta jalan ke sensor sumber terbuka (Wazuh, Suricata, Zeek) dan MISP | §5 dokumen ini; Dokumentasi Teknis §4.4 (pemasangan luring) |
 | **Kualitas Dokumentasi** (10%) | Proposal ini, Dokumentasi Teknis, Panduan Belajar (PDF), dek presentasi, poster A4, README, CHANGELOG per perubahan, dan deklarasi serta atribusi (§6) | Folder `docs/` dan `presentation/` di repositori |
 
@@ -506,7 +521,7 @@ Bagian ini memudahkan Dewan Juri memeriksa klaim kami sendiri: setiap kriteria R
 | **±1,5% siaga · ±1,7% serangan**, **±207 MB**, **0,28–0,40 MB/s** | CPU, memori, dan lalu lintas _server_ untuk 300 layar | `tools/ukur_beban.py`, 26 Okt 2026, Linux 2 inti, 300 siaran SSE sungguhan; Dokumentasi Teknis §2.3 | Bisa diulang siapa pun dengan alat yang sama |
 | **−80% (8,4 → 1,7 MB/s)** | Efek optimasi siaran ralat | Uji beban 15–17 Okt 2026; Dokumentasi Teknis §2.3 | Riwayat optimasi dengan mesin dan alat ukur awal yang tidak disertakan di repositori; tidak dibandingkan langsung dengan angka versi akhir |
 | **±10 milidetik** | Waktu AI menilai 9 aset | `skor_ms` di `app/ai_anomali.py`; dikunci `test_ai` (di bawah 100 ms) | Ukuran di mesin pengembang; uji sengaja memberi batas longgar |
-| **337 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 337 lulus pada 30 Okt 2026 (Linux ±46 detik) | Rilis v5.2.0 (334 uji saat itu) juga lulus semua setelah paket Ubuntu 24.04 bertanda tangan dipasang sebagai root dengan jaringan diputus |
+| **346 uji** | Perilaku yang dikunci uji otomatis | `./run_tests.sh`; 346 lulus pada 30 Okt 2026 (Linux ±46 detik) | Rilis v5.2.0 (334 uji saat itu) juga lulus semua setelah paket Ubuntu 24.04 bertanda tangan dipasang sebagai root dengan jaringan diputus |
 | **200.000 putaran**, **5 percobaan/menit**, **16 KB** | PBKDF2-SHA256 untuk kata sandi, batas _login_, batas kiriman | `app/keamanan.py`; dikunci `test_keamanan` (`test_tebak_sandi_dibatasi`, uji batas kiriman) | — |
 
 ## Lampiran: Kamus Istilah

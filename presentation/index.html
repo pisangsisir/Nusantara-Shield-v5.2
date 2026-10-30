@@ -285,7 +285,7 @@ h2 em { font-style: normal; color: var(--neon); }
 .darurat b { color: var(--merah); font-family: var(--huruf-mono); letter-spacing: .1em; font-size: 14px; white-space: nowrap; }
 
 /* =====================================================================
-   SLIDE 3 · Server: grafik CPU menurun (−74%) + 337 uji
+   SLIDE 3 · Server: grafik CPU menurun (−74%) + 346 uji
    ===================================================================== */
 .dua-kolom { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .grafik { padding: 22px 26px 18px; }
@@ -371,6 +371,7 @@ h2 em { font-style: normal; color: var(--neon); }
 .banding th.lokal { color: var(--kuning); }
 .banding td:first-child { width: 150px; font-family: var(--huruf-mono); font-size: 13px; letter-spacing: .06em; color: var(--teks-samar); text-transform: uppercase; }
 .banding td { color: var(--teks-redup); }
+.rancangan .banding td { padding: 6px 12px; }
 .aturan { margin-top: 16px; padding: 12px 16px; border-radius: 12px; border-left: 3px solid var(--neon); background: var(--neon-lembut); font-size: 15.5px; line-height: 1.45; }
 .aturan b { color: var(--neon); }
 
@@ -635,7 +636,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <div class="angka"><b>66%→20%</b><span>genset WASPADA sebelum diserang; Perketat menurunkannya</span></div>
         <div class="angka"><b>±1,2 dtk</b><span>keputusan → jaringan terputus, bukti sudah aman</span></div>
         <div class="angka"><b>±1,5%</b><span>CPU (prosesor) <i class="asing">server</i> untuk 300 layar (±1,7% saat serangan)</span></div>
-                <div class="angka"><b>337</b><span>uji otomatis, termasuk AI lokal, aturan IT/OT, impor log, dan verifikasi audit</span></div>
+                <div class="angka"><b>346</b><span>uji otomatis, termasuk AI lokal, aturan IT/OT, impor log, dan verifikasi audit</span></div>
       </div>
     </div>
 
@@ -792,7 +793,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="penanda"><b>04</b>Keunggulan <i class="asing">Server</i> · Skalabilitas dan Uji</div>
     <div class="merek"><svg class="logo" aria-hidden="true"><use href="#logo"/></svg>NUSANTARA SHIELD</div>
   </div>
-  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 337 uji.</em></h2>
+  <h2>Satu dapur, satu pengeras suara. <em>Dikunci 346 uji.</em></h2>
 
   <div class="dua-kolom">
     <div>
@@ -822,7 +823,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <div class="terminal-isi">
           <p class="t-perintah"><b>$</b> ./run_tests.sh <span style="color:var(--teks-samar)"># pytest -v -ra</span></p>
           <div class="t-baris t-ai" style="--i:0"><span>▶ AI lokal<small>Isolation Forest · luring · alasan</small></span><em>10 PASSED</em></div>
-          <div class="t-baris" style="--i:1"><span>▶ Manajemen akun<small>pendaftaran, dasbor akun</small></span><em>18 PASSED</em></div>
+          <div class="t-baris" style="--i:1"><span>▶ Manajemen akun<small>pendaftaran, ganti sandi awal</small></span><em>27 PASSED</em></div>
           <div class="t-baris" style="--i:2"><span>▶ Intelijen ancaman dan SOAR<small>prediksi, isolasi</small></span><em>18 PASSED</em></div>
           <div class="t-baris" style="--i:3"><span>▶ Kamus istilah<small>istilah satuan</small></span><em>39 PASSED</em></div>
           <div class="t-baris" style="--i:4"><span>▶ Keamanan dan akses<small><i class="asing">login</i>, peran, batas laju</small></span><em>38 PASSED</em></div>
@@ -838,7 +839,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
           <div class="t-baris" style="--i:14"><span>▶ Impor log luring<small>auth.log · firewall · CSV</small></span><em>18 PASSED</em></div>
           <div class="t-baris" style="--i:15"><span>▶ Verifikasi audit tanpa <i class="asing">server</i><small>HMAC · --cocokkan LAPSIT</small></span><em>12 PASSED</em></div>
           <div class="t-baris" style="--i:16"><span>▶ Paket pasang Ubuntu 24.04<small>Ed25519 · manifest SHA-256</small></span><em>24 PASSED</em></div>
-          <div class="t-akhir" style="--i:17">═══ 337 passed in 45.67s ═══</div>
+          <div class="t-akhir" style="--i:17">═══ 346 passed in 45.06s ═══</div>
         </div>
       </div>
       <p class="terminal-ket">Uji mengunci <b>aturan doktrin</b>, bukan sekadar fungsi: isolasi tanpa bukti ditolak 409 · pemulihan terkunci bila <i class="asing">hash</i> berbeda · sabotase OT diputus ±1,2 dtk tanpa mematikan genset · sandi tidak pernah tercatat di log · AI menilai tanpa satu pun koneksi jaringan · data layar hasil rakitan delta identik dengan <i class="asing">server</i>.</p>
@@ -852,7 +853,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>Komponen: Loket Application Programming Interface (API) <code>app/main.py</code> · Gerbang keamanan <code>app/keamanan.py</code> · Dapur situasi <code>app/telemetri.py</code> · Mesin Deteksi Anomali (<i class="asing">anomaly detection engine</i>) <code>app/ai_anomali.py</code> · Brankas bukti <code>app/bukti.py</code> · Buku berantai <code>app/audit.py</code> · Hub siaran <code>app/siaran.py</code> + <code>app/delta.py</code> · Dasbor <code>static/</code>.</li>
       <li>Gerbang ASGI memeriksa ukuran kiriman sebelum menyentuh logika aplikasi; lebih dari 16 KB diputus dengan kode 413.</li>
       <li>Batas yang sebaiknya disebut sendiri: sistem berjalan sebagai <b>satu proses <i class="asing">server</i></b>. Operasi multiproses adalah langkah lanjutan.</li>
-      <li>Uji bisa dijalankan ulang juri dalam ±50 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli versi akhir: 337 passed in 45.67s (Linux, Python 3.13, 30 Okt 2026), termasuk 24 uji Mesin Deteksi Aturan (<i class="asing">rule-based detection engine</i>), 6 uji linimasa dan KPI, 12 uji verifikasi audit tanpa <i class="asing">server</i>, dan 24 uji paket pasang Ubuntu bertanda tangan.</li>
+      <li>Uji bisa dijalankan ulang juri dalam ±50 detik: <code>./run_tests.sh</code> (Windows: <code>run_tests.bat</code>). Hasil asli versi akhir: 346 passed in 45.06s (Linux, Python 3.13, 30 Okt 2026), termasuk 24 uji Mesin Deteksi Aturan (<i class="asing">rule-based detection engine</i>), 6 uji linimasa dan KPI, 12 uji verifikasi audit tanpa <i class="asing">server</i>, dan 24 uji paket pasang Ubuntu bertanda tangan.</li>
       <li>Kebutuhan minimum: Python 3.10+, 2 inti, 512 MB memori bebas, 50 MB penyimpanan (paket rilis 187 KB). Memori terukur ±207 MB untuk 300 layar, termasuk pustaka scikit-learn dan numpy (±130 MB).</li>
     </ul>
   </aside>
@@ -910,8 +911,9 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
         <tbody>
           <tr><td>(1) Eskalasi</td><td colspan="2">Pengiriman LAPSIT otomatis berjenjang ke Sansidam (Kodam) dan Kartika CSIRT (Pussiberad)</td></tr>
           <tr><td>(2) Lintas satuan</td><td colspan="2">Akses dan tampilan lintas satuan untuk pemantauan serentak di Mabes</td></tr>
-          <tr><td>Umpan intelijen</td><td>BSSN/MISP masuk satu arah lewat gerbang satuan</td><td>Impor berkas indikator lewat media yang diperiksa</td></tr>
+          <tr><td>Umpan intelijen</td><td>BSSN/MISP masuk satu arah lewat gerbang satuan</td><td>Paket indikator bertanda tangan lewat media yang diperiksa</td></tr>
           <tr><td>Asisten Narasi</td><td>LLM awan, hanya bila kebijakan mengizinkan</td><td>Llama 3 8B lewat Ollama di <i class="asing">server</i> satuan (<i class="asing">local inference</i>)</td></tr>
+          <tr><td>Penguatan</td><td colspan="2">Kunci audit berevolusi + titik periksa Ed25519 · otorisasi kedaluwarsa = batal · garis dasar Modbus</td></tr>
           <tr><td>Bila gagal</td><td colspan="2">Koneksi atau LLM mati → sistem jatuh ke <b class="neon">Mode Berdaulat</b>; inti tetap jalan</td></tr>
         </tbody>
       </table>
@@ -929,6 +931,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <li>"Apakah AI sudah dipakai di sistem?" <b>Ya, untuk deteksi anomali.</b> Isolation Forest (scikit-learn) dilatih dan dijalankan di <i class="asing">server</i> satuan; lalu lintas tidak wajar menaikkan aset ke WASPADA dengan alasan yang bisa dibaca, misalnya "perintah tulis Modbus 10× normal". Ini <i class="asing">local inference</i>: tanpa API luar, sehingga siap dipasang <i class="asing">air-gapped</i>. AI hanya menaikkan status; memutus tetap keputusan operator. Model bahasa (Llama 3 8B lewat Ollama) untuk draf LAPSIT masih peta jalan, sengaja tidak dimasukkan ke <i class="asing">server</i> inti agar CPU hemat. Asisten AI juga dipakai pengembang saat menulis kode, sebagaimana diizinkan panitia.</li>
       <li><b>Kaitan dengan Slide 1:</b> "Saat PDNS lumpuh, layanan banyak instansi yang dititipkan di sana ikut berhenti. Karena itu inti pertahanan satuan kami jalankan di posko sendiri, bukan di pusat data atau awan di luar kendali satuan."</li>
       <li><b>Triase dan Kesiapan Siber (bila ditanya "bagaimana dengan alarm palsu?"):</b> Operator menutup peringatan sebagai Selesai ditangani atau Positif Palsu (<i class="asing">False Positive</i>) dengan alasan tertulis; penutupan tercatat di Buku Rantai Bukti, tidak ada yang dihapus, dan bukti baru membuka peringatan lagi. Kartu Kesiapan Siber di samping Postur memberi rapor A–E dari dua sub-skor, Kerawanan dan Insiden.</li>
+      <li><b>Baris "Penguatan" (Proposal §5.5, hasil studi banding 30 Okt 2026):</b> (1) HMAC memakai satu kunci untuk membuat dan memeriksa, jadi penyerang yang membobol <i class="asing">server</i> bisa menulis ulang riwayat; jawabannya kunci yang berevolusi per periode (<i class="asing">forward security</i>, rujukan makalah Nitro, ACM CCS 2025) dan titik periksa Ed25519 yang bisa diperiksa auditor hanya dengan kunci publik. (2) Permintaan Otorisasi kedaluwarsa = tidak dieksekusi; aset vital butuh dua akun berbeda (pola StackStorm dan Shuffle). (3) Garis dasar Modbus berbasis aktivitas (rujukan IPAL, RAID 2022) dan profil <i class="asing">polling</i> Welford. (4) Indikator CTI dikirim sebagai paket bertanda tangan kunci rilis. Semuanya <b>belum dibangun</b>; sebut sebagai rencana.</li>
       <li>Kenapa dua jalur? Hybrid cocok untuk markas yang punya gerbang internet terkendali; AI Lokal (Asisten Narasi) untuk satuan yang wajib <i class="asing">air-gapped</i>. Keduanya opsional dan bisa dimatikan tanpa mengganggu inti.</li>
       <li>Pemasangan (Dokumentasi §4.1): <code>python3 -m venv .venv</code> → aktifkan → <code>pip install -r requirements.txt</code> → <code>python -m uvicorn app.main:app --host 127.0.0.1 --port 8000</code>. Buka 127.0.0.1:8000.</li>
       <li>Variabel penting: <code>NS_OPERATOR_PASSWORD</code>/<code>NS_VIEWER_PASSWORD</code> (sandi bawaan, min. 12), <code>NS_AUDIT_KEY</code> (kunci HMAC, mengaktifkan penyimpanan permanen), <code>NS_KODE_OPERATOR</code> (kode undangan operator).</li>
@@ -949,7 +952,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <div class="besar kartu-dasar" style="--i:0"><b>66→20%</b><strong>Peringatan dini</strong><span>genset naik WASPADA sebelum diserang; satu klik Perketat menurunkan peluangnya.</span></div>
     <div class="besar kartu-dasar" style="--i:1"><b>±1,2 dtk</b><strong>Penahanan ancaman</strong><span>dari keputusan operator sampai jaringan terputus, bukti sudah aman.</span></div>
     <div class="besar kartu-dasar" style="--i:2"><b class="biru">±1,5%</b><strong>CPU <i class="asing">server</i></strong><span>untuk 300 layar komando (±1,7% saat serangan), diukur ulang pada versi akhir.</span></div>
-    <div class="besar kartu-dasar" style="--i:3"><b class="biru">337</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin, ambang deteksi, dan AI lokal; lulus semua.</span></div>
+    <div class="besar kartu-dasar" style="--i:3"><b class="biru">346</b><strong>Uji otomatis</strong><span>mengunci aturan doktrin, ambang deteksi, dan AI lokal; lulus semua.</span></div>
   </div>
 
   <div class="jaminan">
@@ -977,7 +980,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <p><b>Kalimat penutup (pilih satu, ucapkan pelan):</b></p>
     <ul>
       <li>"Alarm, dari mana pun asalnya, hanya memberi tahu. Pertanyaan di satuan adalah siapa yang berwenang memutus dan apakah buktinya masih sah di meja penyidik. Di Nusantara Shield, mesin menaikkan WASPADA, manusia memutus, dan setiap langkah terkunci dalam rantai HMAC."</li>
-      <li>"Sistem yang butuh API awan untuk berpikir akan ikut lumpuh saat jalur internasional terganggu. Aturan deteksi, AI, dan korelasi ancaman Nusantara Shield berjalan di <i class="asing">server</i> satuan sendiri, dan dikunci 337 uji yang bisa diulang Dewan Juri."</li>
+      <li>"Sistem yang butuh API awan untuk berpikir akan ikut lumpuh saat jalur internasional terganggu. Aturan deteksi, AI, dan korelasi ancaman Nusantara Shield berjalan di <i class="asing">server</i> satuan sendiri, dan dikunci 346 uji yang bisa diulang Dewan Juri."</li>
       <li>Jangan menyebut tim lain. Bila ditanya "AI kan banyak alarm palsu?": AI kami tidak pernah memutus; ia hanya menaikkan WASPADA, dan Operator memilah Positif Palsu (<i class="asing">False Positive</i>) dengan alasan tertulis yang tercatat di Buku Rantai Bukti. Jangan mengklaim nol <i class="asing">false positive</i>.</li>
     </ul>
     <ul>
@@ -1024,7 +1027,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
     <table class="kamus peta"><tbody>
       <tr><td><b>Relevansi · 25%</b></td><td>IT dan OT rumah sakit TNI AD dalam satu layar; alat lapis taktis (CDOC satuan); LAPSIT untuk Dansat</td></tr>
       <tr><td><b>Inovasi · 25%</b></td><td>Bukti dulu baru putus, dikunci <i class="asing">server</i> (409); rantai HMAC; dua kunci; AI luring yang menjelaskan alasannya; isolasi OT memutus jalur, genset tetap menyala</td></tr>
-      <tr><td><b>Fungsionalitas · 25%</b></td><td>Berjalan penuh; 337 uji lulus; impor log asli (auth.log, firewall, CSV); paket luring diuji di Mac tanpa internet. <span class="batas">Batas: telemetri langsung sintetis, sakelar simulasi</span></td></tr>
+      <tr><td><b>Fungsionalitas · 25%</b></td><td>Berjalan penuh; 346 uji lulus; impor log asli (auth.log, firewall, CSV); paket luring diuji di Mac tanpa internet. <span class="batas">Batas: telemetri langsung sintetis, sakelar simulasi</span></td></tr>
       <tr><td><b>Kelayakan · 15%</b></td><td>Satu proses Python; ±1,5% CPU untuk 300 layar; pemasangan luring bersidik jari; peran Operator dan Pengamat</td></tr>
       <tr><td><b>Dokumentasi · 10%</b></td><td>Proposal, Dokumentasi Teknis, Panduan Belajar, dek, poster, README, CHANGELOG, deklarasi dan atribusi</td></tr>
     </tbody></table>
@@ -1034,7 +1037,7 @@ table.kamus td:first-child { color: var(--neon); white-space: nowrap; width: 1%;
       <tr><td><b>8× / 60 dtk</b></td><td>Ambang di <code>app/deteksi.py</code>; dikunci <code>test_deteksi</code></td></tr>
       <tr><td><b>±1,5% CPU</b></td><td><code>tools/ukur_beban.py</code>, 26 Okt 2026, 300 siaran SSE sungguhan</td></tr>
       <tr><td><b>±10 ms AI</b></td><td><code>skor_ms</code> di <code>app/ai_anomali.py</code>; uji membatasi &lt; 100 ms</td></tr>
-      <tr><td><b>337 uji</b></td><td><code>./run_tests.sh</code>, lulus 30 Okt 2026 di Linux</td></tr>
+      <tr><td><b>346 uji</b></td><td><code>./run_tests.sh</code>, lulus 30 Okt 2026 di Linux</td></tr>
     </tbody></table>
   </div>
   <p class="dokumen-lengkap">Rincian lengkap: Proposal §7 di <a href="https://github.com/pisangsisir/Nusantara-Shield-v5.2.0">github.com/pisangsisir/Nusantara-Shield-v5.2.0</a></p>

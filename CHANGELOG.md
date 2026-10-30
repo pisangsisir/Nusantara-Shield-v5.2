@@ -4,6 +4,22 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## Belum dirilis
 
+### Wajib ganti sandi awal dan peta jalan studi banding — 30 Oktober 2026 (branch `feature/wajib-ganti-sandi`)
+- **Wajib ganti sandi saat login pertama** (gagasan dari LogCrunch). `pasang.sh` kini menulis `NS_WAJIB_GANTI_SANDI=1` ke berkas env.
+  - Sampai sandi awal diganti, akun bawaan hanya boleh memanggil loket ganti sandi dan keluar. Semua loket lain, termasuk siaran langsung, menjawab 403.
+  - Loket baru `POST /api/akun/ganti-sandi` memeriksa sandi lama dan syarat sandi baru (min. 12 karakter, berbeda dari sandi lama, tanpa nama akun).
+  - Loket itu dibatasi laju seperti *login*, mencabut sesi lain akun tersebut, dan mencatat `GANTI_SANDI` tanpa sandi.
+  - Hash sandi pengganti akun bawaan disimpan di berkas akun, sehingga bertahan setelah *server* menyala ulang; sandi dari env tidak berlaku lagi.
+  - Layar login menampilkan formulir **Ganti sandi awal**. Mode demo (tanpa bendera) tidak berubah.
+- **9 uji baru** di `tests/test_akun.py` (bagian c), ditulis lebih dulu dan gagal sebelum implementasi. Ditambah satu pemeriksaan bendera di uji paket Ubuntu. Total **346 uji**.
+- **Peta jalan penguatan dari studi banding arsitektur** (Proposal §5.5, Dokumentasi Teknis §2.9, slide 5, README):
+  - evolusi kunci audit dan titik periksa Ed25519 (*forward security*, rujukan makalah Nitro ACM CCS 2025);
+  - batas waktu *fail-safe* dan aturan dua orang (pola StackStorm dan Shuffle);
+  - garis dasar Modbus (format pesan IPAL, RAID 2022; profil *polling* Welford);
+  - paket intelijen bertanda tangan (pola Security Onion).
+  - Semuanya belum dibangun. Dokumentasi Teknis §2.7 kini menyebut terus terang bahwa HMAC tidak melindungi dari pemegang kunci.
+- **Panduan Belajar PDF** diekspor ulang: istilah Mesin Deteksi Aturan/Anomali, Mesin Asisten Narasi, dan Kepatuhan Pencadangan; jumlah uji 346 dalam 17 kelompok. Keterangan dua tangkapan layar lama yang masih memperlihatkan label "Server backup" sengaja dibiarkan sesuai gambarnya.
+
 ### Penyeragaman istilah — 30 Oktober 2026 (branch `feature/penyeragaman-istilah`)
 - Pedoman gaya baru: istilah Indonesia didahulukan; istilah asli disebut sekali dalam kurung dan dicetak miring.
 - **Engine Deteksi Aturan → Mesin Deteksi Aturan** (*rule-based detection engine*), **Engine Deteksi Anomali → Mesin Deteksi Anomali** (*anomaly detection engine*), dan Engine Asisten Narasi → Mesin Asisten Narasi.

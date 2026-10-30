@@ -9,7 +9,7 @@ Dasbor pusat operasi keamanan siber (SOC) **defensif** untuk Kartika Cyber Hacka
 (bukti → isolasi → LAPSIT, otomatis setelah satu keputusan Operator; perintah ke perangkat masih simulasi).
 *Server* FastAPI + browser Vanilla JS/Canvas, siaran langsung (SSE), dan jejak audit berantai HMAC.
 
-Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **337 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
+Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bukti tersegel, jalur terputus, dan LAPSIT terbit, dan otaknya (aturan deteksi, AI lokal, korelasi kabar ancaman) berjalan di *server* satuan sendiri, sehingga tidak ikut lumpuh saat koneksi internasional terganggu. Setiap klaim dikunci **346 uji** yang bisa dijalankan ulang siapa pun; angka di dasbor bukan animasi, dan asal setiap angka serta peta lima kriteria penilaian ada di [Proposal §7](docs/01-Proposal-Solusi-Nusantara-Shield.md#7-peta-kriteria-penilaian-dan-asal-angka).
 
 - **Isolasi tidak pernah otomatis.** Isolasi otomatis terdengar cepat, sampai ia memutus segmen OT karena alarm keliru. Di sini isolasi selalu didahului bukti tersegel dan keputusan Operator; yang diputus jalurnya, genset tetap menyala.
 - **"Tanpa awan" berlaku sampai ke demonya.** Aplikasi dipasang dari paket bersidik jari tanpa internet, lalu seluruh uji dijalankan di mesin itu juga.
@@ -22,7 +22,7 @@ Banyak sistem pertahanan berhenti di alarm. Nusantara Shield berlanjut sampai bu
 ```
 app/            kode server: FastAPI, dapur situasi, rantai bukti, LAPSIT, AI lokal
 static/         dasbor (HTML, CSS, JavaScript polos; tanpa pustaka luar atau CDN)
-tests/          337 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
+tests/          346 uji otomatis (pytest), dijalankan dengan ./run_tests.sh
 tools/          alat bantu: pengemasan rilis, paket pasang luring, paket Ubuntu bertanda tangan, verifikasi audit tanpa server
 installer/      pasang.sh, layanan systemd, dan pembungkus verifikasi audit untuk Ubuntu 24.04
 kunci/          kunci PUBLIK rilis (kunci privat tidak pernah ada di repo)
@@ -168,6 +168,7 @@ sudo sh pasang.sh            # --uji: jalankan seluruh uji dulu · --kembali · 
 
 - Wajib Python 3.12 **bawaan Ubuntu** (`/usr/bin/python3.12`) dan OpenSSL 3; paket tidak membawa Python. Bila syarat tidak terpenuhi, pemasang berhenti dengan kode 20 tanpa mengubah apa pun.
 - Pustaka dipasang dengan `pip --no-index --require-hashes` dari wheel di paket; setiap wheel dipaku versi dan SHA-256-nya.
+- Sandi awal operator dan pengamat dibuat acak dan **wajib diganti saat login pertama** (`NS_WAJIB_GANTI_SANDI=1`); sampai diganti, akun itu hanya bisa mengganti sandi atau keluar.
 - Hasilnya: layanan systemd `nusantara-shield` (pengguna tanpa login `nshield`, 127.0.0.1:8000, dengan pengerasan systemd), kunci audit dan sandi acak di `/etc/nusantara-shield/env` (dibuat sekali, tidak pernah ditimpa), data di `/var/lib/nusantara-shield`, dan `sudo ns-verifikasi-audit`.
 - Kode keluar: 10 tanda tangan/sidik jari, 11 isi payload terlarang, 12 berkas tidak cocok manifest, 13 venv/uji asap, 14 versi/pemasangan, 20 prasyarat.
 - **Batas yang jujur:** `pasang.sh` tidak bisa membuktikan keaslian dirinya sendiri, jadi tiga pemeriksaan manual di atas tetap dilakukan operator. Berkas layanan systemd belum diuji di mesin Ubuntu sungguhan (rencana QA di VM); pemasangan, uji asap, dan seluruh uji sudah diuji sebagai root di Ubuntu 24.04 (kontainer) dengan jaringan diputus.
@@ -336,7 +337,7 @@ kelompok muncul setiap kali pytest pindah bagian, dan di akhir tampil ringkasan 
 Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_rantai_bukti.py`,
 `./run_tests.sh --lf` (ulangi yang gagal). **Jangan memakai `-q`** — opsi itu menyembunyikan nama uji.
 
-**Total: 337 uji** dalam 17 kelompok.
+**Total: 346 uji** dalam 17 kelompok.
 
 **Keamanan & akses** — `tests/test_keamanan.py` (38 uji)
 - Semua loket menolak permintaan tanpa login; token palsu & sandi salah ditolak; logout mencabut token
@@ -345,11 +346,12 @@ Contoh memilih sebagian: `./run_tests.sh -k akun`, `./run_tests.sh tests/test_ra
 - Header keamanan terpasang (juga pada penolakan); dokumentasi API dimatikan; CORS menolak situs asing
 - Log audit menyimpan data seminimal mungkin dan mendeteksi manipulasi; LAPSIT PDF terbentuk
 
-**Manajemen akun** — `tests/test_akun.py` (18 uji)
+**Manajemen akun** — `tests/test_akun.py` (27 uji)
 - Pengamat bisa daftar sendiri lalu login, tetapi hanya bisa melihat
 - Operator tanpa kode undangan / dengan kode salah ditolak; dengan kode sah bisa bertindak
 - Validasi nama & sandi; nama ganda dan kolom asing ditolak; pendaftaran dibatasi laju
 - Dasbor operator menghitung pengamat terdaftar / login / memantau; pengamat tidak bisa melihatnya
+- Pemasangan produksi: akun bawaan wajib mengganti sandi awal sebelum memakai dasbor (hanya ganti sandi atau keluar); syarat sandi baru, batas laju, sesi lain dicabut, hash pengganti bertahan setelah *server* menyala ulang
 - Sandi tidak pernah tercatat di log maupun berkas; akun terdaftar bisa dimuat ulang setelah restart
 
 **Telemetri & siaran** — `tests/test_telemetri.py` (19 uji)
@@ -514,7 +516,7 @@ static/peta.js        Peta Ancaman Global (Canvas)
 static/penjadwal.js   satu mesin animasi berbasis visibilitas
 static/style.css      tema gelap + aksen hijau neon
 docs/                 diagram alur (sumber Mermaid + SVG)
-tests/                337 uji otomatis (lihat bagian 6)
+tests/                346 uji otomatis (lihat bagian 6)
 tools/kemas_rilis.py  pembuat zip rilis bersih
 tools/verifikasi_audit.py  verifikasi rantai HMAC log audit & Buku Rantai Bukti tanpa server
 tools/kunci_rilis.py  kunci rilis Ed25519 (dibuat dan dipakai di komputer pembuat rilis)
@@ -545,6 +547,7 @@ pytest.ini            pengaturan tampilan pytest
 | Rantai bukti HMAC-SHA256 | |
 | Korelasi CTI dan Mesin Deteksi Anomali (_anomaly detection engine_; Isolation Forest, luring) | **Respons bertingkat menurut kritikalitas aset:** aset vital tetap dua kunci; endpoint kantor berisiko rendah diisolasi otomatis dengan praotorisasi |
 | Mesin Deteksi Aturan: login gagal berulang, login tembus, pemindaian port, aturan OT (atas peristiwa sintetis), dan **impor log asli** (auth.log, firewall, CSV) | Sensor yang terus-menerus (Wazuh, Suricata, Zeek) dan peristiwa identitas dari Active Directory |
+| | **Penguatan hasil studi banding** (Proposal §5.5): evolusi kunci audit dan titik periksa Ed25519 (*forward security*), batas waktu *fail-safe* dan aturan dua orang, garis dasar Modbus, paket intelijen bertanda tangan |
 | Linimasa 60 menit (data latihan), pita anomali AI per aset, KPI MTTC dan insiden | |
 | Simulasi OT genset (Modbus 502) | |
 | Pembuatan LAPSIT dan ekspor PDF | |

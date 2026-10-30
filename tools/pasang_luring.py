@@ -4,7 +4,7 @@
 """
 pasang_luring.py — memasang Nusantara Shield TANPA internet dari paket luring (jaringan air-gapped).
 
-Berkas ini ikut di akar paket `nusantara-shield-v5.1-luring-*.zip` (dibuat oleh tools/kemas_luring.py).
+Berkas ini ikut di akar paket `nusantara-shield-v<versi>-luring-*.zip` (dibuat oleh tools/kemas_luring.py).
 Hanya memakai pustaka bawaan Python, jadi bisa dijalankan sebelum apa pun terpasang.
 
 Langkah di posko (Mac/Linux/Windows):

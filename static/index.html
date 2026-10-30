@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Nusantara Shield v5.1</title>
+  <title>Nusantara Shield</title>
   <!-- Semua gaya & skrip berasal dari server sendiri (sesuai Content-Security-Policy).
        Tidak ada CDN, font, atau gambar dari luar: aplikasi siap berjalan tanpa internet. -->
   <link rel="icon" href="/static/favicon.ico" sizes="any">
@@ -26,7 +26,7 @@
 
       <div>
         <p class="nama-produk" data-istilah="produk"></p>
-        <p class="sub">Nusantara Shield v5.1 · Minimalist Incident UI · data sintetis</p>
+        <p class="sub"><span data-istilah="nama_versi">Nusantara Shield</span> · <i>Minimalist Incident UI</i> · data sintetis</p>
       </div>
     </div>
     <div class="kepala-kanan">
@@ -47,12 +47,12 @@
     <section id="bagian-login" class="login-wadah" aria-labelledby="judul-login">
       <div class="kartu login-kartu">
         <h1 id="judul-login">Selamat datang</h1>
-        <p class="redup">Masuk untuk memantau jaringan latihan. Akun <b>operator</b> dapat memicu latihan; akun <b>pengamat</b> hanya melihat.</p>
+        <p class="redup">Masuk untuk memantau jaringan latihan. Akun <b>Operator</b> dapat memicu latihan; akun <b>Pengamat</b> hanya melihat.</p>
         <form id="form-login" autocomplete="off" novalidate>
           <label class="bidang">
             <span>Nama akun</span>
             <input id="login-nama" type="text" maxlength="20" required autocomplete="username"
-                   autocapitalize="none" spellcheck="false" placeholder="operator, pengamat, atau akun Anda">
+                   autocapitalize="none" spellcheck="false" placeholder="nama akun, misalnya operator">
           </label>
           <label class="bidang">
             <span>Kata sandi</span>
@@ -110,7 +110,7 @@
               <span><b>Operator</b><small>Bisa memicu latihan &amp; isolasi. Wajib kode undangan dari administrator.</small></span></label>
           </fieldset>
           <label class="bidang" id="bidang-kode" hidden>
-            <span>Kode undangan operator</span>
+            <span>Kode undangan Operator</span>
             <input id="daftar-kode" type="password" maxlength="128" autocomplete="off">
           </label>
           <button class="tombol utama penuh" type="submit" id="tombol-daftar">Buat akun</button>
@@ -232,7 +232,7 @@
         </section>
         </div>
 
-        <aside class="rel-keputusan" aria-label="Rel keputusan operator">
+        <aside class="rel-keputusan" aria-label="Rel keputusan Operator">
             <section class="panel action-center" aria-labelledby="judul-playbook">
               <h2 id="judul-playbook">Action Center <small id="hitung-insiden"></small></h2>
               <div id="daftar-playbook" class="tumpuk"></div>
@@ -251,7 +251,7 @@
                 <button id="tombol-siarkan" class="tombol halus kecil penuh jarak-atas" type="button" data-ubah>Siarkan berita berikutnya</button>
                 <button id="tombol-siarkan-ot" class="tombol halus kecil penuh jarak-atas" type="button" data-ubah>Latihan OT: siarkan kabar Modbus (genset)</button>
               </details>
-              <p class="edu"><b>Alarm rumah &amp; radio satpam.</b> Radio menyiarkan kabar ancaman umum. Server mencocokkan port yang disebut berita dengan aset yang <b>benar-benar kita punya</b>. Peluang = keyakinan sumber × paparan aset × kesegaran berita (× 1,1 bila sektor kita disasar). ≥ 50% → aset dinaikkan ke <b>waspada</b> sebelum serangan datang. Tombol <b>Perketat</b> memotong paparan 70%. <b>AI lokal</b> (Isolation Forest, dilatih di server ini, tanpa internet) menilai enam ciri lalu lintas tiap aset; lalu lintas tidak wajar menambah peluang: 1 − (1 − p<sub>CTI</sub>)(1 − p<sub>AI</sub>), lengkap dengan alasannya. AI hanya menaikkan status; memutus jaringan tetap keputusan operator. <b>Triase:</b> Operator boleh menutup peringatan sebagai <b data-istilah="tutup_selesai"></b> atau Positif Palsu (<i data-istilah="tutup_fp"></i>) dengan alasan tertulis. Tidak ada yang dihapus: penutupan menjadi halaman baru di <span data-istilah="buku_bukti"></span>, dan bukti baru membuka peringatan lagi.</p>
+              <p class="edu"><b>Alarm rumah &amp; radio satpam.</b> Radio menyiarkan kabar ancaman umum. Server mencocokkan port yang disebut berita dengan aset yang <b>benar-benar kita punya</b>. Peluang = keyakinan sumber × paparan aset × kesegaran berita (× 1,1 bila sektor kita disasar). ≥ 50% → aset dinaikkan ke <b>waspada</b> sebelum serangan datang. Tombol <b>Perketat</b> memotong paparan 70%. <b>AI lokal</b> (Isolation Forest, dilatih di server ini, tanpa internet) menilai enam ciri lalu lintas tiap aset; lalu lintas tidak wajar menambah peluang: 1 − (1 − p<sub>CTI</sub>)(1 − p<sub>AI</sub>), lengkap dengan alasannya. AI hanya menaikkan status; memutus jaringan tetap keputusan Operator. <b>Triase:</b> Operator boleh menutup peringatan sebagai <b data-istilah="tutup_selesai"></b> atau Positif Palsu (<i data-istilah="tutup_fp"></i>) dengan alasan tertulis. Tidak ada yang dihapus: penutupan menjadi halaman baru di <span data-istilah="buku_bukti"></span>, dan bukti baru membuka peringatan lagi.</p>
             </section>
 
             <section class="panel" aria-labelledby="judul-log">
@@ -374,13 +374,13 @@
           </div>
           <label class="opsi-gangguan kecil"><input type="checkbox" id="sim-gangguan-bukti" data-ubah>
             Latih kegagalan agen forensik (bukti tidak bisa diamankan sebelum isolasi)</label>
-          <p class="catatan-peran redup kecil" hidden>Akun pengamat hanya dapat melihat.</p>
+          <p class="catatan-peran redup kecil" hidden>Akun Pengamat hanya dapat melihat.</p>
         </section>
       </div>
 
       <!-- ========== ALAT OPERATOR (fitur lama tetap ada) ========== -->
-      <section class="panel alat" aria-label="Alat operator">
-        <nav class="tab-nav" role="tablist" aria-label="Alat operator">
+      <section class="panel alat" aria-label="Alat Operator">
+        <nav class="tab-nav" role="tablist" aria-label="Alat Operator">
           <button role="tab" class="tab" id="tab-indikator" aria-controls="panel-indikator" aria-selected="true">Cek indikator</button>
           <button role="tab" class="tab" id="tab-backup" aria-controls="panel-backup" aria-selected="false" tabindex="-1" data-istilah="kepatuhan_pencadangan"></button>
           <button role="tab" class="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" tabindex="-1">Audit &amp; LAPSIT</button>

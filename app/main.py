@@ -323,11 +323,11 @@ def daftar_mandiri(f: DaftarMasuk) -> dict:
     if f.peran == "operator":
         if not kode_operator_sah(f.kode_operator):
             LOG.catat("tidak-dikenal", "DAFTAR_OPERATOR_DITOLAK", {})
-            raise HTTPException(403, "Akun operator memerlukan kode undangan yang sah dari administrator")
+            raise HTTPException(403, "Akun Operator memerlukan kode undangan yang sah dari administrator")
         asal = "kode_undangan"
     else:
         if not pendaftaran_pengamat_terbuka():
-            raise HTTPException(403, "Pendaftaran pengamat sedang ditutup administrator")
+            raise HTTPException(403, "Pendaftaran Pengamat sedang ditutup administrator")
         asal = "mandiri"
     return _buat_akun(f.nama, f.sandi, f.peran, asal, f.nama)
 

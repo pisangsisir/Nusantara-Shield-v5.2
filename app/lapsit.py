@@ -39,6 +39,7 @@ from xml.sax.saxutils import escape
 from .data_contoh import DAMPAK_OPERASIONAL, GANGGUAN_SKENARIO
 from .istilah import ISTILAH, nama_manajemen
 from .mitre import ringkas as ringkas_mitre
+from .versi import VERSI
 
 WARNA_STATUS = {"hijau": colors.HexColor("#1f8a4c"),
                 "kuning": colors.HexColor("#b7791f"),
@@ -218,7 +219,7 @@ def _penggambar_kop(nomor: str, waktu: str, jenis: str):
         c.drawString(kiri + 23 * mm, atas - 7 * mm, "NUSANTARA SHIELD")
         c.setFont("Helvetica", 8.5)
         c.setFillColor(ABU)
-        c.drawString(kiri + 23 * mm, atas - 11.5 * mm, "Posko Pertahanan Siber Luring \u00b7 v5.1")
+        c.drawString(kiri + 23 * mm, atas - 11.5 * mm, f"Posko Pertahanan Siber Luring \u00b7 v{VERSI}")
         c.drawString(kiri + 23 * mm, atas - 15.5 * mm, "Bukti dulu, baru putus.")
         c.setFillColor(NAVY)
         c.setFont("Helvetica-Bold", 11)

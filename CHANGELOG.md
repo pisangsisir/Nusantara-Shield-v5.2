@@ -4,6 +4,17 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
 
 ## Belum dirilis
 
+### Satu sumber versi dan nama peran berhuruf kapital — 30 Oktober 2026 (branch `feature/satu-sumber-versi`)
+- **Masalah:** rilis v5.2.0 masih menampilkan "v5.1" di judul tab, subjudul dasbor, kop LAPSIT, dan nama zip, karena nomor versi ditulis langsung di beberapa berkas dan tidak ikut diganti.
+- **Perbaikan:** nomor versi kini hanya ada di `app/versi.py` (`VERSI = "5.2.1"`).
+  - Dasbor membacanya lewat label `nama_versi` di `GET /api/istilah`; kop LAPSIT mengimpornya langsung.
+  - `tools/kemas_rilis.py` membacanya sebagai teks, sehingga zip rilis dan paket luring bernama `nusantara-shield-v5.2.1…`; versi bawaan paket Ubuntu ikut nilai yang sama.
+  - `run_tests.sh` dan `run_tests.bat` mencetak versi dari berkas yang sama.
+- **Nama peran:** header sesi, kolom peran di tab **Akun**, dan notifikasi kini menampilkan **Operator** dan **Pengamat** (label baru `peran_operator`, `peran_pengamat` di kamus istilah). Nilai teknis di API tetap huruf kecil (`operator`, `pengamat`), begitu pula nama akun bawaan. Kalimat di dasbor, pesan galat, README, Proposal, dan Dokumentasi Teknis ikut diseragamkan sesuai pedoman gaya.
+- **5 uji baru** di `tests/test_versi.py`: label versi yang ditulis langsung di kode tampilan atau skrip uji → gagal; alat pengemas harus memakai nomor yang sama; nama peran tampil berhuruf kapital. Kamus istilah kini 40 uji (label `nama_versi`). Total **352 uji** dalam 18 kelompok.
+- Dokumentasi Teknis §4.4: tabel kelompok uji dilengkapi baris Triase dan Kesiapan Siber (16) serta Paket pasang Ubuntu 24.04 (24), yang sebelumnya terlewat.
+- Dek, poster, README, Proposal, dan Dokumentasi Teknis: label versi v5.2.1, jumlah uji 352, blok terminal dibuat ulang dari keluaran `./run_tests.sh` yang asli (352 passed in 43.97s).
+
 ### Wajib ganti sandi awal dan peta jalan studi banding — 30 Oktober 2026 (branch `feature/wajib-ganti-sandi`)
 - **Wajib ganti sandi saat login pertama** (gagasan dari LogCrunch). `pasang.sh` kini menulis `NS_WAJIB_GANTI_SANDI=1` ke berkas env.
   - Sampai sandi awal diganti, akun bawaan hanya boleh memanggil loket ganti sandi dan keluar. Semua loket lain, termasuk siaran langsung, menjawab 403.

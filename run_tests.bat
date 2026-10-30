@@ -1,6 +1,6 @@
 @echo off
 rem ---------------------------------------------------------------------------
-rem Menjalankan seluruh uji otomatis Nusantara Shield v5.1 dengan umpan balik PER UJI (Windows).
+rem Menjalankan seluruh uji otomatis Nusantara Shield (versi dari app\versi.py) dengan umpan balik PER UJI (Windows).
 rem   run_tests.bat                 semua uji
 rem   run_tests.bat -k akun         hanya uji yang namanya memuat "akun"
 rem   run_tests.bat --lf            ulangi uji yang gagal terakhir kali
@@ -17,6 +17,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo Menjalankan uji otomatis Nusantara Shield v5.1 - setiap uji tampil satu baris beserta hasilnya
+for /f "tokens=3" %%v in ('findstr /b /c:"VERSI = " app\versi.py') do set "VERSI=%%~v"
+echo Menjalankan uji otomatis Nusantara Shield v%VERSI% - setiap uji tampil satu baris beserta hasilnya
 python -m pytest %*
 exit /b %ERRORLEVEL%

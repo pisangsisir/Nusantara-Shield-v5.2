@@ -102,7 +102,7 @@ SIMPUL: list[dict] = [
     {"id": "ssh",      "nama": "Akses admin SSH",  "ip": "192.0.2.21", "port": 22,   "zona": "internal", "r": .42, "paparan": 0.6},
     {"id": "rdp",      "nama": "Remote desktop",   "ip": "192.0.2.90", "port": 3389, "zona": "internal", "r": .46, "paparan": 0.95,
      "status": "waspada", "catatan": "Port RDP terbuka ke jaringan — sebaiknya ditutup"},
-    {"id": "backup",   "nama": "Server backup",    "ip": "192.0.2.99", "port": 873,  "zona": "internal", "r": .13, "paparan": 0.6},
+    {"id": "backup",   "nama": "Server cadangan",    "ip": "192.0.2.99", "port": 873,  "zona": "internal", "r": .13, "paparan": 0.6},
     # Fase 6 (IT/OT): aset teknologi operasional. Pengendali genset catu daya markas berbicara
     # protokol kendali industri Modbus/TCP (port 502). Kabar ancaman Modbus di Radio CTI kini
     # dikorelasikan ke aset ini (0,80 × 0,75 × 1,1 ≈ 66% → WASPADA), sama seperti aset IT.
@@ -145,7 +145,7 @@ MAKS_CTI_AKTIF = 3
 AMBANG_PROAKTIF = 0.5      # peluang ≥ 50% → aset dinaikkan ke "waspada" sebelum diserang
 BONUS_SEKTOR = 1.1         # berita menyasar sektor yang KITA layani → sedikit lebih relevan
 FAKTOR_PERKETAT = 0.3      # setelah pengerasan (SOAR), paparan tinggal 30%
-SUMBER_AI = "AI-ANOMALI"   # penanda sumber peluang dari Engine Deteksi Anomali lokal (app/ai_anomali.py)
+SUMBER_AI = "AI-ANOMALI"   # penanda sumber peluang dari mesin deteksi anomali lokal (app/ai_anomali.py)
 DURASI_LATIHAN_AI = 300    # detik: lamanya pola lalu lintas latihan disuntikkan ke satu aset
 MAKS_PERINGATAN = 6        # daftar peringatan terbaru di dasbor
 
@@ -174,7 +174,7 @@ DAMPAK: dict[str, dict] = {
                       "core": ("waspada", "Lalu lintas berbagi berkas tak wajar"),
                       "ssh": ("waspada", "Login admin dari 203.0.113.45"),
                       "smb": ("kritis", "Enkripsi massal berkas"),
-                      "backup": ("kritis", "Direktori backup dinonaktifkan")},
+                      "backup": ("kritis", "Direktori cadangan dinonaktifkan")},
         "ancaman": [{"ip": "203.0.113.45", "port": 443, "nama": "Server kendali (C2)", "ioc": "IOC-001",
                      "asal": "eropa_timur"}],
         "kerumunan": 0, "target": 60.0, "goyang": 7.0, "lonjakan": 0.2,
@@ -183,9 +183,9 @@ DAMPAK: dict[str, dict] = {
                 "perangkat": {"smb": ("isolasi", "Diisolasi dari jaringan"),
                               "fw": ("waspada", "Koneksi ke server kendali diblokir")},
                 "ancaman": "isolasi", "target": 38.0, "lonjakan": 0.0},
-            2: {"ket": "Server backup dilepas (offline) agar tidak ikut terenkripsi",
-                "perangkat": {"backup": ("isolasi", "Dilindungi: disimpan offline")}},
-            5: {"ket": "Layanan dihidupkan dari backup teruji",
+            2: {"ket": "Server cadangan dilepas (luring) agar tidak ikut terenkripsi",
+                "perangkat": {"backup": ("isolasi", "Dilindungi: disimpan luring")}},
+            5: {"ket": "Layanan dihidupkan dari cadangan teruji",
                 "perangkat": {"core": ("normal", "Normal"), "ssh": ("normal", "Sandi admin diganti")}},
         },
     },
@@ -238,13 +238,13 @@ DAMPAK: dict[str, dict] = {
     },
     "backup_dimatikan": {
         "perangkat": {"ssh": ("waspada", "Login admin dari 203.0.113.45"),
-                      "backup": ("kritis", "Direktori backup dilepas")},
+                      "backup": ("kritis", "Direktori cadangan dilepas")},
         "ancaman": [{"ip": "203.0.113.45", "port": 22, "nama": "Alamat login mencurigakan", "ioc": "IOC-001",
                      "asal": "timur_tengah"}],
         "kerumunan": 0, "target": 40.0, "goyang": 5.0, "lonjakan": 0.0,
         "langkah": {
-            2: {"ket": "Backup menyala lagi dan salinan darurat dibuat",
-                "perangkat": {"backup": ("normal", "Backup berjalan kembali")}},
+            2: {"ket": "Pencadangan menyala lagi dan salinan darurat dibuat",
+                "perangkat": {"backup": ("normal", "Pencadangan berjalan kembali")}},
             3: {"ket": "Akun mencurigakan dicabut; alamat penyerang diblokir",
                 "perangkat": {"ssh": ("isolasi", "Akses dicabut sementara")},
                 "ancaman": "isolasi"},
@@ -273,9 +273,9 @@ SOAR: dict[str, list[dict]] = {
         _aksi_bukti("Salin memori & log server terdampak, hitung SHA-256, catat berita acara"),
         {"id": "isolasi_otomatis", "label": "Isolasi otomatis", "ikon": "potong", "langkah": 1, "jenis": "pemutus",
          "ket": "Putus server terdampak & blokir alamat C2 di gerbang"},
-        {"id": "amankan_backup", "label": "Amankan backup", "ikon": "cadangan", "langkah": 2, "jenis": "pemutus",
-         "ket": "Lepas server backup dari jaringan (offline)"},
-        {"id": "pulihkan_sistem", "label": "Pulihkan dari backup", "ikon": "pulih", "langkah": 5, "jenis": "pemulihan",
+        {"id": "amankan_backup", "label": "Amankan cadangan", "ikon": "cadangan", "langkah": 2, "jenis": "pemutus",
+         "ket": "Lepas server cadangan dari jaringan (luring)"},
+        {"id": "pulihkan_sistem", "label": "Pulihkan dari cadangan", "ikon": "pulih", "langkah": 5, "jenis": "pemulihan",
          "ket": "Hidupkan layanan dari salinan teruji"},
     ],
     "ddos": [
@@ -299,9 +299,9 @@ SOAR: dict[str, list[dict]] = {
     "backup_dimatikan": [
         _aksi_bukti("Salin riwayat konfigurasi & jejak login, hitung SHA-256, catat berita acara"),
         {"id": "audit_konfigurasi", "label": "Audit konfigurasi", "ikon": "periksa", "langkah": 1, "jenis": "pendukung",
-         "ket": "Telusuri siapa yang mengubah jadwal backup"},
-        {"id": "nyalakan_backup", "label": "Nyalakan ulang backup", "ikon": "cadangan", "langkah": 2, "jenis": "pendukung",
-         "ket": "Aktifkan backup + buat salinan darurat"},
+         "ket": "Telusuri siapa yang mengubah jadwal pencadangan"},
+        {"id": "nyalakan_backup", "label": "Nyalakan ulang pencadangan", "ikon": "cadangan", "langkah": 2, "jenis": "pendukung",
+         "ket": "Aktifkan pencadangan + buat salinan darurat"},
         {"id": "cabut_akses", "label": "Cabut akses & blokir IP", "ikon": "blokir", "langkah": 3, "jenis": "pemutus",
          "ket": "Kunci akun mencurigakan, blokir alamat asal"},
     ],
@@ -458,7 +458,7 @@ class Menara:
         self.rantai: RantaiBukti = RANTAI                    # Fase 4: TIDAK ikut reset() (tambah-saja)
         self.saat_bukti: Callable[[str, str, dict], None] | None = None   # kait: cermin ke log audit
         self.osint = GeneratorOSINT(lambda: self._jam(), self._acak)
-        self.deteksi = MesinDeteksi()                        # Engine Deteksi Aturan (app/deteksi.py)
+        self.deteksi = MesinDeteksi()                        # mesin deteksi aturan (app/deteksi.py)
         self.reset()
 
     # -- siklus hidup -------------------------------------------------------
@@ -539,7 +539,7 @@ class Menara:
         return min(w, 0.97)
 
     # ======================================================================
-    # AI LOKAL: Engine Deteksi Anomali (Isolation Forest, app/ai_anomali.py)
+    # AI LOKAL: mesin deteksi anomali (Isolation Forest, app/ai_anomali.py)
     # ======================================================================
     def _status_insiden(self, layanan: dict) -> dict[str, tuple[str, str]]:
         """Status perangkat yang disebabkan insiden aktif (setelah efek langkah playbook): {id: (status, skenario)}."""
@@ -1182,7 +1182,7 @@ class Menara:
         self.ubah()
 
     # ======================================================================
-    # ENGINE DETEKSI ATURAN: peristiwa mentah sintetis → temuan (app/deteksi.py)
+    # MESIN DETEKSI ATURAN: peristiwa mentah sintetis → temuan (app/deteksi.py)
     # ======================================================================
     def latihan_deteksi(self, layanan: dict, jenis: str, aset_id: str | None = None) -> dict:
         """Latihan: putar rangkaian PERISTIWA MENTAH sintetis (upaya login / koneksi). Temuan lahir dari aturan
@@ -1335,7 +1335,7 @@ class Menara:
         """Bahan LAPSIT formal yang diambil dari keadaan SEBENARNYA (bukan teks tetap):
         - per insiden aktif: jejak tiap langkah playbook (kapan, oleh siapa, T+detik), bukti, laporan, MTTC, darurat;
         - tabel indikator kompromi (IoC): alamat ancaman skenario (diblokir hanya bila langkah pemutusnya sudah
-          berjalan) dan sumber temuan Engine Deteksi Aturan (tidak pernah diblokir otomatis: dua kunci)."""
+          berjalan) dan sumber temuan mesin deteksi aturan (tidak pernah diblokir otomatis: dua kunci)."""
         self._proses_antre_soar(layanan)
         self._proses_deteksi()
         insiden = {}
@@ -1509,7 +1509,7 @@ class Menara:
             self._peristiwa.append(self._entri(e["tingkat"], e["pesan"], e["rel_menit"], e["layanan"]))
         self._proses_antre_soar(layanan)
         self._periksa_ai(layanan)                     # AI lokal: catat perubahan penilaian
-        self._proses_deteksi()                        # Engine Deteksi Aturan: peristiwa mentah → temuan
+        self._proses_deteksi()                        # mesin deteksi aturan: peristiwa mentah → temuan
         # Radio satpam
         baru, habis = self.osint.detak()
         for a in habis:

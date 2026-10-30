@@ -38,7 +38,7 @@ LAYANAN_AWAL: list[dict] = [
      "jam_sejak_backup": 12, "backup_teruji": True},
     {"id": "kesehatan", "nama": "RS Kesdam · SIMRS (contoh)", "singkat": "RS Kesdam",
      "cabang": "RS Kesdam Makassar", "sektor": "Kesehatan",
-     "jam_sejak_backup": 20, "backup_teruji": False},         # backup belum diuji → kuning
+     "jam_sejak_backup": 20, "backup_teruji": False},         # cadangan belum diuji → kuning
     {"id": "listrik", "nama": "Genset & Catu Daya RS Kesdam (contoh)", "singkat": "Genset RS Kesdam",
      "cabang": "RS Kesdam Makassar", "sektor": "Energi",
      "jam_sejak_backup": 8, "backup_teruji": True},
@@ -47,7 +47,7 @@ LAYANAN_AWAL: list[dict] = [
      "jam_sejak_backup": 10, "backup_teruji": True},
 ]
 
-# Batas kepatuhan backup (aturan main demo, bisa disesuaikan)
+# Batas kepatuhan pencadangan (aturan main demo, bisa disesuaikan)
 BATAS_JAM_BACKUP = 24
 
 # Dampak operasional (misi) tiap layanan untuk LAPSIT: apa yang terganggu bila layanan berhenti, dan prosedur
@@ -144,7 +144,7 @@ INDEKS_INDIKATOR = {(i["jenis"], i["nilai"].lower()): i for i in INDIKATOR_CONTO
 # semua orang tahu langkahnya tanpa harus berpikir dari nol.
 SKENARIO = {
     "ransomware": "Ransomware mengenkripsi server",
-    "backup_dimatikan": "Direktori backup tiba-tiba dinonaktifkan",
+    "backup_dimatikan": "Direktori cadangan tiba-tiba dinonaktifkan",
     "ddos": "Banjir trafik (DDoS) membuat layanan lambat",
     # Fase 6 (IT/OT): penyerang yang sama dengan skenario ransomware berpindah dari jaringan kantor
     # ke zona kendali dan mengirim perintah Modbus asing ke pengendali genset rumah sakit.
@@ -161,14 +161,14 @@ LOG_PERINGATAN = {
     "ransomware": [
         (-2880, "sedang", "Login admin dari alamat tak biasa 203.0.113.45 (cocok IOC-001)"),
         (-1440, "sedang", "Akun layanan baru dibuat di luar jam kerja"),
-        (-3, "tinggi", "Direktori backup dinonaktifkan"),
+        (-3, "tinggi", "Direktori cadangan dinonaktifkan"),
         (0, "kritis", "Enkripsi massal berkas terdeteksi"),
         (0, "kritis", "Catatan tebusan ditemukan di server"),
     ],
     "backup_dimatikan": [
         (-60, "sedang", "Login admin dari alamat tak biasa 203.0.113.45 (cocok IOC-001)"),
-        (0, "tinggi", "Jadwal backup dihentikan oleh akun layanan"),
-        (0, "tinggi", "Direktori backup dilepas dari server"),
+        (0, "tinggi", "Jadwal pencadangan dihentikan oleh akun layanan"),
+        (0, "tinggi", "Direktori cadangan dilepas dari server"),
     ],
     "sabotase_ot": [
         (-120, "sedang", "Login jarak jauh ke workstation teknisi fasilitas dari 203.0.113.45 (cocok IOC-001)"),
@@ -190,16 +190,16 @@ PLAYBOOK = {
     "ransomware": [
         "AMANKAN BUKTI: salin memori & log server terdampak, hitung sidik jari SHA-256, catat di buku rantai bukti",
         "ISOLASI: putuskan server terdampak dari jaringan agar tidak menular",
-        "LINDUNGI BACKUP: pastikan salinan backup offline tidak tersambung",
+        "LINDUNGI CADANGAN: pastikan salinan cadangan luring tidak tersambung",
         _LANGKAH_LAPOR,
         "JANGAN BAYAR TEBUSAN: jangan berkomunikasi dengan pelaku; serahkan bukti ke tim forensik",
-        "PULIHKAN: hidupkan layanan dari backup terakhir yang sudah diuji",
+        "PULIHKAN: hidupkan layanan dari cadangan terakhir yang sudah diuji",
         "EVALUASI: catat pelajaran dan perbarui prosedur",
     ],
     "backup_dimatikan": [
         "AMANKAN BUKTI: salin riwayat konfigurasi & jejak login, hitung sidik jari SHA-256, catat di buku rantai bukti",
-        "PERIKSA: siapa dan kapan mengubah pengaturan backup",
-        "NYALAKAN KEMBALI backup dan buat salinan darurat ke lokasi lain",
+        "PERIKSA: siapa dan kapan mengubah pengaturan pencadangan",
+        "NYALAKAN KEMBALI pencadangan dan buat salinan darurat ke lokasi lain",
         "ISOLASI akun yang mencurigakan (ganti kata sandi, cabut akses)",
         _LANGKAH_LAPOR,
         "PANTAU: awasi tanda-tanda ransomware 48 jam ke depan",
@@ -226,9 +226,9 @@ PLAYBOOK = {
 
 # v5.1: label 1–2 kata untuk Action Center (teks panjang tetap ada sebagai tooltip).
 PLAYBOOK_RINGKAS = {
-    "ransomware": [ISTILAH["langkah_bukti"], "Isolasi", "Amankan backup", ISTILAH["laporan_singkat"], "Jangan bayar",
+    "ransomware": [ISTILAH["langkah_bukti"], "Isolasi", "Amankan cadangan", ISTILAH["laporan_singkat"], "Jangan bayar",
                    "Pulihkan", "Evaluasi"],
-    "backup_dimatikan": [ISTILAH["langkah_bukti"], "Periksa jejak", "Nyalakan backup", "Cabut akses",
+    "backup_dimatikan": [ISTILAH["langkah_bukti"], "Periksa jejak", "Nyalakan pencadangan", "Cabut akses",
                          ISTILAH["laporan_singkat"], "Pantau 48 jam"],
     "sabotase_ot": [ISTILAH["langkah_bukti"], "Putus IT–OT", "Blokir akses", ISTILAH["laporan_singkat"], "Cek fisik",
                     "Pulihkan jalur", "Evaluasi"],
@@ -276,9 +276,9 @@ BERITA_ANCAMAN: list[dict] = [
      "port": [22], "sektor": "Semua sektor", "keyakinan": 0.65, "ttl": 100,
      "saran": "Ganti login sandi dengan kunci SSH dan batasi alamat asal"},
     {"id": "CTI-106", "asal": "eropa_barat", "sumber": "Buletin Kerentanan Mingguan (fiktif)",
-     "judul": "Simulasi: kelompok ransomware fiktif mematikan sinkronisasi backup (rsync) sebelum mengenkripsi",
+     "judul": "Simulasi: kelompok ransomware fiktif mematikan sinkronisasi cadangan (rsync) sebelum mengenkripsi",
      "port": [873], "sektor": "Keuangan", "keyakinan": 0.80, "ttl": 120,
-     "saran": "Pastikan salinan backup offline dan pantau perubahan jadwal backup"},
+     "saran": "Pastikan salinan cadangan luring dan pantau perubahan jadwal pencadangan"},
     {"id": "CTI-107", "asal": "timur_tengah", "sumber": "Laboratorium Riset Keamanan Contoh",
      "judul": "Simulasi: teknik penyelundupan data lewat kueri DNS (DNS tunneling) terpantau",
      "port": [53], "sektor": "Semua sektor", "keyakinan": 0.55, "ttl": 100,

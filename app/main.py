@@ -146,10 +146,10 @@ def _status(l: dict) -> tuple[str, str]:
     if l["insiden"]:
         return "merah", f"Insiden aktif: {l['insiden']['judul']}"
     if l["jam_sejak_backup"] > BATAS_JAM_BACKUP:
-        return "kuning", f"Backup terakhir {l['jam_sejak_backup']} jam lalu (batas {BATAS_JAM_BACKUP} jam)"
+        return "kuning", f"Umur cadangan {l['jam_sejak_backup']} jam (batas {BATAS_JAM_BACKUP} jam)"
     if not l["backup_teruji"]:
-        return "kuning", "Backup ada, tetapi belum pernah diuji pemulihannya"
-    return "hijau", "Normal; backup terbaru dan sudah diuji"
+        return "kuning", "Cadangan ada, tetapi belum pernah diuji pulih"
+    return "hijau", "Normal; cadangan terbaru dan sudah diuji"
 
 
 def _tampilan(l: dict) -> dict:
@@ -402,14 +402,14 @@ def pulihkan_layanan(f: LayananMasuk, akun: Akun = Depends(butuh_izin("ubah"))) 
         if not all(ins["langkah_selesai"]):
             # Disiplin prosedur: layanan baru boleh dinyatakan pulih bila semua langkah beres.
             raise HTTPException(409, "Selesaikan semua langkah playbook sebelum memulihkan")
-        try:   # Fase 4: memulihkan dari backup = menghapus jejak penyerang → cocokkan hash bukti dulu
+        try:   # Fase 4: memulihkan dari cadangan = menghapus jejak penyerang → cocokkan hash bukti dulu
             MENARA.verifikasi_untuk_pemulihan(LAYANAN, f.layanan_id, akun.nama)
         except ValueError as e:
             raise HTTPException(409, str(e)) from None
         l["insiden"] = None
-        l["jam_sejak_backup"], l["backup_teruji"] = 0, True  # dipulihkan dari backup teruji
+        l["jam_sejak_backup"], l["backup_teruji"] = 0, True  # dipulihkan dari cadangan teruji
         MENARA.insiden_ditutup(f.layanan_id)
-        MENARA.catat("info", f"{l['nama']} dipulihkan dari backup teruji. Insiden latihan ditutup.",
+        MENARA.catat("info", f"{l['nama']} dipulihkan dari cadangan teruji. Insiden latihan ditutup.",
                      layanan=f.layanan_id)
         MENARA.ubah()
         hasil = _tampilan(l)
@@ -419,7 +419,7 @@ def pulihkan_layanan(f: LayananMasuk, akun: Akun = Depends(butuh_izin("ubah"))) 
 
 class BackupMasuk(Formulir):
     layanan_id: IdLayanan
-    uji_pulih: bool  # True = backup sudah dicoba dipulihkan dan berhasil dibaca
+    uji_pulih: bool  # True = cadangan sudah dicoba dipulihkan dan berhasil dibaca
 
 
 class WaktuMasuk(Formulir):
@@ -428,11 +428,11 @@ class WaktuMasuk(Formulir):
 
 @app.post("/api/backup/catat", dependencies=[Depends(batasi("ubah"))])
 def catat_backup(f: BackupMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
-    """Fitur kepatuhan backup (prioritas hasil riset kasus PDNS 2024).
+    """Fitur kepatuhan pencadangan (prioritas hasil riset kasus PDNS 2024).
 
     Analogi: buku piket fotokopi arsip. Petugas mencatat kapan fotokopi
     terakhir dibuat, dan apakah fotokopi itu sudah dicoba dibaca ulang.
-    Backup yang tidak pernah diuji ibarat payung yang belum pernah dibuka:
+    Cadangan yang tidak pernah diuji ibarat payung yang belum pernah dibuka:
     baru ketahuan bolong saat hujan.
     """
     with _kunci_state:
@@ -440,7 +440,7 @@ def catat_backup(f: BackupMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> di
         l["jam_sejak_backup"] = 0
         l["backup_teruji"] = f.uji_pulih
         MENARA.catat("info" if f.uji_pulih else "sedang",
-                     f"Backup {l['nama']} dicatat" + (" dan sudah diuji pulih" if f.uji_pulih else " (belum diuji)"),
+                     f"Cadangan {l['nama']} dicatat" + (" dan sudah diuji pulih" if f.uji_pulih else " (belum diuji)"),
                      layanan=f.layanan_id)
         MENARA.ubah()
         hasil = _tampilan(l)
@@ -450,7 +450,7 @@ def catat_backup(f: BackupMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> di
 
 @app.post("/api/demo/majukan-waktu", dependencies=[Depends(batasi("ubah"))])
 def majukan_waktu(f: WaktuMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
-    """Mesin waktu demo: memajukan jam agar juri bisa melihat backup yang
+    """Mesin waktu demo: memajukan jam agar juri bisa melihat cadangan yang
     'menua' berubah dari hijau ke kuning tanpa menunggu sehari penuh."""
     with _kunci_state:
         for l in LAYANAN.values():
@@ -708,7 +708,7 @@ def tutup_peringatan(f: TutupPeringatanMasuk, akun: Akun = Depends(butuh_izin("u
 
 @app.post("/api/deteksi/latihan", dependencies=[Depends(batasi("ubah"))])
 def latihan_deteksi(f: LatihanDeteksiMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
-    """Engine Deteksi Aturan: putar peristiwa mentah sintetis (login / koneksi). Temuan lahir dari aturan dengan
+    """Mesin deteksi aturan (app/deteksi.py): putar peristiwa mentah sintetis (login / koneksi). Temuan lahir dari aturan dengan
     ambang terbuka (app/deteksi.py) dan hanya menaikkan status; memutus jaringan tetap keputusan Operator."""
     with _kunci_state:
         try:
@@ -737,8 +737,8 @@ def impor_log(f: ImporLogMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dic
 
 @app.post("/api/ai/latihan", dependencies=[Depends(batasi("ubah"))])
 def latihan_ai(f: LatihanAIMasuk, akun: Akun = Depends(butuh_izin("ubah"))) -> dict:
-    """AI lokal: suntikkan pola lalu lintas tidak wajar (data sintetis) ke satu aset, lalu Engine
-    Deteksi Anomali (Isolation Forest, berjalan di server ini) menilainya. Tidak ada panggilan ke luar."""
+    """AI lokal: suntikkan pola lalu lintas tidak wajar (data sintetis) ke satu aset, lalu mesin
+    deteksi anomali (Isolation Forest, berjalan di server ini) menilainya. Tidak ada panggilan ke luar."""
     with _kunci_state:
         hasil = MENARA.latihan_ai(LAYANAN, f.aset_id, f.pola)
     LOG.catat(akun.nama, "AI_LATIHAN", {"aset": f.aset_id, "pola": hasil["pola"]})

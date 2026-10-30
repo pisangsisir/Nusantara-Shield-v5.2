@@ -245,7 +245,7 @@ def test_lapsit_tanpa_peringatan_tetap_berpengesahan(k, monkeypatch, tmp_path):
     r = k.post("/api/lapsit", headers=masuk(k, "pengamat", "sandi-pengamat-uji-123"))
     teks = teks_pdf(r.content)
     assert r.status_code == 200 and "Tidak ada peringatan." in teks and ISTILAH["ttd_pembuat"] in teks
-    assert "Laporan rutin" in teks and re.search(r"Halaman 1 dari \d", teks)
+    assert "Laporan rutin" in teks and "Halaman 1 dari 1" in teks      # laporan rutin muat satu halaman
     assert "Pemeriksaan rutin" in teks and "Tidak ada insiden aktif." in teks and "Tidak ada indikator kompromi" in teks
     # logo kop digambar sebagai vektor dari static/logo.svg; bila berkasnya hilang, LAPSIT tetap terbit tanpa logo
     from reportlab.pdfgen.canvas import Canvas

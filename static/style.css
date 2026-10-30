@@ -1028,7 +1028,7 @@ body.edu-on .edu-sebaris { display: inline; }
   .tata-posko:has(.kartu-aksi:not(.terisolasi)) .action-center { order: -1; }
 }
 
-/* ---------- Engine Deteksi Aturan: latihan, peringatan terbaru, alasan di kartu prediksi ---------- */
+/* ---------- mesin deteksi aturan: latihan, peringatan terbaru, alasan di kartu prediksi ---------- */
 .chip.deteksi { background: rgba(255, 154, 107, .12); color: var(--oranye); box-shadow: inset 0 0 0 1px rgba(255, 154, 107, .35); }
 .latihan-deteksi { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px; align-items: center; margin-top: 8px; }
 .latihan-deteksi .label-kecil { margin-right: 4px; }

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Nusantara Shield Team. Dikembangkan untuk Kartika Cyber Hackathon 2026.
 # Dilisensikan di bawah GNU General Public License v3.0; lihat berkas LICENSE.
 """
-Engine Deteksi Aturan — membaca PERISTIWA MENTAH (upaya login, koneksi jaringan, dan perintah Modbus ke
+Mesin deteksi aturan — membaca PERISTIWA MENTAH (upaya login, koneksi jaringan, dan perintah Modbus ke
 zona kendali OT), lalu menyimpulkan temuan. Label MITRE ATT&CK tiap aturan ada di app/mitre.py.
 
 Analogi: petugas jaga yang membaca buku tamu. Satu tamu salah menyebut nama sekali itu wajar; orang yang
@@ -39,7 +39,7 @@ ATURAN: dict[str, dict] = {
                      "keparahan": "kritis", "peluang": 0.90},
 }
 MASA_AKTIF = 300   # detik sejak peristiwa terakhir: selama itu temuan masih menyumbang peluang serangan
-AWALAN = "DET-"    # penanda sumber peluang dari Engine Deteksi Aturan (bandingkan "CTI-…" dan "AI-ANOMALI")
+AWALAN = "DET-"    # penanda sumber peluang dari mesin deteksi aturan (bandingkan "CTI-…" dan "AI-ANOMALI")
 
 # Daftar jalur OT yang diizinkan (di satuan: ditetapkan pejabat siber satuan). Selain alamat ini, koneksi ke zona kendali = temuan.
 JALUR_OT_DIIZINKAN = {"192.0.2.140"}          # stasiun rekayasa OT (RFC 5737)

@@ -18,6 +18,7 @@ Seluruh kode dikembangkan sejak **15 Oktober 2026**, setelah publikasi program K
   - garis dasar Modbus (format pesan IPAL, RAID 2022; profil *polling* Welford);
   - paket intelijen bertanda tangan (pola Security Onion).
   - Semuanya belum dibangun. Dokumentasi Teknis §2.7 kini menyebut terus terang bahwa HMAC tidak melindungi dari pemegang kunci.
+- **Panduan Belajar PDF** diekspor ulang: istilah Mesin Deteksi Aturan/Anomali, Mesin Asisten Narasi, dan Kepatuhan Pencadangan; jumlah uji 346 dalam 17 kelompok. Keterangan dua tangkapan layar lama yang masih memperlihatkan label "Server backup" sengaja dibiarkan sesuai gambarnya.
 
 ### Penyeragaman istilah — 30 Oktober 2026 (branch `feature/penyeragaman-istilah`)
 - Pedoman gaya baru: istilah Indonesia didahulukan; istilah asli disebut sekali dalam kurung dan dicetak miring.

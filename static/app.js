@@ -1518,6 +1518,7 @@ async function masuk(ev) {
     try {
       const j = await api("/api/login", { metode: "POST", data: { nama, sandi: sandiEl.value } });
       S.token = j.token; S.akun = j.nama; S.peran = j.peran;
+      if (j.wajib_ganti) { mintaGantiSandi(sandiEl.value); sandiEl.value = ""; return; }
       sandiEl.value = "";
       bukaAplikasi();
     } catch (e) {
@@ -1525,6 +1526,48 @@ async function masuk(ev) {
       sandiEl.select();
     }
   });
+}
+// Pemasangan produksi: akun bawaan wajib mengganti sandi awal. Sandi awal dipegang sementara di variabel
+// lokal (tidak disimpan di mana pun) lalu dihapus begitu sandi berhasil diganti atau pengguna keluar.
+let sandiAwal = "";
+function mintaGantiSandi(sandi) {
+  sandiAwal = sandi;
+  $("#form-login").hidden = true;
+  $("#form-ganti-sandi").hidden = false;
+  $("#baris-ganti-form").hidden = $("#catatan-sandi-demo").hidden = true;
+  $("#ganti-nama").textContent = S.akun;
+  $("#pesan-ganti").textContent = "";
+  $("#ganti-baru").focus();
+}
+function tutupGantiSandi() {
+  sandiAwal = "";
+  $("#ganti-baru").value = $("#ganti-ulang").value = "";
+  $("#form-ganti-sandi").hidden = true;
+  $("#form-login").hidden = false;
+  $("#baris-ganti-form").hidden = $("#catatan-sandi-demo").hidden = false;
+}
+async function simpanSandiBaru(ev) {
+  ev.preventDefault();
+  const baru = $("#ganti-baru").value, pesan = $("#pesan-ganti");
+  pesan.textContent = "";
+  if (baru.length < 12) { pesan.textContent = "Sandi baru minimal 12 karakter."; $("#ganti-baru").focus(); return; }
+  if (baru !== $("#ganti-ulang").value) { pesan.textContent = "Kedua isian sandi baru tidak sama."; $("#ganti-ulang").focus(); return; }
+  await sibuk($("#tombol-ganti-sandi"), async () => {
+    try {
+      await api("/api/akun/ganti-sandi", { metode: "POST", data: { sandi_lama: sandiAwal, sandi_baru: baru } });
+      tutupGantiSandi();
+      bukaAplikasi();
+      toast("Sandi baru tersimpan. Sesi lain akun ini sudah dicabut.", "sukses");
+    } catch (e) {
+      pesan.textContent = e.message;
+    }
+  });
+}
+async function batalGantiSandi() {
+  tutupGantiSandi();
+  await coba(() => api("/api/logout", { metode: "POST" }));
+  S.token = S.akun = S.peran = null;
+  $("#pesan-login").textContent = "Sandi awal belum diganti; dasbor belum bisa dipakai.";
 }
 function bukaAplikasi() {
   $("#bagian-login").hidden = true;
@@ -1605,6 +1648,8 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#tutup-alasan").addEventListener("input", hitungAlasanTutup);
 
   $("#form-login").addEventListener("submit", masuk);
+  $("#form-ganti-sandi").addEventListener("submit", simpanSandiBaru);
+  $("#tombol-batal-ganti").addEventListener("click", batalGantiSandi);
   $("#form-daftar").addEventListener("submit", daftarAkun);
   $("#ganti-form").addEventListener("click", () => gantiForm($("#form-daftar").hidden));
   $$("input[name=daftar-peran]").forEach((r) => r.addEventListener("change", () => {

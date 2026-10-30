@@ -86,6 +86,7 @@ class Akun:
     hash_sandi: bytes
     dibuat: str = ""
     asal: str = "bawaan"      # bawaan (dari environment) | mandiri | kode_undangan | operator
+    wajib_ganti: bool = False  # True = sandi awal dari pemasang; hanya boleh mengganti sandi atau keluar
 
 
 def _muat_akun() -> dict[str, Akun]:
@@ -106,11 +107,16 @@ def _muat_akun() -> dict[str, Akun]:
         if len(sandi) < 12:
             raise RuntimeError(f"{env} minimal 12 karakter")
         garam = secrets.token_bytes(16)
-        akun[nama] = Akun(nama, peran, garam, _hash_sandi(sandi, garam))
+        # Pemasang produksi (installer/pasang.sh) menyalakan NS_WAJIB_GANTI_SANDI=1: sandi awal tertulis di berkas
+        # env server, jadi pemiliknya wajib menggantinya sebelum boleh memakai dasbor (gagasan dari LogCrunch).
+        akun[nama] = Akun(nama, peran, garam, _hash_sandi(sandi, garam),
+                          wajib_ganti=os.getenv("NS_WAJIB_GANTI_SANDI", "0") == "1")
     return akun
 
 
 AKUN = _muat_akun()
+_BAWAAN_AWAL = {n: (a.garam, a.hash_sandi, a.wajib_ganti) for n, a in AKUN.items()}
+KUNCI_BAWAAN_DIGANTI = "__sandi_bawaan_diganti__"   # bukan nama akun yang sah, jadi tidak pernah bentrok
 
 
 # --------------------------------------------------------------------------
@@ -161,6 +167,11 @@ def _simpan_akun() -> None:
     isi = {a.nama: {"peran": a.peran, "garam": a.garam.hex(), "hash": a.hash_sandi.hex(),
                     "dibuat": a.dibuat, "asal": a.asal}
            for a in AKUN.values() if a.asal != "bawaan"}
+    # Akun bawaan yang sudah mengganti sandinya: hanya garam + hash pengganti (sandi env tidak berlaku lagi).
+    diganti = {a.nama: {"garam": a.garam.hex(), "hash": a.hash_sandi.hex()}
+               for a in AKUN.values() if a.asal == "bawaan" and (a.garam, a.hash_sandi) != _BAWAAN_AWAL[a.nama][:2]}
+    if diganti:
+        isi[KUNCI_BAWAAN_DIGANTI] = diganti
     berkas.parent.mkdir(parents=True, exist_ok=True)
     sementara = berkas.with_suffix(".tmp")
     sementara.write_text(json.dumps(isi, ensure_ascii=False, indent=1), "utf-8")
@@ -175,13 +186,39 @@ def muat_akun_terdaftar(berkas: Path | None = None) -> int:
         return 0
     n = 0
     with _kunci_akun:
-        for nama, d in json.loads(berkas.read_text("utf-8")).items():
+        data = json.loads(berkas.read_text("utf-8"))
+        for nama, d in data.pop(KUNCI_BAWAAN_DIGANTI, {}).items():
+            if nama in AKUN and AKUN[nama].asal == "bawaan":
+                a = AKUN[nama]
+                a.garam, a.hash_sandi, a.wajib_ganti = bytes.fromhex(d["garam"]), bytes.fromhex(d["hash"]), False
+        for nama, d in data.items():
             if nama in AKUN or d.get("peran") not in PERAN_IZIN or not POLA_NAMA.match(nama):
                 continue
             AKUN[nama] = Akun(nama, d["peran"], bytes.fromhex(d["garam"]), bytes.fromhex(d["hash"]),
                               d.get("dibuat", ""), d.get("asal", "mandiri"))
             n += 1
     return n
+
+
+def _syarat_sandi(nama: str, sandi: str) -> None:
+    if len(sandi) < MIN_SANDI or len(sandi) > 128:
+        raise GalatAkun(422, f"Kata sandi minimal {MIN_SANDI} karakter")
+    if nama in sandi.lower():
+        raise GalatAkun(422, "Kata sandi tidak boleh memuat nama akun")
+
+
+def ganti_sandi(akun: Akun, sandi_lama: str, sandi_baru: str) -> None:
+    """Mengganti sandi akun yang sedang login. GalatAkun(403) = sandi lama salah; 422 = syarat tidak terpenuhi."""
+    if not hmac.compare_digest(_hash_sandi(sandi_lama, akun.garam), akun.hash_sandi):
+        raise GalatAkun(403, "Sandi lama salah")
+    _syarat_sandi(akun.nama, sandi_baru)
+    if hmac.compare_digest(sandi_lama.encode(), sandi_baru.encode()):
+        raise GalatAkun(422, "Sandi baru harus berbeda dari sandi lama")
+    garam = secrets.token_bytes(16)
+    hash_baru = _hash_sandi(sandi_baru, garam)
+    with _kunci_akun:
+        akun.garam, akun.hash_sandi, akun.wajib_ganti = garam, hash_baru, False
+        _simpan_akun()
 
 
 def daftarkan_akun(nama: str, sandi: str, peran: str, asal: str) -> Akun:
@@ -191,10 +228,7 @@ def daftarkan_akun(nama: str, sandi: str, peran: str, asal: str) -> Akun:
         raise GalatAkun(422, "Nama akun 3–20 karakter: huruf kecil, angka, atau garis bawah, diawali huruf")
     if peran not in PERAN_IZIN:
         raise GalatAkun(422, "Peran tidak dikenal")
-    if len(sandi) < MIN_SANDI or len(sandi) > 128:
-        raise GalatAkun(422, f"Kata sandi minimal {MIN_SANDI} karakter")
-    if nama in sandi.lower():
-        raise GalatAkun(422, "Kata sandi tidak boleh memuat nama akun")
+    _syarat_sandi(nama, sandi)
     garam = secrets.token_bytes(16)
     hash_sandi = _hash_sandi(sandi, garam)               # diaduk DI LUAR kunci: 200.000 putaran itu lambat
     with _kunci_akun:
@@ -248,6 +282,16 @@ def cabut_token(token: str) -> None:
         _sesi.pop(_hash_token(token), None)
 
 
+def cabut_sesi_lain(nama: str, token_kini: str) -> int:
+    """Setelah sandi diganti, semua sesi lain akun itu dicabut (mis. sesi yang dibuka penyusup dengan sandi lama)."""
+    kini = _hash_token(token_kini)
+    with _kunci_sesi:
+        lain = [h for h, (n, _) in _sesi.items() if n == nama and h != kini]
+        for h in lain:
+            del _sesi[h]
+    return len(lain)
+
+
 _bearer = HTTPBearer(auto_error=False)
 
 
@@ -263,10 +307,10 @@ def akun_dari_token(token: str) -> Akun | None:
     return AKUN[data[0]] if data else None
 
 
-def pengguna_saat_ini(
+def pengguna_sesi(
     kred: HTTPAuthorizationCredentials | None = Depends(_bearer),
 ) -> Akun:
-    """Satpam: setiap permintaan ke API wajib membawa token yang sah."""
+    """Token sah saja, TANPA memeriksa kewajiban ganti sandi. Hanya untuk loket ganti sandi dan keluar."""
     if kred is None or kred.scheme.lower() != "bearer":
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Perlu login",
                             headers={"WWW-Authenticate": "Bearer"})
@@ -274,6 +318,14 @@ def pengguna_saat_ini(
     if not akun:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sesi tidak sah atau kedaluwarsa",
                             headers={"WWW-Authenticate": "Bearer"})
+    return akun
+
+
+def pengguna_saat_ini(akun: Akun = Depends(pengguna_sesi)) -> Akun:
+    """Satpam: setiap permintaan ke API wajib membawa token yang sah, dan sandi awal sudah diganti."""
+    if akun.wajib_ganti:
+        raise HTTPException(status.HTTP_403_FORBIDDEN,
+                            "Wajib ganti sandi: sandi awal dari pemasang harus diganti sebelum memakai dasbor")
     return akun
 
 
@@ -332,6 +384,8 @@ def _uji_reset_akun() -> None:
     with _kunci_akun:
         for nama in [n for n, a in AKUN.items() if a.asal != "bawaan"]:
             del AKUN[nama]
+        for nama, (garam, hash_sandi, wajib) in _BAWAAN_AWAL.items():
+            AKUN[nama].garam, AKUN[nama].hash_sandi, AKUN[nama].wajib_ganti = garam, hash_sandi, wajib
     with _kunci_sesi:
         _sesi.clear()
 

@@ -65,6 +65,26 @@
           <p id="pesan-login" class="pesan galat" role="alert"></p>
         </form>
 
+        <!-- Pemasangan produksi: sandi awal dari pemasang wajib diganti sebelum dasbor terbuka -->
+        <form id="form-ganti-sandi" autocomplete="off" novalidate hidden aria-labelledby="judul-ganti-sandi">
+          <h2 id="judul-ganti-sandi" class="judul-daftar">Ganti sandi awal</h2>
+          <p class="redup">Sandi akun <b id="ganti-nama">–</b> masih sandi awal dari pemasang (tersimpan di berkas
+            konfigurasi server). Buat sandi baru yang hanya Anda ketahui sebelum memakai dasbor.</p>
+          <label class="bidang">
+            <span>Sandi baru</span>
+            <input id="ganti-baru" type="password" maxlength="128" required autocomplete="new-password"
+                   aria-describedby="petunjuk-ganti">
+            <small id="petunjuk-ganti" class="petunjuk">Minimal 12 karakter, tidak memuat nama akun, berbeda dari sandi awal</small>
+          </label>
+          <label class="bidang">
+            <span>Ulangi sandi baru</span>
+            <input id="ganti-ulang" type="password" maxlength="128" required autocomplete="new-password">
+          </label>
+          <button class="tombol utama penuh" type="submit" id="tombol-ganti-sandi">Simpan sandi baru</button>
+          <button class="tombol halus penuh" type="button" id="tombol-batal-ganti">Keluar</button>
+          <p id="pesan-ganti" class="pesan galat" role="alert"></p>
+        </form>
+
         <!-- Fase 5 (audit #7): pendaftaran akun mandiri -->
         <form id="form-daftar" autocomplete="off" novalidate hidden aria-labelledby="judul-daftar">
           <h2 id="judul-daftar" class="judul-daftar">Buat akun baru</h2>
@@ -96,8 +116,8 @@
           <button class="tombol utama penuh" type="submit" id="tombol-daftar">Buat akun</button>
           <p id="pesan-daftar" class="pesan galat" role="alert"></p>
         </form>
-        <p class="ganti-form"><button type="button" class="tautan" id="ganti-form" aria-controls="form-daftar">Belum punya akun? Buat akun</button></p>
-        <p class="catatan-kecil">Sandi demo akun bawaan tercetak di terminal saat server dinyalakan.</p>
+        <p class="ganti-form" id="baris-ganti-form"><button type="button" class="tautan" id="ganti-form" aria-controls="form-daftar">Belum punya akun? Buat akun</button></p>
+        <p class="catatan-kecil" id="catatan-sandi-demo">Sandi demo akun bawaan tercetak di terminal saat server dinyalakan.</p>
       </div>
     </section>
 

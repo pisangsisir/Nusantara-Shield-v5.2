@@ -167,3 +167,84 @@ def test_akun_tersimpan_tanpa_sandi_asli_dan_bisa_dimuat_ulang(k, tmp_path, monk
     del AKUN["awet_ok"]                                                          # = server dinyalakan ulang
     assert muat_akun_terdaftar(berkas) == 1
     assert isinstance(masuk(k, "awet_ok", SANDI), dict)
+
+
+# ---------- c. wajib ganti sandi pada login pertama (pemasangan produksi) ----------
+# Pemasang (installer/pasang.sh) membuat sandi awal acak dan menyalakan NS_WAJIB_GANTI_SANDI=1. Sandi awal itu
+# tersimpan di berkas env server, jadi akun bawaan WAJIB mengganti sandinya sebelum boleh memakai dasbor.
+SANDI_BARU = "sandi-baru-pilihan-sendiri-2026"
+
+
+def ganti(k, h, lama, baru):
+    return k.post("/api/akun/ganti-sandi", headers=h, json={"sandi_lama": lama, "sandi_baru": baru})
+
+
+def test_akun_wajib_ganti_hanya_boleh_mengganti_sandi_atau_keluar(k):
+    AKUN["operator"].wajib_ganti = True
+    r = k.post("/api/login", json={"nama": "operator", "sandi": "sandi-operator-uji-123"})
+    assert r.status_code == 200 and r.json()["wajib_ganti"] is True
+    h = {"Authorization": f"Bearer {r.json()['token']}"}
+    for jalur in ("/api/layanan", "/api/telemetri", "/api/telemetri/siaran", "/api/akun/ringkasan"):
+        r = k.get(jalur, headers=h)
+        assert r.status_code == 403 and "Wajib ganti sandi" in r.json()["detail"], jalur
+    assert k.post("/api/simulasi", headers=h, json={"layanan_id": "pajak", "skenario": "ddos"}).status_code == 403
+    assert k.post("/api/logout", headers=h).status_code == 200                  # keluar tetap boleh
+
+
+def test_ganti_sandi_membuka_dasbor_dan_sandi_lama_tidak_berlaku_lagi(k):
+    lain = operator(k)                                                          # sesi lain akun yang sama
+    AKUN["operator"].wajib_ganti = True
+    h = operator(k)
+    r = ganti(k, h, "sandi-operator-uji-123", SANDI_BARU)
+    assert r.status_code == 200 and r.json() == {"ok": True, "wajib_ganti": False}
+    assert k.get("/api/layanan", headers=h).status_code == 200                 # sesi yang sama langsung terbuka
+    assert k.get("/api/layanan", headers=lain).status_code == 401             # sesi lain dicabut
+    assert masuk(k, "operator", "sandi-operator-uji-123") == 401
+    r = k.post("/api/login", json={"nama": "operator", "sandi": SANDI_BARU})
+    assert r.status_code == 200 and r.json()["wajib_ganti"] is False
+    catatan = json.dumps(LOG.daftar(10), ensure_ascii=False)
+    assert "GANTI_SANDI" in catatan and SANDI_BARU not in catatan and "sandi-operator-uji-123" not in catatan
+
+
+@pytest.mark.parametrize("lama, baru, kode", [
+    ("sandi-salah-sekali-123", SANDI_BARU, 403),          # sandi lama salah
+    ("sandi-operator-uji-123", "pendek-11ch", 422),      # kurang dari 12 karakter
+    ("sandi-operator-uji-123", "sandi-operator-uji-123", 422),   # sama dengan sandi lama
+    ("sandi-operator-uji-123", "punya-operator-di-dalamnya", 422),  # memuat nama akun
+])
+def test_syarat_sandi_baru_ditegakkan(k, lama, baru, kode):
+    AKUN["operator"].wajib_ganti = True
+    h = operator(k)
+    assert ganti(k, h, lama, baru).status_code == kode
+    assert AKUN["operator"].wajib_ganti is True                                  # gagal = tetap terkunci
+
+
+def test_ganti_sandi_dibatasi_laju_seperti_login(k):
+    h = operator(k)
+    kode = [ganti(k, h, "tebakan-sandi-salah-1", SANDI_BARU).status_code for _ in range(7)]
+    assert 429 in kode
+
+
+def test_sandi_bawaan_yang_diganti_bertahan_setelah_server_menyala_ulang(k, tmp_path, monkeypatch):
+    berkas = tmp_path / "akun.json"
+    monkeypatch.setenv("NS_AKUN_FILE", str(berkas))
+    AKUN["operator"].wajib_ganti = True
+    assert ganti(k, operator(k), "sandi-operator-uji-123", SANDI_BARU).status_code == 200
+    isi = berkas.read_text("utf-8")
+    assert SANDI_BARU not in isi and "sandi-operator-uji-123" not in isi
+    keamanan._uji_reset_akun()                                                   # = server menyala ulang dari env
+    AKUN["operator"].wajib_ganti = True
+    assert masuk(k, "operator", SANDI_BARU) == 401
+    muat_akun_terdaftar(berkas)                                                  # hash sandi pengganti dimuat
+    assert AKUN["operator"].wajib_ganti is False and isinstance(masuk(k, "operator", SANDI_BARU), dict)
+    assert masuk(k, "operator", "sandi-operator-uji-123") == 401
+
+
+def test_bendera_lingkungan_hanya_mengunci_akun_bawaan(monkeypatch):
+    monkeypatch.setenv("NS_WAJIB_GANTI_SANDI", "1")
+    akun = keamanan._muat_akun()
+    assert akun["operator"].wajib_ganti and akun["pengamat"].wajib_ganti
+    monkeypatch.delenv("NS_WAJIB_GANTI_SANDI")
+    assert not any(a.wajib_ganti for a in keamanan._muat_akun().values())       # mode demo tidak berubah
+    terdaftar = keamanan.daftarkan_akun("tamu_baru", SANDI, "pengamat", "mandiri")
+    assert terdaftar.wajib_ganti is False

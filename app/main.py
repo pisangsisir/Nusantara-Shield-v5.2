@@ -53,7 +53,8 @@ from .data_contoh import (BATAS_JAM_BACKUP, INDEKS_BERITA, INDEKS_INDIKATOR, LOG
                           PLAYBOOK, SKENARIO, salin_layanan_awal)
 from .keamanan import (KONFIG, MIN_SANDI, SIARAN, Akun, BatasBody, GalatAkun, HeaderKeamanan, akun_dari_token,
                        batasi, buat_token, butuh_izin, cabut_token, daftarkan_akun, kode_operator_sah,
-                       pendaftaran_pengamat_terbuka, periksa_sandi, pengguna_saat_ini, ringkasan_akun)
+                       pendaftaran_pengamat_terbuka, periksa_sandi, pengguna_saat_ini, pengguna_sesi, ringkasan_akun)
+from .keamanan import cabut_sesi_lain, ganti_sandi as _ganti_sandi
 from .delta import beda
 from .siaran import HUB
 from .lapsit import buat_pdf
@@ -281,7 +282,25 @@ def login(f: LoginMasuk) -> dict:
         raise HTTPException(401, "Nama atau sandi salah")
     LOG.catat(akun.nama, "LOGIN", {"peran": akun.peran})
     return {"token": buat_token(akun), "nama": akun.nama, "peran": akun.peran,
-            "berlaku_detik": KONFIG.masa_berlaku_token_detik}
+            "berlaku_detik": KONFIG.masa_berlaku_token_detik, "wajib_ganti": akun.wajib_ganti}
+
+
+class GantiSandiMasuk(Formulir):
+    sandi_lama: str = Field(min_length=1, max_length=128)
+    sandi_baru: str = Field(min_length=1, max_length=128)
+
+
+@app.post("/api/akun/ganti-sandi", dependencies=[Depends(batasi("login"))])
+def ganti_sandi(f: GantiSandiMasuk, request: Request, akun: Akun = Depends(pengguna_sesi)) -> dict:
+    """Mengganti sandi sendiri. Wajib untuk akun bawaan pada pemasangan produksi sebelum dasbor terbuka.
+    Dibatasi laju seperti login, karena sandi lama bisa ditebak lewat loket ini."""
+    try:
+        _ganti_sandi(akun, f.sandi_lama, f.sandi_baru)
+    except GalatAkun as e:
+        raise HTTPException(e.kode, e.pesan) from None
+    dicabut = cabut_sesi_lain(akun.nama, request.headers.get("authorization", "").split(" ", 1)[-1])
+    LOG.catat(akun.nama, "GANTI_SANDI", {"sesi_lain_dicabut": dicabut})   # sandi lama maupun baru tidak dicatat
+    return {"ok": True, "wajib_ganti": False}
 
 
 # --------------------------------------------------------------------------
@@ -325,7 +344,7 @@ def ringkasan_akun_operator(akun: Akun = Depends(butuh_izin("kelola_akun"))) -> 
 
 
 @app.post("/api/logout", dependencies=[Depends(batasi("umum"))])
-def logout(request: Request, akun: Akun = Depends(pengguna_saat_ini)) -> dict:
+def logout(request: Request, akun: Akun = Depends(pengguna_sesi)) -> dict:
     token = request.headers.get("authorization", "").split(" ", 1)[-1]
     cabut_token(token)
     LOG.catat(akun.nama, "LOGOUT", {})

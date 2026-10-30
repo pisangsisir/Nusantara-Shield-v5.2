@@ -270,6 +270,7 @@ def test_pasang_berhasil_dan_hasilnya_sesuai_rancangan(paket, tmp_path):
     assert (opt / "kini" / "app" / "main.py").read_bytes() == (AKAR / "app" / "main.py").read_bytes()
     env = (root / "etc" / "nusantara-shield" / "env").read_text(encoding="utf-8")
     nilai = dict(b.split("=", 1) for b in env.splitlines() if b and not b.startswith("#"))
+    assert nilai["NS_WAJIB_GANTI_SANDI"] == "1"                              # sandi awal wajib diganti
     assert nilai["NS_MODE"] == "prod" and len(nilai["NS_AUDIT_KEY"]) == 64 and int(nilai["NS_AUDIT_KEY"], 16) >= 0
     assert len(nilai["NS_OPERATOR_PASSWORD"]) >= 12 and len(nilai["NS_VIEWER_PASSWORD"]) >= 12
     assert nilai["NS_OPERATOR_PASSWORD"] not in r.stdout + r.stderr                # sandi tidak dicetak

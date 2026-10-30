@@ -42,7 +42,8 @@ HASIL PEMASANGAN
   /usr/local/bin/ns-verifikasi-audit        verifikasi log audit tanpa server
 
 Perintah sesudahnya:
-  sudo grep _PASSWORD /etc/nusantara-shield/env     sandi awal operator dan pengamat
+  sudo grep _PASSWORD /etc/nusantara-shield/env     sandi awal operator dan pengamat (wajib diganti saat
+                                                    login pertama; sandi baru hanya tersimpan sebagai hash)
   systemctl status nusantara-shield                 status layanan
   sudo ns-verifikasi-audit --cocokkan <sidik jari>  cocokkan log audit dengan sidik jari di LAPSIT
   sudo sh pasang.sh --kembali                       kembali ke rilis sebelumnya

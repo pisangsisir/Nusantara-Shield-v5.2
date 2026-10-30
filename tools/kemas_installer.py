@@ -45,7 +45,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from kemas_luring import kebutuhan_untuk  # noqa: E402
 from kemas_rilis import AKAR, ikut  # noqa: E402
 
-VERSI_BAWAAN = "5.2.0"
+VERSI_BAWAAN = "5.2.1"
 TARGET = "ubuntu24.04-amd64"
 SKEMA = "nusantara-shield/manifest/1"
 PYTHON_TARGET = "3.12"
